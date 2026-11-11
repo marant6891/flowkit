@@ -1,5 +1,14 @@
 # Historia zmian skilla devops-incident-postmortem
 
+## 1.2 (11.11.2026)
+
+### Zgodność z Google SRE & PagerDuty Framework
+- Wprowadzono **formalne role SRE**: Incident Commander (IC), Lead Investigator (Tech Lead), Communications Lead.
+- Wdrożono **macierz kwalifikacji incydentów (Severity Matrix)**: SEV-1, SEV-2, SEV-3 oraz Near-Miss (sytuacje potencjalnie wypadkowe).
+- Wzbogacono RCA o **wieloczynnikowy łańcuch przyczyn**: Trigger, Amplifier, Detection Gap, Process/Pre-production Gap.
+- Dodano rejestr **komunikacji zewnętrznej, wpisów Status Page oraz wpływu na umowne SLA**.
+- Zaktualizowano szablon, checklistę weryfikacji i instrukcję skilla.
+
 ## 1.1 (11.11.2026)
 
 ### Rozbudowa procesu i poprawki jakościowe
@@ -19,4 +28,3 @@
 - Metryki T0–T4 (TTD, TTR).
 - Trzy typy ACT: PREVENT / DETECT / MITIGATE.
 - Szablon raportu (`templates/postmortem-template.md`).
-

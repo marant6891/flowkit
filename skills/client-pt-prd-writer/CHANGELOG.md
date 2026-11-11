@@ -1,5 +1,14 @@
 # Historia zmian skilla client-pt-prd-writer
 
+## 2.1 (11.11.2026)
+
+### Ulepszenia standardu rynkowego (QA & Dev alignment)
+- Dodano format scenariuszy akceptacyjnych **Given-When-Then (Gherkin)** w User Stories.
+- Wprowadzono sekcję **Definition of Done (DoD)** z kryteriami ukończenia zmiany.
+- Rozszerzono sekcję wyłączeń o jawne **Anty-cele (Non-Goals)** przeciw Scope Creep.
+- Dodano zasadę izolacji kontekstu z tagami XML (`<source_materials>`, `<user_template>`).
+- Zaktualizowano checklistę końcową o weryfikację DoD i Given-When-Then.
+
 ## 2.0 (10.11.2026)
 
 ### Praca na szablonie użytkownika

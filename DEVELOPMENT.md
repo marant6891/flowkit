@@ -118,3 +118,4 @@ Asystenci AI pracujący w tym repozytorium są zobowiązani do:
 1. Bezwzględnego przestrzegania reguły **No Direct Push to `main`** — proponowania zmian w formie gałęzi i PR.
 2. Uruchamiania skryptu walidacji `scripts/validate_skills.py` po dodaniu lub edycji dowolnego skilla.
 3. Zachowania spójności stylistycznej i modularnej struktury katalogów.
+

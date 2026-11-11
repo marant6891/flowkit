@@ -4,6 +4,33 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 
 ---
 
+## [1.2.0] — 2026-11-11
+
+### Rozszerzenia standardu rynkowego (Benchmark Alignment)
+
+#### `client-pt-prd-writer` v2.1
+- **Gherkin Given-When-Then**: Wprowadzono scenariusze akceptacyjne dla User Stories przygotowane pod automatyzację QA.
+- **Definition of Done (DoD)**: Dodano 5-punktową checklistę ukończenia zmiany w szablonie i instrukcji.
+- **Non-Goals (Anty-cele)**: Jawna sekcja ograniczeń zakresu przeciwko zjawisku Scope Creep.
+- **Context Boundary (XML Tags)**: Wytyczne izolacji bloków `<source_materials>` i `<user_template>`.
+
+#### `client-meeting-recap` v1.1
+- **Dwuczęściowy format (Dual Output)**:
+  - **Część A: Wewnętrzny Radar Ryzyk** (nastroje klienta, próby rozszerzenia zakresu, blokady decyzyjne — wyłącznie dla zespołu),
+  - **Część B: Oficjalny szkic e-maila** do klienta.
+- **Zasada DRI (Directly Responsible Individual)**: Wymóg przypisania konkretnego imiennego właściciela do każdego zadania.
+- **Correction Safety Net**: Klauzula bezpieczeństwa dająca klientowi 24–48h na zgłoszenie korekt.
+- **Filtr Burzy Mózgów**: Odróżnianie luźnych pomysłów od wiążących uzgodnień.
+
+#### `devops-incident-postmortem` v1.2
+- **Zgodność z Google SRE & PagerDuty**:
+  - Formalne role incydentowe: Incident Commander (IC), Tech Lead, Comms Lead.
+  - Severity Matrix: SEV-1, SEV-2, SEV-3 oraz Near-Miss (postmortem prewencyjny).
+  - Wieloczynnikowy łańcuch przyczyn: **Trigger, Amplifier, Detection Gap, Process Gap** + 5 Whys.
+  - Rejestr komunikatów zewnętrznych, historia Status Page i analiza naruszenia SLA.
+
+---
+
 ## [1.1.0] — 2026-11-11
 
 ### Dodano

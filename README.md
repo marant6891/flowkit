@@ -10,16 +10,16 @@ Repozytorium spełnia standard otwartych skilli AI oraz posiada manifest [`plugi
 
 ### 📊 Analiza biznesowa i systemowa
 
-| Skill | Opis | Ścieżka |
-|---|---|---|
-| **client-pt-prd-writer** | Przygotowuje precyzyjną dokumentację techniczną (PT) oraz specyfikacje wymagań (PRD) wyłącznie na podstawie dostarczonych materiałów, bez halucynacji. Obsługuje szablony klienta (`.docx`, `.md`). | [`skills/client-pt-prd-writer/`](skills/client-pt-prd-writer/) |
-| **client-meeting-recap** | Przekształca surowe transkrypcje spotkań (`.vtt`, `.docx`, `.txt`) w gotowe do wysłania podsumowanie e-mail do klienta (.md). Ekstrahuje decyzje, podział zadań (My vs Klient) z terminami i pytania otwarte. | [`skills/client-meeting-recap/`](skills/client-meeting-recap/) |
+| Skill | Wersja | Opis | Ścieżka |
+|---|---|---|---|
+| **client-pt-prd-writer** | `2.1` | Tworzy precyzyjną dokumentację techniczną (PT) i PRD wyłącznie na bazie materiałów źródłowych. Zawiera scenariusze akceptacyjne **Given-When-Then (Gherkin)**, **Definition of Done (DoD)**, wyłączenia **Non-Goals** oraz obsługę szablonów klienta (`.docx`, `.md`). | [`skills/client-pt-prd-writer/`](skills/client-pt-prd-writer/) |
+| **client-meeting-recap** | `1.1` | Przekształca surowe transkrypcje (`.vtt`, `.docx`, `.txt`) w 2-częściowe podsumowanie: **Część A (Wewnętrzny Radar Ryzyk / Scope Creep dla zespołu)** oraz **Część B (Oficjalny mail do klienta z zadaniami DRI i klauzulą weryfikacji 48h)**. | [`skills/client-meeting-recap/`](skills/client-meeting-recap/) |
 
 ### ⚙️ DevOps i Infrastruktura
 
-| Skill | Opis | Ścieżka |
-|---|---|---|
-| **devops-incident-postmortem** | Generuje rzetelny, bezobwiniający (blameless) raport postmortem po awarii produkcyjnej na podstawie logów i alertów. Tworzy oś czasu, analizę 5 Whys (RCA) oraz zadania korygujące (Action Items). | [`skills/devops-incident-postmortem/`](skills/devops-incident-postmortem/) |
+| Skill | Wersja | Opis | Ścieżka |
+|---|---|---|---|
+| **devops-incident-postmortem** | `1.2` | Generuje bezobwiniający raport postmortem zgodny ze standardami **Google SRE i PagerDuty**. Zawiera klasyfikację SEV-1/SEV-2, role (Incident Commander), wieloczynnikowy łańcuch przyczyn (**Trigger, Amplifier, Detection/Process Gap**, 5 Whys), rejestr Status Page oraz zadania PREVENT/DETECT/MITIGATE. | [`skills/devops-incident-postmortem/`](skills/devops-incident-postmortem/) |
 
 ### 🛠️ Szablony narzędziowe
 

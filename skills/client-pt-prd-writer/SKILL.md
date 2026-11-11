@@ -1,7 +1,7 @@
 ---
 name: client-pt-prd-writer
-version: "2.0"
-tags: [analyst, prd, pt, requirements, documentation, client, blameless]
+version: "2.1"
+tags: [analyst, prd, pt, requirements, documentation, client, blameless, gherkin, dod]
 description: >
   Tworzy profesjonalną dokumentację PT/PRD (projekt techniczny, specyfikacja
   zmiany, analiza przedwdrożeniowa) dla klienta końcowego, opisującą rzeczywiste
@@ -49,6 +49,8 @@ a nie kompletność wszystkich sekcji.
 9. Identyfikatory zawsze trzycyfrowe: `GOAL-001`, `SC-001`, `OOS-001`, `CHG-001`,
    `FR-001`, `US-001`, `NFR-001`, `INT-001`, `DATA-001`, `TEST-001`, `RISK-001`,
    `ASSUMPTION-001`, `OPEN-001`, `Q-001`, `REC-001`.
+10. **Izolacja materiałów źródłowych (Context Boundary):** Przy wprowadzaniu materiałów zaleca się wydzielenie bloków `<source_materials>...</source_materials>` oraz `<user_template>...</user_template>`. Chroni to model przed myleniem instrukcji skilla ze specyfikacją klienta.
+11. **Format User Stories (Gherkin) i DoD:** Każde User Story powinno zawierać scenariusze w formacie Given-When-Then (Gherkin), a dokument określać sprawdzalne Definition of Done (DoD).
 
 # Etap 0: Ustal szablon i format wyjściowy
 
@@ -138,11 +140,11 @@ odpowiednich sekcjach szablonu – **tylko jeśli dotyczą zmiany**:
 | Metryczka, historia zmian, materiały źródłowe | zawsze |
 | Streszczenie zarządcze | zawsze |
 | Kontekst i cel zmiany | zawsze |
-| Zakres (w zakresie / poza zakresem) | zawsze |
+| Zakres (w zakresie / poza zakresem i Non-Goals) | zawsze |
 | Proces obecny i docelowy, różnice | gdy zmienia się proces lub zachowanie |
 | Role i uprawnienia | gdy zmiana dotyka ról/uprawnień |
 | Wymagania funkcjonalne | zawsze |
-| User stories z kryteriami akceptacji | gdy są zmiany widoczne dla użytkownika |
+| User stories z kryteriami akceptacji (Given-When-Then) | gdy są zmiany widoczne dla użytkownika |
 | Wymagania niefunkcjonalne | tylko te wynikające ze źródeł |
 | Analiza wpływu na aplikację | zawsze (lub „Nie analizowano”) |
 | Architektura i diagram | gdy zmienia się architektura i jest analiza |
@@ -150,6 +152,7 @@ odpowiednich sekcjach szablonu – **tylko jeśli dotyczą zmiany**:
 | Model danych i migracje | gdy zmieniają się dane/schemat |
 | Bezpieczeństwo, RODO, audyt | gdy zmiana dotyka danych osobowych, dostępu, audytu |
 | Plan testów | zawsze |
+| Kryteria ukończenia (Definition of Done - DoD) | zawsze |
 | Wdrożenie i rollback | gdy są informacje o wdrożeniu (inaczej OPEN) |
 | Ryzyka i zależności | zawsze – tylko zidentyfikowane, ze źródłem |
 | Rekomendacje (poza wymaganiami) | opcjonalnie |

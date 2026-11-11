@@ -18,9 +18,10 @@
 - [ ] Format pliku zgodny z szablonem / prośbą; dokument otwarty i sprawdzony wizualnie.
 
 ## C. Kompletność (w granicach zakresu zmiany)
-- [ ] Cel i zakres (w / poza) są jednoznaczne.
+- [ ] Cel i zakres (w / poza zakresem i Non-Goals) są jednoznaczne.
 - [ ] Każde FR ma ID, kryterium akceptacji, źródło i status.
-- [ ] Każda US ma kryteria akceptacji.
+- [ ] Każda US ma kryteria akceptacji w formacie Given-When-Then (Gherkin).
+- [ ] Zdefiniowano listę kryteriów Definition of Done (DoD) dla zmiany.
 - [ ] Każde FR ma co najmniej jeden test.
 - [ ] Integracje i zmiany danych (jeśli są) mają opis, obsługę błędów / migrację lub OPEN.
 - [ ] Ryzyka mają działanie łagodzące i właściciela (lub DO POTWIERDZENIA).

@@ -55,11 +55,11 @@ efekt dla klienta, kluczowe ryzyka i decyzje oczekujące.]
 |---|---|---|---|
 | SC-001 | [Element] | [Opis] | SRC-001 |
 
-### 3.2 Poza zakresem
+### 3.2 Poza zakresem i Anty-cele (Non-Goals)
 
-| ID | Element | Powód wyłączenia | Źródło |
+| ID | Element wyłączony | Powód wyłączenia / Ryzyko Scope Creep | Źródło |
 |---|---|---|---|
-| OOS-001 | [Element] | [Powód] | SRC-001 |
+| OOS-001 | [Element] | [Dlaczego tego świadomie NIE robimy w tej zmianie] | SRC-001 |
 
 ## 4. Proces obecny i docelowy (warunkowa)
 
@@ -89,16 +89,25 @@ efekt dla klienta, kluczowe ryzyka i decyzje oczekujące.]
 
 ## 7. User stories (warunkowa)
 
-### US-001: [Tytuł]
+### US-001: [Tytuł User Story]
 
-**Jako** [rola]
-**chcę** [akcja]
-**aby** [korzyść].
+**Jako** [rola użytkownika]  
+**chcę** [akcja / funkcja w systemie]  
+**aby** [mierzalna korzyść biznesowa].
 
 Źródło: SRC-001 · Powiązane wymagania: FR-001
 
-**Kryteria akceptacji:**
-- [ ] [Kryterium sprawdzalne]
+**Kryteria akceptacji (Format Given-When-Then / Scenariusze Gherkin):**
+
+- **Scenariusz 1 (Ścieżka główna — Happy Path):**
+  - **Mając (Given):** [stan początkowy systemu / zalogowany użytkownik z uprawnieniem X]
+  - **Gdy (When):** [użytkownik wykonuje akcję Y z prawidłowymi danymi]
+  - **Wtedy (Then):** [system reaguje w określony sposób Z i zapisuje stan]
+
+- **Scenariusz 2 (Przypadek brzegowy / Błąd walidacji):**
+  - **Mając (Given):** [stan początkowy]
+  - **Gdy (When):** [użytkownik wprowadza nieprawidłowe dane lub przekracza limit]
+  - **Wtedy (Then):** [system wyświetla czytelny komunikat błędu i blokuje operację]
 
 ## 8. Wymagania niefunkcjonalne (warunkowa – tylko ze źródeł)
 
@@ -141,7 +150,17 @@ architektury; każdy węzeł musi występować w tekście i tabeli wpływu.]
 |---|---|---|---|
 | TEST-001 | [Scenariusz] | [Wynik] | FR-001 |
 
-## 15. Wdrożenie i rollback (warunkowa)
+## 15. Kryteria ukończenia zmiany (Definition of Done - DoD)
+
+| Lp. | Kryterium DoD | Odpowiedzialny | Status weryfikacji |
+|---|---|---|---|
+| 1 | Kod wdrożony i przeszedł Code Review | Tech Lead / Dev | [ ] |
+| 2 | Testy jednostkowe i integracyjne wykonane bez błędów | Dev / QA | [ ] |
+| 3 | Scenariusze akceptacyjne (US Given-When-Then) zweryfikowane na środowisku testowym | QA / Analityk | [ ] |
+| 4 | Dokumentacja API / techniczna zaktualizowana | Analityk / Dev | [ ] |
+| 5 | Akceptacja biznesowa (UAT / Demo) klienta uzyskana | Product Owner / Klient | [ ] |
+
+## 16. Wdrożenie i rollback (warunkowa)
 
 | Etap | Działanie | Odpowiedzialny | Warunek wejścia | Warunek wyjścia |
 |---|---|---|---|---|
@@ -149,31 +168,31 @@ architektury; każdy węzeł musi występować w tekście i tabeli wpływu.]
 
 Rollback: [Sposób wycofania – ze źródła lub OPEN.]
 
-## 16. Ryzyka i zależności
+## 17. Ryzyka i zależności
 
 | ID | Ryzyko / zależność | Wpływ | Prawdopodobieństwo | Działanie łagodzące | Właściciel | Źródło |
 |---|---|---|---|---|---|---|
 | RISK-001 | [Ryzyko] | [W/Ś/N] | [W/Ś/N] | [Działanie] | [Osoba lub DO POTWIERDZENIA] | [SRC-NNN / analiza] |
 
-## 17. Rekomendacje (opcjonalna – poza zakresem wymagań)
+## 18. Rekomendacje (opcjonalna – poza zakresem wymagań)
 
 | ID | Rekomendacja | Uzasadnienie | Wymaga decyzji |
 |---|---|---|---|
 | REC-001 | [Propozycja autora] | [Dlaczego] | Tak |
 
-## 18. Słownik pojęć (warunkowa)
+## 19. Słownik pojęć (warunkowa)
 
 | Pojęcie / skrót | Znaczenie |
 |---|---|
 | [Pojęcie] | [Wyjaśnienie] |
 
-## 19. Macierz śledzenia wymagań (warunkowa – od 3 FR)
+## 20. Macierz śledzenia wymagań (warunkowa – od 3 FR)
 
 | Wymaganie | User story | Test | Komponent | Źródło | Status |
 |---|---|---|---|---|---|
 | FR-001 | US-001 | TEST-001 | [Komponent] | SRC-001 | Otwarte / W toku / Zamknięte |
 
-## 20. Założenia i tematy do wyjaśnienia
+## 21. Założenia i tematy do wyjaśnienia
 
 ### 20.1 Założenia
 

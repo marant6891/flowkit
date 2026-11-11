@@ -16,11 +16,9 @@ Repozytorium spełnia standard otwartych skilli AI oraz posiada manifest [`plugi
 
 ### ⚙️ DevOps i Infrastruktura
 
-*(Sekcja przygotowana na kolejne skille — wkrótce: CI/CD, Kubernetes, Terraform)*
-
 | Skill | Opis | Ścieżka |
 |---|---|---|
-| *Wkrótce* | Kolejne skille będą dodawane do tej sekcji. Zgłoś pomysł w [Issues](../../issues)! | `skills/` |
+| **devops-incident-postmortem** | Generuje rzetelny, bezobwiniający (blameless) raport postmortem po awarii produkcyjnej na podstawie logów i alertów. Tworzy oś czasu, analizę 5 Whys (RCA) oraz zadania korygujące (Action Items). | [`skills/devops-incident-postmortem/`](skills/devops-incident-postmortem/) |
 
 ### 🛠️ Szablony narzędziowe
 

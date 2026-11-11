@@ -5,7 +5,7 @@
   "description": "Kolekcja sprawdzonych umiejętności (Agent Skills) dla analityków biznesowo-systemowych i inżynierów DevOps.",
   "suggestedPrompts": [
     "Napisz projekt techniczny (PT) na podstawie załączonego zgłoszenia",
-    "Przygotuj specyfikację PRD bez dopisywania niepotwierdzonych faktów",
+    "Przygotuj raport postmortem po awarii w oparciu o logi i oś czasu",
     "Przeanalizuj wymagania zmiany i stwórz listę pytań blokujących"
   ]
 }

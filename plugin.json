@@ -1,0 +1,11 @@
+{
+  "name": "flowkit",
+  "displayName": "FlowKit - Analyst & DevOps Skills",
+  "version": "1.0.0",
+  "description": "Kolekcja sprawdzonych umiejętności (Agent Skills) dla analityków biznesowo-systemowych i inżynierów DevOps.",
+  "suggestedPrompts": [
+    "Napisz projekt techniczny (PT) na podstawie załączonego zgłoszenia",
+    "Przygotuj specyfikację PRD bez dopisywania niepotwierdzonych faktów",
+    "Przeanalizuj wymagania zmiany i stwórz listę pytań blokujących"
+  ]
+}

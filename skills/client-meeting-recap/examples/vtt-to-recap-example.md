@@ -35,3 +35,4 @@ Cześć, przepraszam, przerwało mi połączenie, o czym mówimy?
 | Przygotowanie makiet głównej ścieżki na zarząd | Anna Nowak (Nasz zespół) | Środa |
 
 *(Uwaga: wtrącenie Piotra o problemach z łączem zostało całkowicie zignorowane jako szum techniczny).*
+

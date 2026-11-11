@@ -1,5 +1,7 @@
 ---
 name: client-pt-prd-writer
+version: "2.0"
+tags: [analyst, prd, pt, requirements, documentation, client, blameless]
 description: >
   Tworzy profesjonalną dokumentację PT/PRD (projekt techniczny, specyfikacja
   zmiany, analiza przedwdrożeniowa) dla klienta końcowego, opisującą rzeczywiste

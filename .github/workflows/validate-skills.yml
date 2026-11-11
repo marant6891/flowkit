@@ -23,10 +23,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyyaml
 
-      - name: Validate Skills frontmatter and structure
+      - name: Validate Skills structure and frontmatter
         run: |
           python - << 'EOF'
           import sys
+          import re
           from pathlib import Path
           import yaml
 
@@ -36,43 +37,73 @@ jobs:
               sys.exit(1)
 
           errors = []
-          for skill_path in skills_dir.iterdir():
+
+          for skill_path in sorted(skills_dir.iterdir()):
               if not skill_path.is_dir() or skill_path.name.startswith("_"):
                   continue
 
+              skill_name = skill_path.name
               skill_file = skill_path / "SKILL.md"
+
+              # 1. SKILL.md must exist
               if not skill_file.exists():
-                  errors.append(f"Missing SKILL.md in {skill_path.name}")
+                  errors.append(f"[{skill_name}] Missing SKILL.md")
                   continue
 
               content = skill_file.read_text(encoding="utf-8")
+
+              # 2. Must start with YAML frontmatter
               if not content.startswith("---"):
-                  errors.append(f"{skill_file}: SKILL.md must start with YAML frontmatter ('---')")
+                  errors.append(f"[{skill_name}] SKILL.md must start with YAML frontmatter ('---')")
                   continue
 
               parts = content.split("---", 2)
               if len(parts) < 3:
-                  errors.append(f"{skill_file}: Incomplete YAML frontmatter delimiter")
+                  errors.append(f"[{skill_name}] Incomplete YAML frontmatter delimiter")
                   continue
 
               try:
                   meta = yaml.safe_load(parts[1])
-                  if not isinstance(meta, dict):
-                      errors.append(f"{skill_file}: Frontmatter is not a valid YAML dictionary")
-                      continue
-                  if "name" not in meta or not meta["name"]:
-                      errors.append(f"{skill_file}: Missing 'name' in frontmatter")
-                  if "description" not in meta or not meta["description"]:
-                      errors.append(f"{skill_file}: Missing 'description' in frontmatter")
               except Exception as e:
-                  errors.append(f"{skill_file}: YAML parsing error: {e}")
+                  errors.append(f"[{skill_name}] YAML parsing error: {e}")
+                  continue
+
+              if not isinstance(meta, dict):
+                  errors.append(f"[{skill_name}] Frontmatter is not a valid YAML dictionary")
+                  continue
+
+              # 3. Required fields
+              if not meta.get("name"):
+                  errors.append(f"[{skill_name}] Missing 'name' in frontmatter")
+              elif meta["name"] != skill_name:
+                  errors.append(f"[{skill_name}] 'name' in frontmatter ('{meta['name']}') does not match directory name ('{skill_name}')")
+
+              if not meta.get("description"):
+                  errors.append(f"[{skill_name}] Missing 'description' in frontmatter")
+
+              if not meta.get("version"):
+                  errors.append(f"[{skill_name}] Missing 'version' in frontmatter (e.g. version: \"1.0\")")
+
+              if not meta.get("tags") or not isinstance(meta.get("tags"), list) or len(meta["tags"]) == 0:
+                  errors.append(f"[{skill_name}] Missing or empty 'tags' list in frontmatter")
+
+              # 4. templates/ directory must exist
+              if not (skill_path / "templates").is_dir():
+                  errors.append(f"[{skill_name}] Missing 'templates/' directory")
+
+              # 5. Internal links in SKILL.md must resolve
+              link_pattern = re.compile(r'\[.*?\]\(\./([^)]+)\)')
+              for match in link_pattern.finditer(parts[2]):
+                  relative = match.group(1)
+                  target = skill_path / relative
+                  if not target.exists():
+                      errors.append(f"[{skill_name}] Broken internal link in SKILL.md: ./{relative}")
 
           if errors:
-              print("\nValidation failed with errors:")
+              print(f"\nValidation failed with {len(errors)} error(s):")
               for err in errors:
                   print(f"  - {err}")
               sys.exit(1)
 
           print("All skills validated successfully!")
           EOF
-

@@ -5,9 +5,11 @@
 | **Data zdarzenia** | YYYY-MM-DD |
 | **Krytyczność (Severity)** | Sev-1 / Sev-2 / Sev-3 |
 | **Właściciel raportu** | [Imię / Rola] |
-| **Czas trwania przestoju** | [X godz. / min] |
-| **Czas do wykrycia (TTD)** | [X min] |
-| **Czas do naprawy (TTR)** | [X min] |
+| **Czas trwania przestoju** | [X godz. / min — T4 minus T0] |
+| **Czas do wykrycia (TTD)** | [X min — T1 minus T0] |
+| **Czas do naprawy (TTR)** | [X min — T4 minus T1] |
+| **MTTD (Mean Time to Detect)** | [Uzupełnij przy serii incydentów lub DO POTWIERDZENIA] |
+| **MTTR (Mean Time to Recover)** | [Uzupełnij przy serii incydentów lub DO POTWIERDZENIA] |
 | **Status raportu** | Szkic / W recenzji / Zaakceptowany |
 
 ---
@@ -53,19 +55,28 @@
 ## 5. Co zadziałało dobrze vs Co wymaga poprawy
 
 ### Co poszło dobrze:
-- Szybka reakcja dyżurnego inżyniera.
-- Skuteczny rollback wersji.
+*Na podstawie osi czasu i materiałów — konkretne zachowania i mechanizmy, które ograniczyły skutki incydentu.*
+- [Opisz konkretne działania lub mechanizmy, które zadziałały poprawnie — ze źródła]
 
 ### Gdzie pojawiły się trudności:
-- Alert pojawił się dopiero po zgłoszeniu od klientów.
-- Brak czytelnych logów błędu w klastrze produkcyjnym.
+*Luki w procesach, automatyzacji lub monitoringu, które wydłużyły TTD lub TTR.*
+- [Opisz konkretne problemy z procesu reakcji — ze źródła lub analizy osi czasu]
 
 ---
 
-## 6. Działania naprawcze (Action Items)
+## 6. Komunikacja podczas incydentu (Communication)
+
+| Czas | Kanał | Odbiorca | Treść komunikatu |
+|---|---|---|---|
+| **HH:MM** | [Slack / E-mail / Status Page] | [Klienci / Zarząd / Interesariusze] | [Treść lub link do komunikatu] |
+
+---
+
+## 7. Działania naprawcze (Action Items)
 
 | ID | Typ | Opis zadania | Priorytet | Właściciel | Ticket |
 |---|---|---|---|---|---|
 | **ACT-001** | PREVENT | Wdrożenie walidacji schematu przed zapisem konfiguracji | P1 | DevOps Team | JIRA-101 |
 | **ACT-002** | DETECT | Konfiguracja alertu na skok błędów HTTP 5xx powyżej 2% | P1 | Monitoring Team | JIRA-102 |
 | **ACT-003** | MITIGATE | Aktualizacja procedury rollbacku w runbooku | P2 | SRE | JIRA-103 |
+

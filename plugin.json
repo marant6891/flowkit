@@ -1,12 +1,14 @@
 {
   "name": "flowkit",
   "displayName": "FlowKit - Analyst & DevOps Skills",
-  "version": "1.0.0",
-  "description": "Kolekcja sprawdzonych umiejętności (Agent Skills) dla analityków biznesowo-systemowych i inżynierów DevOps.",
+  "version": "1.1.0",
+  "author": "Mariusz Antosiewicz",
+  "homepage": "https://github.com/marant6891/flowkit",
+  "description": "Kolekcja sprawdzonych umiejętności (Agent Skills) dla analityków biznesowo-systemowych i inżynierów DevOps. Skille pracują wyłącznie na dostarczonych materiałach, bez halucynacji i zmyślania faktów.",
+  "tags": ["analyst", "devops", "sre", "prd", "postmortem", "meeting-recap", "documentation", "blameless"],
   "suggestedPrompts": [
     "Napisz projekt techniczny (PT) na podstawie załączonego zgłoszenia",
     "Przygotuj podsumowanie e-mail dla klienta z załączonej transkrypcji VTT/Word",
     "Przygotuj raport postmortem po awarii w oparciu o logi i oś czasu"
   ]
 }
-

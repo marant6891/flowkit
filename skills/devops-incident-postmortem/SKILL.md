@@ -1,5 +1,7 @@
 ---
 name: devops-incident-postmortem
+version: "1.0"
+tags: [devops, sre, postmortem, rca, incident, blameless, monitoring, production]
 description: >
   Generuje profesjonalny, bezobwiniający (blameless) raport postmortem po awarii
   lub incydencie produkcyjnym w oparciu o dostarczone logi, zrzuty z monitoringu,
@@ -46,4 +48,26 @@ Uporządkuj zdarzenia chronologicznie. Każdy punkt musi zawierać:
 - **Przyczyny źródłowe (Root Causes):** Dlaczego system na to pozwolił (np. brak mechanizmu circuit breaker, brak healthchecka, brak testów obciążeniowych).
 
 ### Krok 4: Opracowanie Działań Naprawczych (Action Items)
-Każde działanie musi być konkretne, mierzalne i przypisywalne do sprintu lub zespołu.
+
+Każde działanie musi spełniać następujące warunki — jeśli któregoś brakuje, dodaj `[Do uzupełnienia]`:
+
+- **Konkretne i mierzalne:** Zamiast „Poprawić monitoring" wpisz „Dodać alert Datadog na błędy HTTP 5xx > 2% przez 5 min w usłudze X".
+- **Przypisane do właściciela:** Konkretna osoba lub zespół (np. `SRE Team`, `Jan Kowalski`), nigdy `ktoś` ani `team`.
+- **Określony termin lub sprint:** Data lub numer sprintu. Brak terminu → `[Do ustalenia na retro]`.
+- **Ticket powiązania** (jeśli system istnieje): `JIRA-NNN`, `GH-NNN`, `ADO-NNN`.
+- **Typ działania** (jeden z trzech):
+  - `PREVENT` — eliminuje przyczynę źródłową (np. walidacja schematu przed deployem),
+  - `DETECT` — skraca czas do wykrycia (nowy alert, dashboard, test syntetyczny),
+  - `MITIGATE` — skraca czas przywracania (runbook, circuit breaker, automatyczny rollback).
+
+Zasady dodatkowe:
+- Każde zidentyfikowane Root Cause musi mieć co najmniej jedno działanie PREVENT.
+- Każda luka w detekcji (T1 > 15 min od T0) musi mieć działanie DETECT.
+- Jeśli TTR był > 1h, dodaj działanie MITIGATE poprawiające procedurę przywracania.
+- Nie dodawaj działań ogólnych w stylu „Poprawić komunikację w zespole" — są nieweryfikowalne.
+- Sprawdź kompletność z [checklistą weryfikacji raportu](./checklists/postmortem-review-checklist.md).
+
+### Krok 5: Weryfikacja przed publikacją
+
+Przejdź przez [checklistę weryfikacji raportu](./checklists/postmortem-review-checklist.md) przed udostępnieniem raportu zespołowi lub interesariuszom.
+

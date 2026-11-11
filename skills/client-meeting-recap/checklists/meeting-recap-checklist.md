@@ -17,3 +17,4 @@ Przed wysłaniem e-maila do klienta zweryfikuj poniższe punkty:
 - [ ] Czy usunięto wzmianki o problemach z łączem, spóźnieniach czy nieformalnych dygresjach?
 - [ ] Czy temat wiadomości jest jednoznaczny i zawiera datę oraz nazwę projektu?
 - [ ] Czy podsumowanie jest zwięzłe i mieści się na 1–2 ekranach bez scrollowania?
+

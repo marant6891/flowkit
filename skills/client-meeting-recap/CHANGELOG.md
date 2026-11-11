@@ -13,3 +13,4 @@
 - 5-etapowy proces: oczyszczenie → decyzje → action items → redakcja → weryfikacja.
 - Reguła doboru tonu (formalny / semi-formalny) na podstawie kontekstu relacji z klientem.
 - Konwencja nazewnictwa pliku wyjściowego: `recap-YYYY-MM-DD-[skrót-projektu].md`.
+

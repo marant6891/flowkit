@@ -21,6 +21,7 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 - Rozbudowane `.github/copilot-instructions.md` z sekcjami Role, When to Activate, Core Rules.
 - `CHANGELOG.md` projektu (ten plik).
 - `CONTRIBUTING.md` z wytycznymi dla autorów nowych skilli.
+- `DEVELOPMENT.md` ze standardami inżynierskimi, strategią gałęzi Git (zasada zmian wyłącznie przez PR do `main`), konwencją Conventional Commits i polityką bezpieczeństwa.
 
 ### Zmieniono
 - `_template/SKILL.md`: dodano pola `version`, `tags`, komentarze HTML, kompletna struktura etapów.
@@ -44,3 +45,4 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 - CI workflow `validate-skills.yml` (walidacja frontmatteru YAML).
 - Szablony PR i Issues dla społeczności.
 - `.github/copilot-instructions.md` i `.github/prompts/`.
+

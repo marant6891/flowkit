@@ -2,6 +2,9 @@
 
 Dziękujemy za zainteresowanie rozwojem biblioteki FlowKit! Poniżej znajdziesz wszystko, czego potrzebujesz, aby przygotować nowego skilla i zgłosić go przez Pull Request.
 
+> [!IMPORTANT]
+> Przed rozpoczęciem pracy zapoznaj się z dokumentem [**`DEVELOPMENT.md`**](DEVELOPMENT.md), który definiuje zasady inżynierskie, konwencję commitów oraz bezwzględną regułę wprowadzania zmian wyłącznie przez Pull Request (brak bezpośrednich pushy do `main`).
+
 ---
 
 ## 1. Wymagania dla nowego skilla
@@ -97,3 +100,4 @@ Otwórz Issue używając szablonu **„Propozycja nowego skilla"** dostępnego w
 ## 5. Licencja
 
 Wnosząc wkład, zgadzasz się, że Twój kod jest udostępniany na licencji [MIT](LICENSE).
+

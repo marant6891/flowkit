@@ -67,3 +67,4 @@ Plik Word zawiera transkrypcję w tabeli lub jako ciągły tekst z nagłówkami 
 - Usuń dźwięki nieartykułowane transkrybowane jako słowa: `yyy`, `eee`, `mhm`, `okej okej`.
 - Usuń komunikaty techniczne: `[Cisza]`, `[Muzyka]`, `[Niewyraźnie]`.
 - Zachowaj pełne zdania merytoryczne nawet jeśli zawierają potoczny język — nie przeformułowuj treści, tylko ją ekstrahujesz.
+

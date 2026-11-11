@@ -92,9 +92,10 @@ Dzięki obecności manifestu [`plugin.json`](plugin.json) w głównym katalogu, 
 
 ---
 
-## 🔒 Bezpieczeństwo i licencja
+## 🔒 Bezpieczeństwo, zasady i licencja
 
 - **Dostęp**: Repozytorium jest publiczne do przeglądania i pobierania.
-- **Ochrona gałęzi `main`**: Bezpośredni push z zewnątrz jest zablokowany regułą GitHub Ruleset (`protect-main.json`). Wszelkie zmiany z zewnątrz wymagają weryfikacji w Pull Request.
+- **Zasady inżynierskie**: Wszystkie standardy pracy, konwencje commitów oraz strategię gałęzi opisuje dokument [**`DEVELOPMENT.md`**](DEVELOPMENT.md).
+- **Ochrona gałęzi `main`**: Bezpośredni push do `main` jest zablokowany regułą GitHub Ruleset (`protect-main.json`). Wszystkie zmiany (zarówno społeczności, jak i właściciela) trafiają do `main` wyłącznie przez Pull Request na gałęziach `feat/*`, `fix/*`.
 - **Ochrona danych**: Plik [`.gitignore`](.gitignore) wyklucza dane wrażliwe, sekrety, pliki `.env` oraz tymczasowe pliki edytorów.
 - **Licencja**: Kod udostępniany jest na bezpiecznej, otwartej licencji [MIT](LICENSE).

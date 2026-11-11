@@ -19,3 +19,4 @@
 - Metryki T0–T4 (TTD, TTR).
 - Trzy typy ACT: PREVENT / DETECT / MITIGATE.
 - Szablon raportu (`templates/postmortem-template.md`).
+

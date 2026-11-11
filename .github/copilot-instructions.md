@@ -21,11 +21,17 @@ Activate a skill when the user requests an output that matches the skill's `desc
 
 When activating a skill, read the full `SKILL.md` and all files referenced inside it before generating output.
 
-## Core Rules (All Skills)
+## Core Rules (All Skills & AI Agents)
 
+- **No direct push to `main`:** All changes must be developed on feature branches (`feat/*`, `fix/*`, `docs/*`) and merged into `main` exclusively through Pull Requests after CI validation passes.
 - **No hallucination:** Every fact in output must come from user-provided materials. Missing data → mark as `[Do potwierdzenia]`, `OPEN-NNN`, or `Brak danych`.
 - **User's template takes priority** over the skill's fallback template.
 - **No sensitive data in commits:** No client names, credentials, tokens, or production hostnames.
+- **Always validate before PR:** Run `python scripts/validate_skills.py` to ensure all skills meet structure and frontmatter requirements.
+
+## Detailed Engineering Guidelines
+
+See [`DEVELOPMENT.md`](../DEVELOPMENT.md) for full branch strategy, conventional commits, quality standards, and security policies.
 
 ## Contributing a New Skill
 

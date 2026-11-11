@@ -30,3 +30,4 @@ Przed publikacją raportu (Slack / Confluence / Jira) zweryfikuj poniższe punkt
 - [ ] Wpływ finansowy/operacyjny podany lub oznaczony jako `Brak danych`.
 - [ ] Sekcja komunikacji (do klientów/interesariuszy) jest wypełniona lub zaznaczono `Nie dotyczy`.
 - [ ] Usunięto hardcoded przykłady z szablonu (placeholdery w nawiasach `[...]`).
+

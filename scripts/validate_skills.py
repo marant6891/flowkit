@@ -50,3 +50,4 @@ if errors:
         print(f"  - {e}")
     sys.exit(1)
 print("All skills OK!")
+

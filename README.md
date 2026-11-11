@@ -16,8 +16,18 @@ Kolekcja sprawdzonych umiejętności (**Agent Skills**) dla narzędzi AI takich 
 
 ### 1. Claude Code
 
-#### Opcja A: Globalnie dla Twojego konta
-Skopiuj wybrany folder skilla do katalogu konfiguracyjnego Claude Code:
+#### Opcja A: Szybki skrypt instalacyjny (zalecane)
+Wystarczy uruchomić dołączony skrypt, który skopiuje wybrany skill do Twojego katalogu Claude:
+```bash
+# Windows (PowerShell)
+.\scripts\install.ps1 -SkillName client-pt-prd-writer
+
+# Linux / macOS (Bash)
+./scripts/install.sh client-pt-prd-writer
+```
+
+#### Opcja B: Ręczna instalacja globalna (dla Twojego konta)
+Skopiuj folder skilla do katalogu konfiguracyjnego Claude Code:
 ```bash
 # Linux / macOS
 mkdir -p ~/.claude/skills
@@ -28,8 +38,8 @@ New-Item -ItemType Directory -Force -Path "$HOME\.claude\skills"
 Copy-Item -Recurse -Force skills\client-pt-prd-writer "$HOME\.claude\skills\"
 ```
 
-#### Opcja B: Lokalnie w projekcie
-Umieść skill bezpośrednio w projekcie w folderze `.claude/skills/`:
+#### Opcja C: Lokalnie w projekcie
+Umieść skill bezpośrednio w repozytorium danego projektu w folderze `.claude/skills/`:
 ```bash
 mkdir -p .claude/skills
 cp -r /path/to/flowkit/skills/client-pt-prd-writer .claude/skills/

@@ -1,0 +1,77 @@
+name: Validate Skills
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml
+
+      - name: Validate Skills frontmatter and structure
+        run: |
+          python - << 'EOF'
+          import sys
+          from pathlib import Path
+          import yaml
+
+          skills_dir = Path("skills")
+          if not skills_dir.exists():
+              print("Skills directory not found!")
+              sys.exit(1)
+
+          errors = []
+          for skill_path in skills_dir.iterdir():
+              if not skill_path.is_dir() or skill_path.name.startswith("_"):
+                  continue
+
+              skill_file = skill_path / "SKILL.md"
+              if not skill_file.exists():
+                  errors.append(f"Missing SKILL.md in {skill_path.name}")
+                  continue
+
+              content = skill_file.read_text(encoding="utf-8")
+              if not content.startswith("---"):
+                  errors.append(f"{skill_file}: SKILL.md must start with YAML frontmatter ('---')")
+                  continue
+
+              parts = content.split("---", 2)
+              if len(parts) < 3:
+                  errors.append(f"{skill_file}: Incomplete YAML frontmatter delimiter")
+                  continue
+
+              try:
+                  meta = yaml.safe_load(parts[1])
+                  if not isinstance(meta, dict):
+                      errors.append(f"{skill_file}: Frontmatter is not a valid YAML dictionary")
+                      continue
+                  if "name" not in meta or not meta["name"]:
+                      errors.append(f"{skill_file}: Missing 'name' in frontmatter")
+                  if "description" not in meta or not meta["description"]:
+                      errors.append(f"{skill_file}: Missing 'description' in frontmatter")
+              except Exception as e:
+                  errors.append(f"{skill_file}: YAML parsing error: {e}")
+
+          if errors:
+              print("\nValidation failed with errors:")
+              for err in errors:
+                  print(f"  - {err}")
+              sys.exit(1)
+
+          print("All skills validated successfully!")
+          EOF

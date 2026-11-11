@@ -75,3 +75,4 @@ jobs:
 
           print("All skills validated successfully!")
           EOF
+

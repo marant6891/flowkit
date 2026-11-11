@@ -11,3 +11,4 @@ Zasady nadrzędne:
 4. Nie dopisuj funkcji, których nie ma w materiałach źródłowych.
 
 Skorzystaj z checklist i szablonów znajdujących się w katalogu `skills/client-pt-prd-writer/`.
+

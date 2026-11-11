@@ -1,0 +1,58 @@
+---
+name: client-meeting-recap
+description: >
+  Przekształca surowe transkrypcje spotkań (.vtt, .txt, .docx z MS Teams, Zoom,
+  Google Meet) lub notatki w profesjonalne, gotowe do wysłania podsumowanie
+  e-mail dla klienta w formacie Markdown (.md). Ekstrahuje kluczowe decyzje,
+  podział zadań (Action Items po stronie Zespołu i Klienta) z terminami oraz
+  tematy otwarte bez dopisywania nieustalonych faktów.
+---
+
+# Cel
+
+Przekształć surowy zapis lub transkrypcję spotkania w zwięzłe, biznesowe i profesjonalne podsumowanie e-mail w formacie Markdown (`.md`), gotowe do bezpośredniego skopiowania i wysłania do klienta.
+
+Podsumowanie musi być natychmiast czytelne dla uczestników biznesowych, eliminować szum rozmowy i precyzyjnie rozliczać odpowiedzialności.
+
+# Zasady nadrzędne (obowiązują zawsze)
+
+1. **Brak zmyślania ustaleń i terminów:** Jeżeli termin wykonania zadania lub osoba odpowiedzialna nie padły w transkrypcji, wpisz `[Do potwierdzenia]` lub `[Do ustalenia w zespole]`. Nigdy nie zgaduj terminów (np. „do piątku”), jeśli nie padły wprost z ust uczestników.
+2. **Filtracja szumu technicznego i dygresji:** Bezwzględnie usuwaj:
+   - kwestie techniczne połączenia („czy mnie słychać?”, „udostępniam ekran”),
+   - kurtuazyjne wstępy i pogawędki nieformalne,
+   - odrzucone w trakcie dyskusji pomysły (chyba że stanowią istotny kontekst decyzji odrzucającej).
+3. **Rozdział odpowiedzialności (My vs Klient):** Lista zadań (Action Items) musi być jednoznacznie podzielona na:
+   - **Po stronie Wykonawcy / Naszego Zespołu**,
+   - **Po stronie Klienta**.
+4. **Format gotowej wiadomości e-mail:** Wynik musi być kompletnym szkicem e-maila zawierającym:
+   - Proponowany temat wiadomości (Subject),
+   - Uprzejme otwarcie i podziękowanie za spotkanie,
+   - Kluczowe decyzje i ustalenia merytoryczne,
+   - Zadania i terminy w czytelnej tabeli lub liście z przypisanym właścicielem,
+   - Tematy otwarte / pytania blokujące,
+   - Informację o kolejnym kontakcie lub terminie następnego spotkania.
+5. **Szablon użytkownika ma pierwszeństwo:** Jeśli użytkownik posiada własny wzorzec notatki po spotkaniu, zastosuj jego układ. W przeciwnym razie użyj [szablonu zapasowego](./templates/client-email-recap-template.md).
+
+# Etapy pracy
+
+### Etap 1: Oczyszczenie i analiza transkrypcji (.vtt / .docx / .txt)
+- W przypadku plików `.vtt`: zignoruj znaczniki czasu (np. `00:14:22.100 --> 00:14:25.500`), identyfikatory wierszy i powtórzenia automatycznego rozpoznawania mowy.
+- W przypadku plików `.docx`: wyekstrahuj treść tekstową oraz zidentyfikuj uczestników (zwróć uwagę na role: Klient vs Zespół wdrożeniowy).
+- Zmapuj uczestników na role i organizacje:
+  - *Klient*: np. Jan Kowalski (Product Owner / Sponsor),
+  - *Nasz Zespół*: np. Anna Nowak (Analityk), Piotr Wiśniewski (DevOps).
+
+### Etap 2: Ekstrakcja ustaleń i decyzji
+Wypisz wyłącznie to, co zostało uzgodnione:
+- Co zostało zaakceptowane lub zatwierdzone?
+- Jakie zmiany w zakresie lub architekturze zostały przyjęte?
+- Jakie warianty zostały wykluczone?
+
+### Etap 3: Ekstrakcja zadań do wykonania (Action Items)
+Dla każdego zadania określ:
+- **Kto** odpowiada (konkretna osoba z imienia i nazwiska lub zespół, jeśli nie sprecyzowano),
+- **Co** dokładnie ma być dostarczone,
+- **Do kiedy** (data lub `Do potwierdzenia`).
+
+### Etap 4: Redakcja wiadomości e-mail w Markdown
+Sformatuj wynik w pliku Markdown zgodnie z [szablonem zapasowym](./templates/client-email-recap-template.md) i przejrzyj z [checklistą weryfikacji](./checklists/meeting-recap-checklist.md).

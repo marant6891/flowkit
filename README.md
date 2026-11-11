@@ -13,6 +13,7 @@ Repozytorium spełnia standard otwartych skilli AI oraz posiada manifest [`plugi
 | Skill | Opis | Ścieżka |
 |---|---|---|
 | **client-pt-prd-writer** | Przygotowuje precyzyjną dokumentację techniczną (PT) oraz specyfikacje wymagań (PRD) wyłącznie na podstawie dostarczonych materiałów, bez halucynacji. Obsługuje szablony klienta (`.docx`, `.md`). | [`skills/client-pt-prd-writer/`](skills/client-pt-prd-writer/) |
+| **client-meeting-recap** | Przekształca surowe transkrypcje spotkań (`.vtt`, `.docx`, `.txt`) w gotowe do wysłania podsumowanie e-mail do klienta (.md). Ekstrahuje decyzje, podział zadań (My vs Klient) z terminami i pytania otwarte. | [`skills/client-meeting-recap/`](skills/client-meeting-recap/) |
 
 ### ⚙️ DevOps i Infrastruktura
 

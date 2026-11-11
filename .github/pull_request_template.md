@@ -7,3 +7,4 @@
 - [ ] Kod i dokumentacja nie zawierają żadnych poufnych danych klientów, haseł ani tokenów
 - [ ] Dołączono ewentualne szablony, checklisty lub przykłady
 - [ ] Zaktualizowano tabelę w głównym `README.md`
+

@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Instaluje wybrany skill z repozytorium flowkit do katalogu Claude Code.
 .PARAMETER SkillName

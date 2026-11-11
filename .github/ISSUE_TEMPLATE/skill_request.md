@@ -17,3 +17,4 @@ assignees: ''
 
 ### Oczekiwany format wejścia i wyjścia
 <!-- Z jakich materiałów skill ma korzystać i co ma być wynikiem? -->
+

@@ -1,29 +1,39 @@
 ﻿<#
 .SYNOPSIS
-    Instaluje wybrany skill z repozytorium flowkit do katalogu Claude Code (~/.claude/skills).
+    Instaluje wybrany skill z repozytorium flowkit do katalogu Claude Code.
 .PARAMETER SkillName
     Nazwa skilla (np. client-pt-prd-writer). Jeśli nie podano, wyświetla listę dostępnych skilli.
+.PARAMETER TargetPath
+    Katalog docelowy. Domyślnie ~/.claude/skills (instalacja globalna). Można podać np. ./.claude/skills.
 .EXAMPLE
     .\scripts\install.ps1 -SkillName client-pt-prd-writer
+.EXAMPLE
+    .\scripts\install.ps1 -SkillName client-pt-prd-writer -TargetPath ./.claude/skills
 #>
 [CmdletBinding()]
 param(
-    [string]$SkillName
+    [string]$SkillName,
+    [string]$TargetPath
 )
 
 $RepoRoot = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $SkillsDir = Join-Path $RepoRoot "skills"
-$TargetDir = Join-Path $HOME ".claude\skills"
+if (-not $TargetPath) {
+    $TargetDir = Join-Path $HOME ".claude\skills"
+} else {
+    $TargetDir = (Resolve-Path -Path $TargetPath -ErrorAction SilentlyContinue)
+    if (-not $TargetDir) { $TargetDir = $TargetPath }
+}
 
 $AvailableSkills = Get-ChildItem -Path $SkillsDir -Directory | Where-Object { $_.Name -notlike "_*" } | Select-Object -ExpandProperty Name
 
 if (-not $SkillName) {
-    Write-Host "Dostepne skille w repozytorium:" -ForegroundColor Cyan
+    Write-Host "Dostępne skille w repozytorium:" -ForegroundColor Cyan
     foreach ($s in $AvailableSkills) {
         Write-Host "  - $s"
     }
     Write-Host ""
-    $SkillName = Read-Host "Podaj nazwe skilla do zainstalowania"
+    $SkillName = Read-Host "Podaj nazwę skilla do zainstalowania"
 }
 
 if (-not ($AvailableSkills -contains $SkillName)) {
@@ -34,10 +44,16 @@ if (-not ($AvailableSkills -contains $SkillName)) {
 $SourcePath = Join-Path $SkillsDir $SkillName
 $DestinationPath = Join-Path $TargetDir $SkillName
 
-if (-not (Test-Path $TargetDir)) {
-    New-Item -ItemType Directory -Force -Path $TargetDir | Out-Null
+try {
+    if (-not (Test-Path $TargetDir)) {
+        New-Item -ItemType Directory -Force -Path $TargetDir -ErrorAction Stop | Out-Null
+    }
+
+    Copy-Item -Path $SourcePath -Destination $DestinationPath -Recurse -Force -ErrorAction Stop
+    Write-Host "Pomyślnie zainstalowano skill '$SkillName' w: $DestinationPath" -ForegroundColor Green
+    Write-Host "Claude Code będzie miał teraz automatyczny dostęp do tego skilla." -ForegroundColor Gray
+} catch {
+    Write-Error "Błąd podczas instalacji: $_"
+    exit 1
 }
 
-Copy-Item -Path $SourcePath -Destination $DestinationPath -Recurse -Force
-Write-Host "Pomyslnie zainstalowano skill '$SkillName' w: $DestinationPath" -ForegroundColor Green
-Write-Host "Claude Code bedzie mial teraz automatyczny dostep do tego skilla." -ForegroundColor Gray

@@ -7,6 +7,7 @@ SKILLS_DIR="$REPO_ROOT/skills"
 TARGET_DIR="$HOME/.claude/skills"
 
 SKILL_NAME="$1"
+TARGET_DIR="${2:-$HOME/.claude/skills}"
 
 if [ -z "$SKILL_NAME" ]; then
     echo "Dostępne skille w repozytorium:"
@@ -31,3 +32,4 @@ mkdir -p "$TARGET_DIR"
 cp -r "$SOURCE_PATH" "$TARGET_DIR/"
 echo "Pomyślnie zainstalowano skill '$SKILL_NAME' w: $TARGET_DIR/$SKILL_NAME"
 echo "Claude Code ma teraz dostęp do tego skilla."
+

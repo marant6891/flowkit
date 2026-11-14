@@ -1,53 +1,132 @@
-import sys, re
+"""Walidacja struktury skilli FlowKit. Uruchom: python scripts/validate_skills.py"""
+import json
+import re
+import sys
 from pathlib import Path
+
 import yaml
 
-skills_dir = Path("skills")
+ROOT = Path(__file__).resolve().parent.parent
+SKILLS_DIR = ROOT / "skills"
+KEBAB = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+VERSION = re.compile(r"^\d+\.\d+$")
+LINK = re.compile(r"\[[^\]]*\]\(([^)\s]+)\)")
+EXTERNAL = ("http://", "https://", "mailto:", "#")
+
 errors = []
 
-for skill_path in sorted(skills_dir.iterdir()):
-    if not skill_path.is_dir() or skill_path.name.startswith("_"):
-        continue
-    skill_name = skill_path.name
+
+def has_md(directory: Path) -> bool:
+    return directory.is_dir() and any(directory.glob("*.md"))
+
+
+def check_skill(skill_path: Path, readme: str) -> None:
+    name = skill_path.name
+
+    def err(msg: str) -> None:
+        errors.append(f"[{name}] {msg}")
+
     skill_file = skill_path / "SKILL.md"
     if not skill_file.exists():
-        errors.append(f"[{skill_name}] Missing SKILL.md"); continue
+        return err("Missing SKILL.md")
     content = skill_file.read_text(encoding="utf-8")
-    if not content.startswith("---"):
-        errors.append(f"[{skill_name}] No YAML frontmatter"); continue
-    parts = content.split("---", 2)
-    if len(parts) < 3:
-        errors.append(f"[{skill_name}] Incomplete frontmatter"); continue
+    match = re.match(r"^---\r?\n(.*?)\r?\n---\r?\n(.*)$", content, re.DOTALL)
+    if not match:
+        return err("SKILL.md must start with a YAML frontmatter block delimited by '---' lines")
     try:
-        meta = yaml.safe_load(parts[1])
-    except Exception as e:
-        errors.append(f"[{skill_name}] YAML error: {e}"); continue
+        meta = yaml.safe_load(match.group(1))
+    except yaml.YAMLError as e:
+        return err(f"YAML parsing error: {e}")
     if not isinstance(meta, dict):
-        errors.append(f"[{skill_name}] Not a dict"); continue
+        return err("Frontmatter is not a YAML mapping")
+    body = match.group(2)
+
+    # Frontmatter
+    if not KEBAB.match(name):
+        err("Directory name is not kebab-case (lowercase letters, digits, hyphens)")
     if not meta.get("name"):
-        errors.append(f"[{skill_name}] Missing name")
-    elif meta["name"] != skill_name:
-        errors.append(f"[{skill_name}] name mismatch: frontmatter={meta['name']} dir={skill_name}")
+        err("Missing 'name' in frontmatter")
+    elif meta["name"] != name:
+        err(f"'name' in frontmatter ('{meta['name']}') does not match directory name")
     if not meta.get("description"):
-        errors.append(f"[{skill_name}] Missing description")
-    if not meta.get("version"):
-        errors.append(f"[{skill_name}] Missing version")
+        err("Missing 'description' in frontmatter")
+    version = meta.get("version")
+    if version is None:
+        err("Missing 'version' in frontmatter (e.g. version: \"1.0\")")
+    elif not isinstance(version, str) or not VERSION.match(version):
+        err(f"'version' must be a quoted string in X.Y format, got {version!r}")
+        version = None
     tags = meta.get("tags")
-    if not tags or not isinstance(tags, list) or len(tags) == 0:
-        errors.append(f"[{skill_name}] Missing or empty tags")
-    if not (skill_path / "templates").is_dir():
-        errors.append(f"[{skill_name}] Missing templates/")
-    link_pattern = re.compile(r"\[.*?\]\(\./([^)]+)\)")
-    for match in link_pattern.finditer(parts[2]):
-        relative = match.group(1)
-        target = skill_path / relative
+    if not isinstance(tags, list) or len(tags) < 3:
+        err("'tags' must be a list with at least 3 entries")
+
+    # Wymagana struktura
+    if not has_md(skill_path / "templates"):
+        err("'templates/' must contain at least one .md file")
+    if not has_md(skill_path / "checklists"):
+        err("'checklists/' must contain at least one .md file")
+    changelog = skill_path / "CHANGELOG.md"
+    if not changelog.exists():
+        err("Missing CHANGELOG.md")
+    elif version:
+        latest = re.search(r"^##\s+\[?(\d+\.\d+)", changelog.read_text(encoding="utf-8"), re.MULTILINE)
+        if not latest or latest.group(1) != version:
+            found = latest.group(1) if latest else "none"
+            err(f"Latest CHANGELOG.md entry ({found}) does not match frontmatter version ({version})")
+
+    # Linki względne w SKILL.md
+    for link in LINK.findall(body):
+        if link.startswith(EXTERNAL):
+            continue
+        target = skill_path / link.split("#", 1)[0]
         if not target.exists():
-            errors.append(f"[{skill_name}] Broken link: ./{relative}")
+            err(f"Broken link in SKILL.md: {link}")
 
-if errors:
-    print(f"FAIL - {len(errors)} errors:")
-    for e in errors:
-        print(f"  - {e}")
-    sys.exit(1)
-print("All skills OK!")
+    # Katalog w README
+    row = re.search(rf"^\|\s*\*\*{re.escape(name)}\*\*\s*\|\s*`([^`]+)`", readme, re.MULTILINE)
+    if not row:
+        err("Skill is not listed in the README.md catalog table")
+    elif version and row.group(1) != version:
+        err(f"README.md lists version {row.group(1)}, frontmatter has {version}")
 
+
+def check_release() -> None:
+    manifest = ROOT / ".claude-plugin" / "plugin.json"
+    if not manifest.exists():
+        errors.append("[repo] Missing .claude-plugin/plugin.json")
+        return
+    try:
+        plugin_version = json.loads(manifest.read_text(encoding="utf-8")).get("version")
+    except json.JSONDecodeError as e:
+        errors.append(f"[repo] .claude-plugin/plugin.json is not valid JSON: {e}")
+        return
+    changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    released = re.search(r"^##\s+\[(\d+\.\d+\.\d+)\]", changelog, re.MULTILINE)
+    if not released or released.group(1) != plugin_version:
+        found = released.group(1) if released else "none"
+        errors.append(
+            f"[repo] plugin.json version ({plugin_version}) does not match "
+            f"latest released CHANGELOG.md entry ({found})"
+        )
+
+
+def main() -> int:
+    if not SKILLS_DIR.is_dir():
+        print("Skills directory not found!")
+        return 1
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    for skill_path in sorted(SKILLS_DIR.iterdir()):
+        if skill_path.is_dir() and not skill_path.name.startswith("_"):
+            check_skill(skill_path, readme)
+    check_release()
+    if errors:
+        print(f"Validation failed with {len(errors)} error(s):")
+        for e in errors:
+            print(f"  - {e}")
+        return 1
+    print("All skills validated successfully!")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -38,7 +38,20 @@ Przed pisaniem utwórz mapę (wewnętrznie, pokaż użytkownikowi w Etapie 4):
   Nieznane pola: `DO POTWIERDZENIA`.
 - Nie dodawaj sekcji „na zapas” spoza szablonu.
 
-## 4. Kontrola
+## 4. Tryb końcowy bez dopisków
+
+Gdy użytkownik prosi o dokument końcowy bez dopisków (patrz SKILL.md):
+
+- Mapę sekcji prowadź jak zwykle, ale traktuj ją jako **rejestr pochodzenia**
+  oddawany poza dokumentem – do dokumentu nie trafia żadna jej część.
+- Nie dodawaj kolumny „Źródło”, przypisów o pochodzeniu ani rozdziałów spoza
+  szablonu (wiersz „(brak w szablonie)” z mapy powyżej w tym trybie nie
+  powstaje).
+- Używaj wyłącznie kolumn, numeracji i identyfikatorów przewidzianych w szablonie.
+- Pola metryczki bez danych uzgodnij z użytkownikiem przed generowaniem;
+  nie wpisuj `DO POTWIERDZENIA`.
+
+## 5. Kontrola
 
 Po wygenerowaniu otwórz dokument (dla .docx: konwersja do PDF/obrazu) i sprawdź:
 style nagłówków, numerację, tabele, brak placeholderów, spis treści (jeśli

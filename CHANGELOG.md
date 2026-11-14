@@ -4,6 +4,23 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 
 ---
 
+## [Unreleased]
+
+#### `client-pt-prd-writer` v2.2
+- **Tryb „Dokument końcowy bez dopisków”**: na życzenie użytkownika pełny dokument dokładnie w udostępnionym szablonie, bez oznaczeń źródeł i tematów otwartych; pochodzenie treści w osobnym rejestrze, luki rozstrzyga użytkownik.
+
+### Naprawiono
+- `install.ps1`: ponowna instalacja nie zagnieżdża już skilla w `<skill>\<skill>`.
+- `install.sh`: nadany bit wykonywalności; usunięte zdublowane przypisanie `TARGET_DIR`.
+- `.gitignore`: wzorce `*secret*` / `*credential*` zawężone, aby nie ignorować skilli o takich nazwach.
+
+### Zmieniono
+- Manifest przeniesiony do `.claude-plugin/plugin.json` (format Claude Code: `author` jako obiekt, `keywords`); dodany `.claude-plugin/marketplace.json`.
+- CI uruchamia `scripts/validate_skills.py` zamiast kopii inline; walidator sprawdza dodatkowo `CHANGELOG.md`, `checklists/`, format wersji, liczbę tagów, kebab-case, wszystkie linki względne oraz zgodność wersji z README i `plugin.json`.
+- Ruleset `protect-main.json`: wymagany status check `validate`, usunięty bypass administratora.
+
+---
+
 ## [1.2.0] — 2026-11-11
 
 ### Rozszerzenia standardu rynkowego (Benchmark Alignment)

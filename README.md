@@ -2,7 +2,7 @@
 
 > Uniwersalna biblioteka umiejętności (**Agent Skills**) dla **Claude Code**, **GitHub Copilot**, **OpenAI Codex / ChatGPT**, **Cursor** oraz **Antigravity**. Zoptymalizowana pod kątem automatyzacji zadań **Analityka Biznesowo-Systemowego** oraz **Inżyniera DevOps**.
 
-Repozytorium spełnia standard otwartych skilli AI oraz posiada manifest [`plugin.json`](plugin.json) kompatybilny z katalogami **Agent Marketplace**.
+Repozytorium spełnia standard otwartych skilli AI oraz posiada manifest [`.claude-plugin/plugin.json`](.claude-plugin/plugin.json) kompatybilny z katalogami **Agent Marketplace**.
 
 ---
 
@@ -12,7 +12,7 @@ Repozytorium spełnia standard otwartych skilli AI oraz posiada manifest [`plugi
 
 | Skill | Wersja | Opis | Ścieżka |
 |---|---|---|---|
-| **client-pt-prd-writer** | `2.1` | Tworzy precyzyjną dokumentację techniczną (PT) i PRD wyłącznie na bazie materiałów źródłowych. Zawiera scenariusze akceptacyjne **Given-When-Then (Gherkin)**, **Definition of Done (DoD)**, wyłączenia **Non-Goals** oraz obsługę szablonów klienta (`.docx`, `.md`). | [`skills/client-pt-prd-writer/`](skills/client-pt-prd-writer/) |
+| **client-pt-prd-writer** | `2.2` | Tworzy precyzyjną dokumentację techniczną (PT) i PRD wyłącznie na bazie materiałów źródłowych. Zawiera scenariusze akceptacyjne **Given-When-Then (Gherkin)**, **Definition of Done (DoD)**, wyłączenia **Non-Goals** oraz obsługę szablonów klienta (`.docx`, `.md`). Opcjonalny tryb **dokumentu końcowego bez dopisków** — czysty dokument w szablonie klienta. | [`skills/client-pt-prd-writer/`](skills/client-pt-prd-writer/) |
 | **client-meeting-recap** | `1.1` | Przekształca surowe transkrypcje (`.vtt`, `.docx`, `.txt`) w 2-częściowe podsumowanie: **Część A (Wewnętrzny Radar Ryzyk / Scope Creep dla zespołu)** oraz **Część B (Oficjalny mail do klienta z zadaniami DRI i klauzulą weryfikacji 48h)**. | [`skills/client-meeting-recap/`](skills/client-meeting-recap/) |
 
 ### ⚙️ DevOps i Infrastruktura
@@ -78,7 +78,15 @@ Skille mogą być wykorzystywane przez Copilota w VS Code, Visual Studio oraz Je
 
 ### 4. Agent Marketplace & Antigravity
 
-Dzięki obecności manifestu [`plugin.json`](plugin.json) w głównym katalogu, repozytorium jest traktowane jako gotowy pakiet (bundle). Może być dodane jako wtyczka i automatycznie udostępniać wszystkie zainstalowane skille asystentowi.
+Dzięki manifestom [`.claude-plugin/plugin.json`](.claude-plugin/plugin.json) i [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) repozytorium jest gotowym pakietem (bundle) udostępniającym wszystkie skille. W Claude Code:
+
+```bash
+claude plugin marketplace add marant6891/flowkit
+```
+
+```bash
+claude plugin install flowkit@flowkit
+```
 
 ---
 
@@ -96,6 +104,6 @@ Dzięki obecności manifestu [`plugin.json`](plugin.json) w głównym katalogu, 
 
 - **Dostęp**: Repozytorium jest publiczne do przeglądania i pobierania.
 - **Zasady inżynierskie**: Wszystkie standardy pracy, konwencje commitów oraz strategię gałęzi opisuje dokument [**`DEVELOPMENT.md`**](DEVELOPMENT.md).
-- **Ochrona gałęzi `main`**: Bezpośredni push do `main` jest zablokowany regułą GitHub Ruleset (`protect-main.json`). Wszystkie zmiany (zarówno społeczności, jak i właściciela) trafiają do `main` wyłącznie przez Pull Request na gałęziach `feat/*`, `fix/*`.
+- **Ochrona gałęzi `main`**: Bezpośredni push do `main` jest zablokowany regułą GitHub Ruleset ([`protect-main.json`](.github/rulesets/protect-main.json) — wymaga zaimportowania w *Settings → Rules → Rulesets*), która wymaga też zielonego wyniku CI (`validate`). Wszystkie zmiany (zarówno społeczności, jak i właściciela) trafiają do `main` wyłącznie przez Pull Request na gałęziach `feat/*`, `fix/*`.
 - **Ochrona danych**: Plik [`.gitignore`](.gitignore) wyklucza dane wrażliwe, sekrety, pliki `.env` oraz tymczasowe pliki edytorów.
 - **Licencja**: Kod udostępniany jest na bezpiecznej, otwartej licencji [MIT](LICENSE).

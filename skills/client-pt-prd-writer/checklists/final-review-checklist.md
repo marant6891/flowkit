@@ -36,3 +36,12 @@
 - [ ] Dokument zrozumiały dla osoby nietechnicznej; skróty w słowniku.
 - [ ] Wskazano, kto musi podjąć jakie decyzje.
 - [ ] Długość adekwatna do wielkości zmiany – brak treści „na wypełnienie”.
+
+## F. Tryb „Dokument końcowy bez dopisków” (tylko gdy użytkownik o niego poprosił)
+- [ ] Użytkownik wprost poprosił o wersję bez dopisków; tryb nie został włączony domyślnie.
+- [ ] Dokument ma dokładnie strukturę udostępnionego szablonu – żadnych sekcji dodanych przez skill (Materiały źródłowe, Założenia, Tematy do wyjaśnienia, Rekomendacje), o ile szablon ich nie przewiduje.
+- [ ] Wyszukiwanie w dokumencie nie znajduje: `SRC-`, `ŹRÓDŁO:`, `ASSUMPTION-`, `OPEN-`, `Q-`, `REC-`, `DO POTWIERDZENIA`, „Nie analizowano”, „Brak danych”, kolumn „Źródło” spoza szablonu, placeholderów `[...]` ani komentarzy.
+- [ ] Każda luka (OPEN) i każde założenie (ASSUMPTION) zostały przed generowaniem rozstrzygnięte decyzją użytkownika: uzupełnione / zatwierdzone / pominięte / zapisane neutralnym sformułowaniem.
+- [ ] Żadna luka nie została wypełniona treścią spoza źródeł – test pochodzenia (sekcja A) wykonano na rejestrze pochodzenia.
+- [ ] Rejestr pochodzenia przekazano użytkownikowi poza dokumentem (osobny plik lub odpowiedź) wraz z listą miejsc o neutralnym sformułowaniu.
+- [ ] Status dokumentu w metryczce jest taki, jaki wskazał użytkownik.

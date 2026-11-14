@@ -70,7 +70,7 @@ cp -r skills/_template skills/moj-nowy-skill
 # 4. Dodaj szablony, checklists i przykłady
 # 5. Dopisz skill do tabeli w README.md (odpowiednia kategoria)
 # 6. Uruchom lokalną walidację
-python scripts/validate_skills.py  # (jeśli dostępny) lub sprawdź ręcznie
+python scripts/validate_skills.py
 
 # 7. Zatwierdź zmiany i otwórz PR
 git add skills/moj-nowy-skill README.md

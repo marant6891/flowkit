@@ -1,5 +1,12 @@
 # Historia zmian skilla client-pt-prd-writer
 
+## 2.2 (14.11.2026)
+
+### Tryb „Dokument końcowy bez dopisków”
+- Nowy, opcjonalny tryb wyniku (na wyraźną prośbę użytkownika): pełny dokument dokładnie w udostępnionym szablonie, bez oznaczeń SRC / ASSUMPTION / OPEN / DO POTWIERDZENIA, kolumn „Źródło” i sekcji dodawanych przez skill.
+- Zasada „brak źródła = brak treści” bez zmian: pochodzenie prowadzone w rejestrze pochodzenia poza dokumentem; luki rozstrzyga użytkownik (uzupełnienie / zatwierdzenie / pominięcie / neutralne sformułowanie).
+- Etap 0: wybór trybu wyniku; nowa sekcja F w checkliście końcowej; uzupełnione `references/template-mapping.md` i prompt Copilota.
+
 ## 2.1 (11.11.2026)
 
 ### Ulepszenia standardu rynkowego (QA & Dev alignment)

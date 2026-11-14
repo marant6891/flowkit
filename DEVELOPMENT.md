@@ -105,7 +105,7 @@ Do repozytorium **nigdy nie mogą trafić**:
 
 - Repozytorium jako całość podlega wersjonowaniu semantycznemu (**SemVer**): `MAJOR.MINOR.PATCH`.
 - Każde wydanie nowej wersji wymaga:
-  1. Aktualizacji pola `version` w [`plugin.json`](plugin.json).
+  1. Aktualizacji pola `version` w [`.claude-plugin/plugin.json`](.claude-plugin/plugin.json).
   2. Uzupełnienia wpisu w głównym [`CHANGELOG.md`](CHANGELOG.md).
   3. Nadania taga Git (np. `v1.1.0`).
 - Każdy pojedynczy skill posiada także własną historię zmian w `skills/<nazwa>/CHANGELOG.md`.

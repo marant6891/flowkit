@@ -9,6 +9,7 @@ Zasady nadrzędne:
 2. Każdy wpis musi mieć oznaczenie pochodzenia: `SRC-NNN`, `ASSUMPTION-NNN` lub `OPEN-NNN`.
 3. Szablon użytkownika ma pierwszeństwo nad szablonem domyślnym.
 4. Nie dopisuj funkcji, których nie ma w materiałach źródłowych.
+5. Gdy użytkownik wprost prosi o wersję końcową bez dopisków, zastosuj tryb „Dokument końcowy bez dopisków” ze `SKILL.md`: dokument dokładnie w udostępnionym szablonie, bez oznaczeń z pkt 1–2, a luki rozstrzyga użytkownik przed generowaniem (pochodzenie treści oddaj poza dokumentem).
 
 Skorzystaj z checklist i szablonów znajdujących się w katalogu `skills/client-pt-prd-writer/`.
 

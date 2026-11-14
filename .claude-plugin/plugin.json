@@ -1,0 +1,35 @@
+{
+  "name": "flowkit",
+  "displayName": "FlowKit - Analyst & DevOps Skills",
+  "version": "1.2.0",
+  "description": "Kolekcja profesjonalnych umiejętności (Agent Skills) dla analityków biznesowo-systemowych i inżynierów DevOps zgodna ze standardami Anthropic, Atlassian, Google SRE i PagerDuty. Zero halucynacji, ścisłe śledzenie źródeł.",
+  "author": {
+    "name": "Mariusz Antosiewicz",
+    "url": "https://github.com/marant6891"
+  },
+  "homepage": "https://github.com/marant6891/flowkit",
+  "repository": "https://github.com/marant6891/flowkit",
+  "license": "MIT",
+  "keywords": [
+    "analyst",
+    "devops",
+    "sre",
+    "prd",
+    "pt",
+    "gherkin",
+    "dod",
+    "postmortem",
+    "pagerduty",
+    "google-sre",
+    "meeting-recap",
+    "risk-radar",
+    "blameless"
+  ],
+  "metadata": {
+    "suggestedPrompts": [
+      "Napisz projekt techniczny (PT) z kryteriami Given-When-Then i Definition of Done",
+      "Przygotuj podsumowanie e-mail dla klienta z Wewnętrznym Radarem Ryzyk z transkrypcji VTT",
+      "Przygotuj raport postmortem SRE (SEV-1/SEV-2) z osią czasu, łańcuchem przyczyn i zadaniami ACT"
+    ]
+  }
+}

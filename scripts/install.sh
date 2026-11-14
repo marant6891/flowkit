@@ -4,7 +4,6 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 SKILLS_DIR="$REPO_ROOT/skills"
-TARGET_DIR="$HOME/.claude/skills"
 
 SKILL_NAME="$1"
 TARGET_DIR="${2:-$HOME/.claude/skills}"

@@ -1,5 +1,15 @@
 # Historia zmian skilla client-meeting-recap
 
+## 1.2 (14.11.2026)
+
+### Rzetelność i bezpieczeństwo wysyłki
+- Część A i Część B zapisywane w **osobnych plikach** (`-wewnetrzne.md`, `-klient.md`), aby notatka wewnętrzna nie trafiła przypadkiem do klienta.
+- Radar Ryzyk wymaga **dowodu** dla każdej obserwacji (cytat, mówca, znacznik czasu); oceny nastroju oznaczane jako `Interpretacja:`.
+- Szablon użytkownika ma pierwszeństwo; pytanie o szablon w Etapie 1.
+- Jedno oznaczenie braków: `DO POTWIERDZENIA` (zamiast `[Do potwierdzenia]` / `[Do wskazania przez klienta]`); okno korekt ujednolicone do 48 godzin.
+- Przykład przepisany: poprawny format VTT MS Teams, obie części, daty i braki zgodne z zasadami skilla.
+- `description` uzupełniony o frazę aktywacji „Użyj, gdy…”.
+
 ## 1.1 (11.11.2026)
 
 ### Standard rynkowy (Chief of Staff & Client Success Alignment)

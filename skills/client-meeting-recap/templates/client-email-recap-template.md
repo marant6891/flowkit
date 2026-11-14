@@ -1,50 +1,52 @@
-# Podsumowanie spotkania: [Nazwa Projektu / Temat] (DD.MM.YYYY)
-
-<!-- 
-  Dokument wyjściowy składa się z dwóch niezależnych części:
-  - CZĘŚĆ A: Notatka wewnętrzna dla zespołu (Risk Radar) — NIE wysyłać klientowi!
-  - CZĘŚĆ B: Oficjalny szkic e-maila do skopiowania i wysłania do klienta.
+<!--
+  Szablon ZAPASOWY. Używaj go tylko, gdy użytkownik nie dostarczył własnego wzoru.
+  Wynik to DWA OSOBNE PLIKI:
+  - PLIK 1 (Część A): recap-YYYY-MM-DD-[skrót-projektu]-wewnetrzne.md — NIE wysyłać klientowi!
+  - PLIK 2 (Część B): recap-YYYY-MM-DD-[skrót-projektu]-klient.md — szkic e-maila do klienta.
+  Wszystko w nawiasach [...] to placeholder; brak danych oznacz `DO POTWIERDZENIA`.
+  Usuń komentarze i placeholdery przed oddaniem.
 -->
 
----
+<!-- ===================== PLIK 1: CZĘŚĆ A ===================== -->
 
-## CZĘŚĆ A: Notatka wewnętrzna i Radar Ryzyk (Tylko dla Zespołu)
+# Notatka wewnętrzna i Radar Ryzyk: [Nazwa Projektu / Temat] (DD.MM.YYYY)
 
 > [!WARNING]
-> Ta sekcja jest poufna i przeznaczona wyłącznie do użytku wewnętrznego naszego zespołu.
+> Dokument poufny, wyłącznie do użytku wewnętrznego naszego zespołu. Nie przesyłać klientowi.
 
-### 1. Radar nastrojów i ryzyk projektowych
-- **Nastroje klienta / dynamika rozmowy:** [np. Zadowolenie z postępów / Zniecierpliwienie opóźnieniem modułu X / Presja na termin zarządu]
-- **Próby rozszerzenia zakresu (Scope Creep alert):** [Wszelkie pomysły klienta wykraczające poza obecny kontrakt — odnotowane, aby pilnować budżetu i terminów]
-- **Zależności i potencjalne wąskie gardła:** [np. Klient ma problem z uzyskaniem zgody od działu bezpieczeństwa na dostęp do bazy]
+## 1. Radar nastrojów i ryzyk projektowych
 
-### 2. Kluczowe punkty uwagi dla PM / Account / Analityka
-- [Kwestia wymagająca wewnętrznego przedyskutowania przed kolejnym spotkaniem]
+Każdy wpis: obserwacja + dowód (cytat, mówca, znacznik czasu). Bez dowodu nie ma wpisu.
 
----
+| Obszar | Dowód z transkrypcji (cytat, mówca, czas) | Interpretacja |
+|---|---|---|
+| Nastroje klienta / dynamika rozmowy | [„cytat” — Imię i Nazwisko, HH:MM:SS] | [Interpretacja: …] |
+| Próby rozszerzenia zakresu (Scope Creep) | [„cytat” — Imię i Nazwisko, HH:MM:SS] | [Interpretacja: …] |
+| Zależności i wąskie gardła | [„cytat” — Imię i Nazwisko, HH:MM:SS] | [Interpretacja: …] |
 
-## CZĘŚĆ B: Oficjalny szkic wiadomości e-mail do klienta
+[Obszar bez obserwacji: „Brak obserwacji w transkrypcji”.]
 
-<!-- Instrukcja: Poniższą treść skopiuj i wklej do wiadomości e-mail po usunięciu placeholderów. -->
+## 2. Kluczowe punkty uwagi dla PM / Account / Analityka
+
+- [Kwestia wymagająca wewnętrznego przedyskutowania przed kolejnym spotkaniem — z odwołaniem do wpisu z Radaru]
+
+<!-- ===================== PLIK 2: CZĘŚĆ B ===================== -->
 
 **Temat:** [Podsumowanie spotkania] [Nazwa Projektu] — Ustalenia i kolejne kroki (DD.MM.YYYY)
 
 ---
 
-[Formalnie: Szanowni Państwo / Dzień dobry Panie/Pani {Nazwisko}] /  
-[Semi-formalnie: Cześć {Imię} / Dzień dobry {Imię}],
+[Wybierz jedno powitanie zgodnie z tonem relacji — formalne: „Szanowni Państwo,” / semi-formalne: „Dzień dobry {Imię},”]
 
 dziękuję za dzisiejsze spotkanie dotyczące **[Temat spotkania / Nazwa Projektu]**.
 
-Poniżej przesyłam zwięzłe podsumowanie naszych kluczowych ustaleń oraz listę kolejnych kroków z podziałem na odpowiedzialności (DRI).
+Poniżej przesyłam zwięzłe podsumowanie naszych kluczowych ustaleń oraz listę kolejnych kroków z podziałem na odpowiedzialności.
 
 ---
 
 ### 1. Kluczowe decyzje i ustalenia merytoryczne
 
-- **[Obszar / Temat 1]:** [Opis decyzji podjętej na spotkaniu i co z niej wynika].
-- **[Obszar / Temat 2]:** [Opis ustaleń odnośnie zakresu prac lub architektury].
-- **[Obszar / Temat 3]:** [Wykluczone warianty lub odroczone funkcjonalności].
+- **[Obszar / Temat]:** [Decyzja potwierdzona przez obie strony i co z niej wynika].
 
 ---
 
@@ -52,32 +54,31 @@ Poniżej przesyłam zwięzłe podsumowanie naszych kluczowych ustaleń oraz list
 
 #### Po stronie naszego zespołu:
 
-| Zadanie | Osoba odpowiedzialna (DRI) | Termin realizacji |
+| Zadanie | Osoba odpowiedzialna | Termin realizacji |
 |---|---|---|
-| [Opis zadania] | [Imię i Nazwisko] | [DD.MM.YYYY] |
-| [Opis zadania] | [Imię i Nazwisko] | [DD.MM.YYYY] |
+| [Opis zadania] | [Imię i Nazwisko lub DO POTWIERDZENIA] | [DD.MM.YYYY lub DO POTWIERDZENIA] |
 
 #### Po stronie Klienta:
 
-| Zadanie | Osoba odpowiedzialna (DRI) | Termin realizacji |
+| Zadanie | Osoba odpowiedzialna | Termin realizacji |
 |---|---|---|
-| [Opis zadania, np. dostarczenie specyfikacji/dostępu] | [Imię i Nazwisko Klienta lub "Do wskazania"] | [DD.MM.YYYY lub Do potwierdzenia] |
-| [Opis zadania] | [Imię i Nazwisko Klienta] | [DD.MM.YYYY] |
+| [Opis zadania] | [Imię i Nazwisko lub DO POTWIERDZENIA] | [DD.MM.YYYY lub DO POTWIERDZENIA] |
 
 ---
 
 ### 3. Tematy otwarte i pytania blokujące
 
 *Kwestie, które wymagają dodatkowych konsultacji lub decyzji:*
-1. **[Temat 1]:** [Opis wątpliwości i kto musi podjąć decyzję].
-2. **[Temat 2]:** [Brakujące dane lub decyzje biznesowe].
+1. **[Temat]:** [Opis wątpliwości i kto musi podjąć decyzję — lub DO POTWIERDZENIA].
+
+[Jeśli brak: „Brak tematów otwartych.”]
 
 ---
 
-### 4. Następne kroki i klauzula weryfikacji ustaleń
+### 4. Następne kroki i weryfikacja ustaleń
 
-- **Kolejne spotkanie:** [Planowane na: DD.MM.YYYY, godz. HH:MM — zaproszenie wyślemy w osobnym mailu].
-- **Weryfikacja ustaleń (Correction Safety Net):** *Gdyby którykolwiek z powyższych punktów różnił się od Państwa notatek lub wymagał doprecyzowania, uprzejmie proszę o informację zwrotną w ciągu 24–48 godzin.*
+- **Kolejne spotkanie:** [DD.MM.YYYY, godz. HH:MM — tylko jeśli padło na spotkaniu; inaczej DO POTWIERDZENIA].
+- **Weryfikacja ustaleń:** *Gdyby którykolwiek z powyższych punktów różnił się od Państwa notatek lub wymagał doprecyzowania, uprzejmie proszę o informację zwrotną w ciągu 48 godzin.*
 
 Pozdrawiam serdecznie,  
 **[Twoje Imię i Nazwisko]**  

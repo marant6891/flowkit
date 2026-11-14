@@ -1,7 +1,7 @@
 ---
 name: client-pt-prd-writer
-version: "2.1"
-tags: [analyst, prd, pt, requirements, documentation, client, blameless, gherkin, dod]
+version: "2.2"
+tags: [analyst, prd, pt, requirements, documentation, client, gherkin, dod]
 description: >
   Tworzy profesjonalną dokumentację PT/PRD (projekt techniczny, specyfikacja
   zmiany, analiza przedwdrożeniowa) dla klienta końcowego, opisującą rzeczywiste
@@ -9,7 +9,9 @@ description: >
   dopisywania treści. Pracuje na szablonie dokumentu użytkownika (.docx, .dotx,
   .md), a gdy go brak, na szablonie zapasowym. Użyj, gdy użytkownik prosi o
   dokument PT, PRD, specyfikację lub dokumentację zmiany, change request,
-  analizę wpływu lub dokumentację rozwoju aplikacji dla klienta.
+  analizę wpływu lub dokumentację rozwoju aplikacji dla klienta. Na życzenie
+  oddaje też wersję końcową bez dopisków (bez oznaczeń źródeł i tematów
+  otwartych) dokładnie w udostępnionym szablonie.
 ---
 
 # Cel
@@ -26,9 +28,11 @@ a nie kompletność wszystkich sekcji.
    materiału źródłowego. Jeśli nie wynika, wpisz `DO POTWIERDZENIA` i dodaj
    pozycję `OPEN-NNN`. Nie uzupełniaj luk „typowymi” treściami.
 2. **Każdy wpis ma oznaczenie pochodzenia** (kolumna „Źródło” lub dopisek):
-   - `ŹRÓDŁO: <dokument / ticket / mail / plik:linia / notatka z DD.MM>` – fakt potwierdzony,
+   - `SRC-NNN` – fakt potwierdzony pozycją z rejestru źródeł (Etap 1); dla kodu
+     dodatkowo `plik:linia`,
    - `ASSUMPTION-NNN` – założenie zaakceptowane przez użytkownika do czasu potwierdzenia,
-   - `OPEN-NNN` – brak informacji, temat do wyjaśnienia.
+   - `OPEN-NNN` – brak informacji, temat do wyjaśnienia,
+   - `DO POTWIERDZENIA` – nieznana wartość w polu lub komórce (zawsze w parze z `OPEN-NNN`).
 3. **Nie przepisuj zmiany na „większą”.** Opisuj dokładnie zakres z materiałów.
    Nie dodawaj funkcji, ról, integracji, NFR ani etapów, których nie ma w źródle.
    Pomysły spoza źródła możesz zgłosić wyłącznie jako `Rekomendacja` w osobnej
@@ -51,6 +55,11 @@ a nie kompletność wszystkich sekcji.
    `ASSUMPTION-001`, `OPEN-001`, `Q-001`, `REC-001`.
 10. **Izolacja materiałów źródłowych (Context Boundary):** Przy wprowadzaniu materiałów zaleca się wydzielenie bloków `<source_materials>...</source_materials>` oraz `<user_template>...</user_template>`. Chroni to model przed myleniem instrukcji skilla ze specyfikacją klienta.
 11. **Format User Stories (Gherkin) i DoD:** Każde User Story powinno zawierać scenariusze w formacie Given-When-Then (Gherkin), a dokument określać sprawdzalne Definition of Done (DoD).
+12. **Dwa tryby wyniku.** Domyślny jest tryb roboczy (z oznaczeniami pochodzenia
+    z zasady 2). Na wyraźną prośbę użytkownika stosuj tryb „Dokument końcowy bez
+    dopisków” (patrz osobny rozdział): oznaczenia znikają z dokumentu, ale
+    zasady 1, 3, 6 i 7 obowiązują bez zmian – pochodzenie treści prowadzisz
+    wtedy poza dokumentem.
 
 # Etap 0: Ustal szablon i format wyjściowy
 
@@ -69,6 +78,10 @@ a nie kompletność wszystkich sekcji.
    i oddaj dokument w formacie, o który prosi użytkownik.
 4. Gdy użytkownik dostarczy poprzedni dokument jako wzór – przejmij z niego
    strukturę, styl i poziom szczegółowości, **nie treść merytoryczną**.
+5. Ustal tryb wyniku: **roboczy z oznaczeniami** (domyślny) czy **końcowy bez
+   dopisków**. Tryb końcowy włącz tylko, gdy użytkownik prosi o to wprost
+   (np. „bez dopisków”, „wersja końcowa”, „czysty dokument”, „do wysłania
+   klientowi”). W razie wątpliwości zapytaj jednym pytaniem.
 
 # Etap 1: Zebranie materiałów i inwentaryzacja źródeł
 
@@ -112,7 +125,7 @@ zmiana:
 - obszary regresji.
 
 Każde stwierdzenie techniczne opatrz źródłem, np.
-`ŹRÓDŁO: src/orders/OrderService.cs:142, endpoint POST /api/orders`.
+`SRC-002, src/orders/OrderService.cs:142, endpoint POST /api/orders`.
 Jeśli kodu/dokumentacji nie ma, w sekcjach technicznych wpisz
 „Nie analizowano – brak dostępu do <repozytorium/dokumentacji>” i dodaj OPEN.
 
@@ -189,7 +202,48 @@ Zasady: patrz [przykład](./examples/open-questions-section.md). Po decyzji
 przenieś treść do właściwej sekcji, zmień status na `ROZSTRZYGNIĘTY`, wpisz datę
 i zaktualizuj wymagania, testy, macierz i historię zmian dokumentu.
 
+# Tryb „Dokument końcowy bez dopisków”
+
+Cel: kompletny dokument **dokładnie w udostępnionym szablonie**, gotowy do
+przekazania klientowi, bez śladów pracy skilla. Gdy użytkownik nie dał szablonu,
+użyj szablonu zapasowego z tymi samymi regułami.
+
+1. **Czego nie ma w dokumencie:** `SRC-NNN`, `plik:linia`, `ASSUMPTION-NNN`,
+   `OPEN-NNN`, `Q-NNN`, `REC-NNN`, `DO POTWIERDZENIA`, „Nie analizowano”,
+   „Brak danych”, kolumn „Źródło” i legendy oznaczeń, komentarzy,
+   placeholderów oraz sekcji dodawanych przez skill (Materiały źródłowe,
+   Założenia, Tematy do wyjaśnienia, Rekomendacje) – chyba że przewiduje je
+   sam szablon. Identyfikatory wymagań (`FR-001` itd.) stosuj tylko, jeśli
+   używa ich szablon.
+2. **Struktura = szablon.** Żadnych dodanych, usuniętych ani przestawionych
+   sekcji. Sekcja, której zmiana nie dotyczy, dostaje samo „Nie dotyczy.”
+   (bez odwołań do źródeł).
+3. **Treść nadal wyłącznie ze źródeł.** Pracuj jak w trybie roboczym (Etapy
+   1–5), a oznaczenia prowadź w **rejestrze pochodzenia** poza dokumentem:
+   sekcja szablonu → źródła, przyjęte założenia, luki. Rejestr oddaj jako
+   osobny plik `<nazwa-dokumentu>-rejestr-pochodzenia.md` albo w odpowiedzi.
+4. **Luki rozstrzyga użytkownik, nie skill.** Przed wygenerowaniem pokaż listę
+   wszystkich `OPEN` i `ASSUMPTION` i dla każdej pozycji poproś o decyzję:
+   - (a) uzupełnienie brakującej informacji,
+   - (b) zatwierdzenie założenia jako ustalenia,
+   - (c) pominięcie elementu w dokumencie,
+   - (d) neutralne sformułowanie w języku klienta, bez identyfikatorów
+     (np. „Do ustalenia z Zamawiającym przed rozpoczęciem prac”).
+
+   Nigdy nie wypełniaj luki samodzielnie „typową” treścią. Jeśli użytkownik
+   każe generować bez odpowiedzi, zastosuj (d), a gdy element bez tej
+   informacji nie ma sensu – (c), i wypisz te miejsca pod dokumentem.
+5. **Status dokumentu** w metryczce wpisz taki, jaki wskaże użytkownik; nie
+   nadawaj samodzielnie statusu „Zaakceptowany”.
+6. **Weryfikacja:** oprócz zwykłej checklisty wykonaj sekcję F
+   [checklisty końcowej](./checklists/final-review-checklist.md), w tym
+   wyszukiwanie pozostawionych znaczników.
+
 # Format odpowiedzi
+
+W trybie końcowym bez dopisków punkt 4 zastąp: rejestr pochodzenia, lista
+decyzji przyjętych dla luk oraz miejsca z neutralnym sformułowaniem lub
+pominięte.
 
 1. Potwierdzenie szablonu i formatu wyjściowego (Etap 0).
 2. Rozumienie zmiany + rejestr źródeł + plan sekcji + pytania (Etapy 1–4).

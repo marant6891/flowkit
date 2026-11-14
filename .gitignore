@@ -20,8 +20,9 @@ desktop.ini
 *.key
 *.cert
 *.token
-*secret*
-*credential*
+*.secret
+secrets.*
+credentials.*
 id_rsa*
 
 # Logs & Runtime

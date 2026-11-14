@@ -51,7 +51,7 @@ Skill musi zawierać:
 
 ### Zasada rzetelności (obowiązkowa we wszystkich skillach)
 
-Każdy skill w FlowKit działa na zasadzie **„brak źródła = brak treści"**. Skill nigdy nie może zmyślać faktów, terminów, właścicieli ani wymagań. Brak danych oznacza się jako `[Do potwierdzenia]`, `OPEN-NNN` lub `Brak danych`.
+Każdy skill w FlowKit działa na zasadzie **„brak źródła = brak treści"**. Skill nigdy nie może zmyślać faktów, terminów, właścicieli ani wymagań. Brak danych oznacza się jako `DO POTWIERDZENIA` (w skillach z rejestrem tematów także `OPEN-NNN`) lub `Brak danych`.
 
 ---
 
@@ -70,7 +70,7 @@ cp -r skills/_template skills/moj-nowy-skill
 # 4. Dodaj szablony, checklists i przykłady
 # 5. Dopisz skill do tabeli w README.md (odpowiednia kategoria)
 # 6. Uruchom lokalną walidację
-python scripts/validate_skills.py  # (jeśli dostępny) lub sprawdź ręcznie
+python scripts/validate_skills.py
 
 # 7. Zatwierdź zmiany i otwórz PR
 git add skills/moj-nowy-skill README.md

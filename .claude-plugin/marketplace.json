@@ -1,0 +1,14 @@
+{
+  "name": "flowkit",
+  "description": "Agent Skills dla analityków biznesowo-systemowych i inżynierów DevOps",
+  "owner": {
+    "name": "Mariusz Antosiewicz"
+  },
+  "plugins": [
+    {
+      "name": "flowkit",
+      "source": "./",
+      "description": "Skille: client-pt-prd-writer, client-meeting-recap, devops-incident-postmortem"
+    }
+  ]
+}

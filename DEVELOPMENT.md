@@ -59,7 +59,7 @@ Wszystkie commity powinny być sformatowane według schematu `typ: zwięzły opi
 To najważniejsza reguła odróżniająca FlowKit od innych repozytoriów promptów:
 - Skille **nie mogą zgadywać, konfabulować ani uzupełniać braków „typowymi danymi"**.
 - Jeśli użytkownik nie dostarczył terminu, osoby odpowiedzialnej, architektury czy metryki:
-  - Zastosuj oznaczenie: `[Do potwierdzenia]`, `OPEN-NNN` lub `Nie analizowano — brak dostępu do <źródła>`.
+  - Zastosuj oznaczenie: `DO POTWIERDZENIA` (w skillach z rejestrem tematów także `OPEN-NNN`) lub `Nie analizowano — brak dostępu do <źródła>`.
 - Wszelkie propozycje własne modelu muszą być wyraźnie odseparowane od wymagań i oznaczone jako `Rekomendacja` (np. `REC-001`).
 
 ### 2.2 Wymagana struktura każdego skilla
@@ -68,7 +68,7 @@ To najważniejsza reguła odróżniająca FlowKit od innych repozytoriów prompt
 | Plik / Folder | Rola | Obowiązkowy? |
 |---|---|:---:|
 | `SKILL.md` | Główna definicja, YAML frontmatter, cel, zasady, etapy | **TAK** |
-| `CHANGELOG.md` | Historia wersji danego skilla (SemVer) | **TAK** |
+| `CHANGELOG.md` | Historia wersji danego skilla (format `X.Y`) | **TAK** |
 | `templates/` | Co najmniej jeden zapasowy szablon dokumentu (`.md`) | **TAK** |
 | `checklists/` | Co najmniej jedna checklista weryfikacji jakości przed oddaniem | **TAK** |
 | `examples/` | Przykłady transformacji wejście → wyjście (dobrze vs źle) | Zalecany |
@@ -105,7 +105,7 @@ Do repozytorium **nigdy nie mogą trafić**:
 
 - Repozytorium jako całość podlega wersjonowaniu semantycznemu (**SemVer**): `MAJOR.MINOR.PATCH`.
 - Każde wydanie nowej wersji wymaga:
-  1. Aktualizacji pola `version` w [`plugin.json`](plugin.json).
+  1. Aktualizacji pola `version` w [`.claude-plugin/plugin.json`](.claude-plugin/plugin.json).
   2. Uzupełnienia wpisu w głównym [`CHANGELOG.md`](CHANGELOG.md).
   3. Nadania taga Git (np. `v1.1.0`).
 - Każdy pojedynczy skill posiada także własną historię zmian w `skills/<nazwa>/CHANGELOG.md`.

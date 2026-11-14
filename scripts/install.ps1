@@ -49,7 +49,12 @@ try {
         New-Item -ItemType Directory -Force -Path $TargetDir -ErrorAction Stop | Out-Null
     }
 
-    Copy-Item -Path $SourcePath -Destination $DestinationPath -Recurse -Force -ErrorAction Stop
+    # Kopiujemy zawartość, a nie sam folder: przy ponownej instalacji Copy-Item
+    # zagnieżdżałby skill w istniejącym katalogu (<skill>\<skill>).
+    if (-not (Test-Path $DestinationPath)) {
+        New-Item -ItemType Directory -Force -Path $DestinationPath -ErrorAction Stop | Out-Null
+    }
+    Copy-Item -Path (Join-Path $SourcePath "*") -Destination $DestinationPath -Recurse -Force -ErrorAction Stop
     Write-Host "Pomyślnie zainstalowano skill '$SkillName' w: $DestinationPath" -ForegroundColor Green
     Write-Host "Claude Code będzie miał teraz automatyczny dostęp do tego skilla." -ForegroundColor Gray
 } catch {

@@ -34,20 +34,24 @@ Service: api-gateway | Env: production
 
 ## Wynik — prawidłowe wpisy w osi czasu
 
-| Czas | Opis zdarzenia | Źródło |
-|---|---|---|
-| **14:27 UTC** | Wdrożono nieautoryzowaną zmianę `pg_hba.conf` na `db-primary` | Notatka ze Slack #incidents, wpis DBA 14:34 |
-| **14:28:01 UTC** | Pierwsze błędy połączenia `api-gateway → db-primary:5432` | Log Pod api-gateway |
-| **14:28:03 UTC** | Wyczerpanie puli połączeń (max=50); serwis zaczął zwracać HTTP 503 | Log Pod api-gateway |
-| **14:29:05 UTC** | Alert Datadog: `error_rate > 10%` wyzwolił PagerDuty | Alert Datadog #alert-prod-01 |
-| **14:31 UTC** | Inżynier dyżurny rozpoczął diagnostykę | Slack #incidents |
-| **14:34 UTC** | DBA zidentyfikował nieautoryzowaną zmianę konfiguracji; inicjacja rollbacku | Slack #incidents |
-| **14:35:14 UTC** | Rollback `pg_hba.conf` zakończony; PostgreSQL przeładował konfigurację | Log db-primary |
-| **14:35:16 UTC** | `api-gateway` przywrócił połączenia z bazą danych | Log Pod api-gateway |
-| **14:41 UTC** | Metryki produkcyjne wróciły do normy; incydent zamknięty | Slack #incidents |
+Data zdarzenia: 2026-11-10. Wszystkie czasy w UTC.
 
-**TTD (T0 → T1):** 14:27 → 14:29:05 = **~2 min 05 s** (automatyczny alert)  
-**TTR (T1 → T4):** 14:29:05 → 14:41 = **~12 min** (rollback konfiguracji)
+| Czas | Zdarzenie | Faza (T0–T4) | Źródło |
+|---|---|---|---|
+| **14:27** `[SZACUNEK]` | Wdrożono nieautoryzowaną zmianę `pg_hba.conf` na `db-primary` | **T0 (Trigger)** | Slack #incidents, wpis @dba z 14:34 |
+| **14:28:01** | Pierwsze błędy połączenia `api-gateway → db-primary:5432` | – | Log Pod api-gateway |
+| **14:28:03** | Wyczerpanie puli połączeń (max=50); serwis zaczął zwracać HTTP 503 | – | Log Pod api-gateway |
+| **14:29:05** | Alert Datadog `api-gateway.error_rate > 10%` (503 = 94,3%) | **T1 (Detection)** | Alert Datadog (e-mail do PagerDuty) |
+| **14:31** | Inżynier dyżurny rozpoczął diagnostykę | **T2 (Response)** | Slack #incidents |
+| **14:34** | Zidentyfikowano nieautoryzowaną zmianę konfiguracji; rozpoczęto rollback | – | Slack #incidents |
+| **14:35:14** | PostgreSQL przeładował `pg_hba.conf` po wycofaniu zmiany | **T3 (Mitigation)** | Log db-primary |
+| **14:35:16** | `api-gateway` przywrócił połączenia z bazą danych | – | Log Pod api-gateway |
+| **14:41** | Metryki wróciły do normy; incydent zamknięty | **T4 (Resolved)** | Slack #incidents |
+
+**TTD (T0 → T1):** 14:27 → 14:29:05 = **ok. 2 min** `[SZACUNEK]` — T0 znane tylko z dokładnością do minuty (wpis na Slacku, brak logu wdrożenia)  
+**TTR (T1 → T4):** 14:29:05 → 14:41 = **ok. 12 min**
+
+Czego przykład celowo nie wypełnia: materiały nie podają identyfikatora alertu ani nazwisk osób, więc ich nie ma w osi czasu.
 
 ---
 

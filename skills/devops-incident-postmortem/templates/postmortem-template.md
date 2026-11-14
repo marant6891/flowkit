@@ -1,95 +1,98 @@
+<!--
+Szablon ZAPASOWY. Używaj go tylko, gdy użytkownik nie dostarczył własnego szablonu.
+Wszystko w nawiasach [...] to placeholder – zastąp treścią ze źródeł albo wpisz
+`DO POTWIERDZENIA`. Żaden placeholder nie jest przykładem do skopiowania.
+Usuń komentarze i placeholdery przed oddaniem raportu.
+-->
+
 # Raport Postmortem: [Nazwa Incydentu / System]
 
 | Metryka / Pole | Wartość |
 |---|---|
-| **Identyfikator incydentu** | INC-YYYY-NNN / [PagerDuty ID] |
-| **Data zdarzenia** | YYYY-MM-DD |
-| **Krytyczność (Severity)** | **SEV-1** (Krytyczna awaria) / **SEV-2** (Częściowa degradacja) / **SEV-3** / **Near-Miss** |
+| **Identyfikator incydentu** | [ID incydentu ze źródła, np. z systemu on-call] |
+| **Data zdarzenia** | [YYYY-MM-DD] |
+| **Krytyczność (Severity)** | [SEV-1 / SEV-2 / SEV-3 / Near-Miss] |
 | **Incident Commander (IC)** | [Imię i Nazwisko / Rola] |
 | **Lead Investigator (Tech Lead)** | [Imię i Nazwisko / Rola] |
 | **Communications Lead** | [Imię i Nazwisko / Rola] |
 | **Właściciel raportu** | [Imię i Nazwisko] |
-| **Czas trwania przestoju** | [X godz. / min — T4 minus T0] |
-| **Czas do wykrycia (TTD)** | [X min — T1 minus T0] |
-| **Czas do naprawy (TTR)** | [X min — T4 minus T1] |
-| **MTTD / MTTR (Średnie)** | [Wartość lub DO POTWIERDZENIA przy incydencie jednostkowym] |
+| **Czas trwania przestoju** | [T4 minus T0] |
+| **Czas do wykrycia (TTD)** | [T1 minus T0] |
+| **Czas do naprawy (TTR)** | [T4 minus T1] |
+| **MTTD / MTTR (Średnie)** | [Wartość ze źródła lub „Nie dotyczy – incydent jednostkowy”] |
 | **Naruszenie SLA / Kary umowne** | [Brak naruszenia / Naruszenie SLA (X%) / Ryzyko kary umownej] |
-| **Status raportu** | Szkic / W recenzji / Zaakceptowany |
+| **Status raportu** | [Szkic / W recenzji / Zaakceptowany] |
 
 ---
 
 ## 1. Streszczenie incydentu (Executive Summary)
-*Zwięzłe podsumowanie (2–4 zdania) dla kadry zarządzającej: co zawiodło, jaki był mierzalny wpływ biznesowy, jak przywrócono działanie i co robimy, by to się nie powtórzyło.*
+
+[2–4 zdania dla kadry zarządzającej, pisane na końcu i wyłącznie z treści raportu:
+co zawiodło, jaki był mierzalny wpływ, jak przywrócono działanie, co zapobiegnie powtórce.]
 
 ---
 
 ## 2. Wpływ na użytkowników i biznes (Impact)
+
 - **Dotknięte usługi / komponenty:** [lista komponentów]
-- **Liczba dotkniętych użytkowników:** [dokładna liczba lub % aktywnych sesji]
-- **Wpływ na SLA / SLO:** [np. spadek dostępności z 99.95% do 98.40%]
-- **Wpływ finansowy / operacyjny:** [np. utracone transakcje e-commerce, opóźnienia w przetwarzaniu zamówień]
-- **Liczba zgłoszeń do Supportu / Helpdesku:** [liczba ticketów zgłoszonych przez klientów]
+- **Liczba dotkniętych użytkowników:** [liczba lub % aktywnych sesji]
+- **Wpływ na SLA / SLO:** [dostępność przed i po]
+- **Wpływ finansowy / operacyjny:** [wartość ze źródła]
+- **Liczba zgłoszeń do Supportu / Helpdesku:** [liczba ticketów]
 
 ---
 
 ## 3. Oś czasu (Timeline)
 
-*Wszystkie czasy w strefie UTC (lub CET, jeśli ujednolicone).*
+[Strefa czasowa wszystkich wpisów, np. UTC.] Czasy przybliżone oznacz `[SZACUNEK]`.
 
 | Czas | Zdarzenie | Faza (T0–T4) | Źródło (Log / Alert / Chat) |
 |---|---|---|---|
-| **HH:MM** | Wystąpienie anomalii / wdrożenie zmiany | **T0 (Trigger)** | [np. Git commit / Log z Pod-A] |
-| **HH:MM** | Pierwszy alert monitoringu | **T1 (Detection)** | [np. Alert Datadog / PagerDuty] |
-| **HH:MM** | Otwarcie mostka incydentu / powołanie IC | **T2 (Response)** | [np. Slack #incident-room] |
-| **HH:MM** | Zastosowanie obejścia / rollback wersji | **T3 (Mitigation)** | [np. CI/CD pipeline / kubectl] |
-| **HH:MM** | Potwierdzenie powrotu metryk do normy | **T4 (Resolved)** | [np. Grafana dashboard] |
+| [HH:MM:SS] | [Zdarzenie inicjujące] | **T0 (Trigger)** | [Źródło] |
+| [HH:MM:SS] | [Pierwszy sygnał wykrycia] | **T1 (Detection)** | [Źródło] |
+| [HH:MM:SS] | [Rozpoczęcie reakcji] | **T2 (Response)** | [Źródło] |
+| [HH:MM:SS] | [Zastosowane obejście / wycofanie zmiany] | **T3 (Mitigation)** | [Źródło] |
+| [HH:MM:SS] | [Potwierdzenie powrotu do normy] | **T4 (Resolved)** | [Źródło] |
 
 ---
 
 ## 4. Łańcuch przyczyn awarii (Root Causes & Contributing Factors)
 
-*Standard Google SRE zakłada, że poważna awaria jest splotem wielu czynników systemowych, a nie pojedynczego błędu.*
+- **1. Wyzwalacz bezpośredni (Trigger):** [Zdarzenie inicjujące – ze źródłem]
+- **2. Czynnik wzmacniający (Amplifier):** [Co spowodowało eskalację – ze źródłem]
+- **3. Luka w detekcji (Detection Gap):** [Dlaczego monitoring nie zareagował od razu]
+- **4. Luka procesowa / testowa (Process Gap):** [Dlaczego problem nie został wykryty przed produkcją]
 
-- **1. Wyzwalacz bezpośredni (Trigger):**  
-  [np. Wdrożenie wersji 2.4.1 zawierającej niezindeksowane zapytanie SQL]
-- **2. Czynnik wzmacniający (Amplifier / Escalating Factor):**  
-  [np. Brak limitu połączeń (Connection Pool exhaustion) oraz brak timeoutów w bramce API doprowadziły do lawinowej awarii kolejnych serwisów (Cascading failure)]
-- **3. Luka w detekcji (Detection Gap):**  
-  [np. Alert był skonfigurowany na średnie obciążenie CPU zamiast na stopę błędów HTTP 5xx, co opóźniło powiadomienie o 18 minut]
-- **4. Luka procesowa / testowa (Process / Pre-production Gap):**  
-  [np. Środowisko stagingowe posiadało zbyt mały zbiór danych, przez co problem wydajnościowy nie ujawnił się przed produkcją]
+### Analiza 5 Whys
 
-### Analiza 5 Whys (Drzewo pytań):
-1. *Dlaczego serwis przestał odpowiadać?* -> Baza danych przestała przyjmować połączenia.
-2. *Dlaczego baza przestała przyjmować połączenia?* -> Pula połączeń została wyczerpana przez blokujące zapytania.
-3. *Dlaczego zapytanie blokowało bazę?* -> Brakowało indeksu na kolumnie `customer_uuid`.
-4. *Dlaczego brakowało indeksu?* -> Migracja bazy danych pominęła indeks w skrypcie deployu.
-5. *Dlaczego migracja pominęła indeks?* -> Brak automatycznego lintera schematów w pipeline CI/CD przed scaleniem do main.
+1. *Dlaczego [obserwowany objaw]?* → [Odpowiedź ze źródłem]
+2. *Dlaczego [odpowiedź 1]?* → [Odpowiedź ze źródłem]
+3. *Dlaczego [odpowiedź 2]?* → [Odpowiedź ze źródłem]
+4. *Dlaczego [odpowiedź 3]?* → [Odpowiedź ze źródłem]
+5. *Dlaczego [odpowiedź 4]?* → [Luka w procesie, testach lub architekturze]
+
+[Jeśli materiały nie pozwalają odpowiedzieć na kolejne „dlaczego”, zakończ łańcuch
+wpisem `DO POTWIERDZENIA` zamiast domyślać się przyczyny.]
 
 ---
 
 ## 5. Co zadziałało dobrze vs Gdzie pojawiły się trudności
 
-### Co zadziałało dobrze (System & Team Resilience):
-*Konkretne mechanizmy i procedury, które ograniczyły skutki awarii:*
-- [np. Procedura automatycznego rollbacku w CI/CD zadziałała w 3 minuty od decyzji IC]
-- [np. Komunikacja na kanale incydentu przebiegała sprawnie i bez chaosu]
+### Co zadziałało dobrze
+- [Mechanizm lub procedura, która ograniczyła skutki awarii – ze źródłem]
 
-### Gdzie pojawiły się trudności (Vulnerabilities & Bottlenecks):
-*Luki w narzędziach, runbookach lub uprawnieniach:*
-- [np. Inżynier dyżurny nie posiadał uprawnień do natychmiastowego restartu usługi w klastrze B]
-- [np. Runbook odzyskiwania bazy danych zawierał nieaktualne polecenia]
+### Gdzie pojawiły się trudności
+- [Luka w narzędziach, runbookach lub uprawnieniach – ze źródłem]
 
 ---
 
 ## 6. Komunikacja zewnętrzna i Status Page (External Comms)
 
+[Jeśli nie było komunikacji zewnętrznej, wpisz to wprost wraz ze źródłem tej informacji.]
+
 | Czas | Kanał komunikacji | Treść komunikatu | Status publiczny |
 |---|---|---|---|
-| **HH:MM** | Status Page (`status.domain.com`) | „Investigating: Zidentyfikowano degradację wydajności API" | Yellow (Degraded) |
-| **HH:MM** | Status Page | „Identified: Zidentyfikowano przyczynę, trwa procedura wycofywania zmiany" | Red (Major Outage) |
-| **HH:MM** | Status Page | „Resolved: Wszystkie usługi działają poprawnie, metryki w normie" | Green (Operational) |
-| **HH:MM** | Komunikat bezpośredni do klientów Enterprise | E-mail z oficjalnym powiadomieniem o incydencie | Wysłano |
+| [HH:MM] | [Status Page / e-mail / inny] | [Dosłowna treść komunikatu ze źródła] | [Status ze źródła] |
 
 ---
 
@@ -97,6 +100,6 @@
 
 | ID | Typ | Opis działania naprawczego | Priorytet | Właściciel (DRI) | Ticket | Termin / Sprint |
 |---|---|---|---|---|---|---|
-| **ACT-001** | `PREVENT` | [Działanie eliminujące Root Cause] | P1 | [Osoba/Zespół] | JIRA-101 | Sprint 42 |
-| **ACT-002** | `DETECT` | [Nowy alert lub metryka skracająca TTD] | P1 | [Osoba/Zespół] | JIRA-102 | Sprint 42 |
-| **ACT-003** | `MITIGATE` | [Runbook / automatyzacja skracająca TTR] | P2 | [Osoba/Zespół] | JIRA-103 | Sprint 43 |
+| **ACT-001** | `PREVENT` | [Działanie eliminujące przyczynę źródłową] | [Priorytet] | [Osoba lub DO POTWIERDZENIA] | [ID ticketu lub DO POTWIERDZENIA] | [Termin lub DO POTWIERDZENIA] |
+| **ACT-002** | `DETECT` | [Alert lub metryka skracająca TTD] | [Priorytet] | [Osoba lub DO POTWIERDZENIA] | [ID ticketu lub DO POTWIERDZENIA] | [Termin lub DO POTWIERDZENIA] |
+| **ACT-003** | `MITIGATE` | [Runbook lub automatyzacja skracająca TTR] | [Priorytet] | [Osoba lub DO POTWIERDZENIA] | [ID ticketu lub DO POTWIERDZENIA] | [Termin lub DO POTWIERDZENIA] |

@@ -9,6 +9,19 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 #### `client-pt-prd-writer` v2.2
 - **Tryb „Dokument końcowy bez dopisków”**: na życzenie użytkownika pełny dokument dokładnie w udostępnionym szablonie, bez oznaczeń źródeł i tematów otwartych; pochodzenie treści w osobnym rejestrze, luki rozstrzyga użytkownik.
 
+#### `client-meeting-recap` v1.2
+- Część A i B w osobnych plikach; Radar Ryzyk wymaga cytatu z mówcą i czasem, oceny oznaczane jako `Interpretacja:`; przepisany przykład; pytanie o szablon użytkownika.
+
+#### `devops-incident-postmortem` v1.3
+- Szablon bez gotowych treści (same placeholdery); zasada `DO POTWIERDZENIA` dla całego raportu; pytanie o szablon użytkownika; progi DETECT/MITIGATE w zasadach.
+
+#### Wszystkie skille
+- Jedno oznaczenie braków `DO POTWIERDZENIA` i jedno oznaczenie źródeł `SRC-NNN`; frazy aktywacji „Użyj, gdy…” w `description`.
+
+#### Dokumentacja i Copilot
+- Prompt files dla `client-meeting-recap` i `devops-incident-postmortem` w `.github/prompts/`.
+- Szablon PR, README i DEVELOPMENT zgodne z faktycznymi wymaganiami walidatora (pola frontmatteru, wymagane pliki, format wersji skilli).
+
 ### Naprawiono
 - `install.ps1`: ponowna instalacja nie zagnieżdża już skilla w `<skill>\<skill>`.
 - `install.sh`: nadany bit wykonywalności; usunięte zdublowane przypisanie `TARGET_DIR`.

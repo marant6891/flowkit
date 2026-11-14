@@ -13,13 +13,13 @@ Repozytorium spełnia standard otwartych skilli AI oraz posiada manifest [`.clau
 | Skill | Wersja | Opis | Ścieżka |
 |---|---|---|---|
 | **client-pt-prd-writer** | `2.2` | Tworzy precyzyjną dokumentację techniczną (PT) i PRD wyłącznie na bazie materiałów źródłowych. Zawiera scenariusze akceptacyjne **Given-When-Then (Gherkin)**, **Definition of Done (DoD)**, wyłączenia **Non-Goals** oraz obsługę szablonów klienta (`.docx`, `.md`). Opcjonalny tryb **dokumentu końcowego bez dopisków** — czysty dokument w szablonie klienta. | [`skills/client-pt-prd-writer/`](skills/client-pt-prd-writer/) |
-| **client-meeting-recap** | `1.1` | Przekształca surowe transkrypcje (`.vtt`, `.docx`, `.txt`) w 2-częściowe podsumowanie: **Część A (Wewnętrzny Radar Ryzyk / Scope Creep dla zespołu)** oraz **Część B (Oficjalny mail do klienta z zadaniami DRI i klauzulą weryfikacji 48h)**. | [`skills/client-meeting-recap/`](skills/client-meeting-recap/) |
+| **client-meeting-recap** | `1.2` | Przekształca surowe transkrypcje (`.vtt`, `.docx`, `.txt`) w 2-częściowe podsumowanie: **Część A (Wewnętrzny Radar Ryzyk / Scope Creep dla zespołu, z cytatami jako dowodami)** oraz **Część B (Oficjalny mail do klienta z zadaniami DRI i klauzulą weryfikacji 48h)** — w osobnych plikach. | [`skills/client-meeting-recap/`](skills/client-meeting-recap/) |
 
 ### ⚙️ DevOps i Infrastruktura
 
 | Skill | Wersja | Opis | Ścieżka |
 |---|---|---|---|
-| **devops-incident-postmortem** | `1.2` | Generuje bezobwiniający raport postmortem zgodny ze standardami **Google SRE i PagerDuty**. Zawiera klasyfikację SEV-1/SEV-2, role (Incident Commander), wieloczynnikowy łańcuch przyczyn (**Trigger, Amplifier, Detection/Process Gap**, 5 Whys), rejestr Status Page oraz zadania PREVENT/DETECT/MITIGATE. | [`skills/devops-incident-postmortem/`](skills/devops-incident-postmortem/) |
+| **devops-incident-postmortem** | `1.3` | Generuje bezobwiniający raport postmortem zgodny ze standardami **Google SRE i PagerDuty**. Zawiera klasyfikację SEV-1/SEV-2, role (Incident Commander), wieloczynnikowy łańcuch przyczyn (**Trigger, Amplifier, Detection/Process Gap**, 5 Whys), rejestr Status Page oraz zadania PREVENT/DETECT/MITIGATE. | [`skills/devops-incident-postmortem/`](skills/devops-incident-postmortem/) |
 
 ### 🛠️ Szablony narzędziowe
 
@@ -62,7 +62,7 @@ Repozytorium zawiera gotowe skrypty instalacyjne dla Windows i Linux/macOS:
 
 Skille mogą być wykorzystywane przez Copilota w VS Code, Visual Studio oraz JetBrains:
 
-1. **Prompt Files (`.prompt.md`)**: W katalogu `.github/prompts/` znajdują się gotowe wywołania Copilot Chat (np. `/client-pt-prd-writer`).
+1. **Prompt Files (`.prompt.md`)**: W katalogu `.github/prompts/` znajdują się gotowe wywołania Copilot Chat dla każdego skilla (np. `/client-pt-prd-writer`).
 2. **Plik referencyjny w sesji czatu**: W Copilot Chat wpisz `#file:skills/<skill-name>/SKILL.md` i zadaj pytanie.
 3. **Reguły całego projektu**: Wklej zasady danego skilla do pliku [`.github/copilot-instructions.md`](.github/copilot-instructions.md).
 4. **Globalne instrukcje użytkownika**: Dodaj treść do ustawień VS Code: `github.copilot.chat.codeGeneration.instructions`.
@@ -93,10 +93,10 @@ claude plugin install flowkit@flowkit
 ## ➕ Jak dodać nowy skill do repozytorium?
 
 1. Skopiuj folder [`skills/_template/`](skills/_template/) do nowego katalogu `skills/<nowa-nazwa>/`.
-2. Wypełnij plik `SKILL.md` (upewnij się, że nagłówek YAML zawiera pola `name` i `description`).
-3. Dodaj opcjonalne podkatalogi: `templates/`, `checklists/`, `examples/` lub `references/`.
+2. Wypełnij plik `SKILL.md` (upewnij się, że nagłówek YAML zawiera pola `name`, `version`, `tags` i `description`).
+3. Dodaj wymagane `CHANGELOG.md`, `templates/` i `checklists/` (co najmniej jeden plik `.md` w każdym) oraz opcjonalne `examples/` i `references/`.
 4. Dopisz nowy skill do tabeli w sekcji [Katalog skilli](#-katalog-skilli-skills-catalog) w niniejszym pliku.
-5. Zgłoś zmianę przez Pull Request (automatyczny pipeline CI zweryfikuje składnię nagłówków).
+5. Zgłoś zmianę przez Pull Request (lokalnie uruchom `python scripts/validate_skills.py`; ten sam walidator działa w CI).
 
 ---
 

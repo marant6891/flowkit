@@ -1,7 +1,7 @@
 ---
 name: client-pt-prd-writer
 version: "2.2"
-tags: [analyst, prd, pt, requirements, documentation, client, blameless, gherkin, dod]
+tags: [analyst, prd, pt, requirements, documentation, client, gherkin, dod]
 description: >
   Tworzy profesjonalną dokumentację PT/PRD (projekt techniczny, specyfikacja
   zmiany, analiza przedwdrożeniowa) dla klienta końcowego, opisującą rzeczywiste
@@ -28,9 +28,11 @@ a nie kompletność wszystkich sekcji.
    materiału źródłowego. Jeśli nie wynika, wpisz `DO POTWIERDZENIA` i dodaj
    pozycję `OPEN-NNN`. Nie uzupełniaj luk „typowymi” treściami.
 2. **Każdy wpis ma oznaczenie pochodzenia** (kolumna „Źródło” lub dopisek):
-   - `ŹRÓDŁO: <dokument / ticket / mail / plik:linia / notatka z DD.MM>` – fakt potwierdzony,
+   - `SRC-NNN` – fakt potwierdzony pozycją z rejestru źródeł (Etap 1); dla kodu
+     dodatkowo `plik:linia`,
    - `ASSUMPTION-NNN` – założenie zaakceptowane przez użytkownika do czasu potwierdzenia,
-   - `OPEN-NNN` – brak informacji, temat do wyjaśnienia.
+   - `OPEN-NNN` – brak informacji, temat do wyjaśnienia,
+   - `DO POTWIERDZENIA` – nieznana wartość w polu lub komórce (zawsze w parze z `OPEN-NNN`).
 3. **Nie przepisuj zmiany na „większą”.** Opisuj dokładnie zakres z materiałów.
    Nie dodawaj funkcji, ról, integracji, NFR ani etapów, których nie ma w źródle.
    Pomysły spoza źródła możesz zgłosić wyłącznie jako `Rekomendacja` w osobnej
@@ -123,7 +125,7 @@ zmiana:
 - obszary regresji.
 
 Każde stwierdzenie techniczne opatrz źródłem, np.
-`ŹRÓDŁO: src/orders/OrderService.cs:142, endpoint POST /api/orders`.
+`SRC-002, src/orders/OrderService.cs:142, endpoint POST /api/orders`.
 Jeśli kodu/dokumentacji nie ma, w sekcjach technicznych wpisz
 „Nie analizowano – brak dostępu do <repozytorium/dokumentacji>” i dodaj OPEN.
 
@@ -206,7 +208,7 @@ Cel: kompletny dokument **dokładnie w udostępnionym szablonie**, gotowy do
 przekazania klientowi, bez śladów pracy skilla. Gdy użytkownik nie dał szablonu,
 użyj szablonu zapasowego z tymi samymi regułami.
 
-1. **Czego nie ma w dokumencie:** `SRC-NNN` / `ŹRÓDŁO:`, `ASSUMPTION-NNN`,
+1. **Czego nie ma w dokumencie:** `SRC-NNN`, `plik:linia`, `ASSUMPTION-NNN`,
    `OPEN-NNN`, `Q-NNN`, `REC-NNN`, `DO POTWIERDZENIA`, „Nie analizowano”,
    „Brak danych”, kolumn „Źródło” i legendy oznaczeń, komentarzy,
    placeholderów oraz sekcji dodawanych przez skill (Materiały źródłowe,

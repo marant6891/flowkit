@@ -194,13 +194,13 @@ Rollback: [Sposób wycofania – ze źródła lub OPEN.]
 
 ## 21. Założenia i tematy do wyjaśnienia
 
-### 20.1 Założenia
+### 21.1 Założenia
 
 | ID | Założenie | Uzasadnienie | Do potwierdzenia przez | Status |
 |---|---|---|---|---|
 | ASSUMPTION-001 | [Założenie] | [Dlaczego bezpieczne] | [Osoba/rola] | Do potwierdzenia |
 
-### 20.2 Tematy do wyjaśnienia
+### 21.2 Tematy do wyjaśnienia
 
 | ID | Temat | Opis | Dlaczego wymaga wyjaśnienia | Wpływ | Właściciel decyzji | Priorytet | Status | Data decyzji |
 |---|---|---|---|---|---|---|---|---|

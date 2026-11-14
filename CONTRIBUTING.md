@@ -51,7 +51,7 @@ Skill musi zawierać:
 
 ### Zasada rzetelności (obowiązkowa we wszystkich skillach)
 
-Każdy skill w FlowKit działa na zasadzie **„brak źródła = brak treści"**. Skill nigdy nie może zmyślać faktów, terminów, właścicieli ani wymagań. Brak danych oznacza się jako `[Do potwierdzenia]`, `OPEN-NNN` lub `Brak danych`.
+Każdy skill w FlowKit działa na zasadzie **„brak źródła = brak treści"**. Skill nigdy nie może zmyślać faktów, terminów, właścicieli ani wymagań. Brak danych oznacza się jako `DO POTWIERDZENIA` (w skillach z rejestrem tematów także `OPEN-NNN`) lub `Brak danych`.
 
 ---
 

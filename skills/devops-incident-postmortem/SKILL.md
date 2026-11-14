@@ -1,13 +1,15 @@
 ---
 name: devops-incident-postmortem
-version: "1.2"
+version: "1.3"
 tags: [devops, sre, postmortem, rca, incident, blameless, monitoring, production, google-sre, pagerduty, statuspage]
 description: >
   Generuje profesjonalny, bezobwiniający (blameless) raport postmortem zgodny ze
   standardami Google SRE i PagerDuty po awarii produkcyjnej. Tworzy precyzyjną oś
   czasu (Timeline T0–T4), wieloczynnikową analizę przyczyn (Trigger, Amplifier,
   Detection/Process Gap, 5 Whys), rejestr komunikacji Status Page oraz mierzalne
-  działania naprawcze (Action Items PREVENT/DETECT/MITIGATE).
+  działania naprawcze (Action Items PREVENT/DETECT/MITIGATE). Użyj, gdy
+  użytkownik dostarcza logi, alerty lub zapis komunikacji z incydentu i prosi o
+  postmortem, RCA, raport z awarii lub analizę przyczyn incydentu.
 ---
 
 # Cel
@@ -32,32 +34,34 @@ Przygotuj rzetelny, bezobwiniający raport postmortem opisujący przebieg incyde
    - **Detection Gap:** dlaczego monitoring nie zareagował od razu (np. zły próg alertu),
    - **Process Gap:** dlaczego zmiana przeszła przez testy/staging.
 5. **Rejestr Status Page i Wpływ na SLA:** Każdy postmortem musi odnotować, co i kiedy komunikowano klientom zewnętrznym oraz czy nastąpiło formalne naruszenie SLA.
-6. **Brak logu/źródła = brak wpisu w osi czasu:** Każde zdarzenie na osi czasu musi mieć określony dokładny znacznik czasu i źródło (`Log z Pod-A`, `Alert Datadog #1234`, `Wpis ze Slack #incident`).
-7. **Identyfikatory działań naprawczych (`ACT-001`):** Klasyfikacja: `PREVENT`, `DETECT`, `MITIGATE`. Każda zidentyfikowana przyczyna źródłowa musi mieć co najmniej jedno zadanie PREVENT.
+6. **Brak logu/źródła = brak wpisu w osi czasu:** Każde zdarzenie na osi czasu musi mieć określony dokładny znacznik czasu i źródło (`Log z Pod-A`, `Alert Datadog #1234`, `Wpis ze Slack #incident`). Ta sama reguła dotyczy ról, wpływu, przyczyn, komunikatów, właścicieli, ticketów i terminów: czego nie ma w materiałach, oznacz `DO POTWIERDZENIA` — nie uzupełniaj „typową” treścią ani przykładami z szablonu.
+7. **Identyfikatory działań naprawczych (`ACT-001`):** Klasyfikacja: `PREVENT`, `DETECT`, `MITIGATE`. Każda zidentyfikowana przyczyna źródłowa musi mieć co najmniej jedno zadanie PREVENT. Gdy TTD przekracza 15 minut, wymagane jest co najmniej jedno zadanie DETECT; gdy TTR przekracza 1 godzinę — co najmniej jedno MITIGATE.
+8. **Szablon użytkownika ma pierwszeństwo:** Jeśli użytkownik dostarczył własny szablon postmortem, zachowaj jego strukturę i nazwy sekcji; szablon z `templates/` jest wyłącznie zapasowy.
 
 # Etapy pracy
 
-### Krok 1: Inwentaryzacja materiałów i kwalifikacja (SEV)
+### Etap 1: Inwentaryzacja materiałów i kwalifikacja (SEV)
+- Sprawdź, czy użytkownik dostarczył własny szablon postmortem. Jeśli o nim wspomina, ale go nie załączył — poproś o niego jednym pytaniem. Gdy szablonu brak, pracuj na [szablonie zapasowym](./templates/postmortem-template.md).
 - Zbierz logi, alerty z PagerDuty/Datadog, zapisy ze Slacka/Teams i zrzuty ekranu.
 - Określ poziom Severity (SEV-1 / SEV-2 / SEV-3 / Near-Miss).
 - Zidentyfikuj kluczowe metryki czasowe: T0 (Trigger), T1 (Detection), T2 (Response), T3 (Mitigation), T4 (Resolved), TTD, TTR.
 
-### Krok 2: Konstrukcja Osi Czasu (Timeline)
+### Etap 2: Konstrukcja Osi Czasu (Timeline)
 Uporządkuj zdarzenia chronologicznie ze wskazaniem fazy (T0–T4) oraz źródła informacji. Zobacz [przykład](./examples/log-to-timeline-example.md).
 
-### Krok 3: Analiza wieloczynnikowa i 5 Whys
+### Etap 3: Analiza wieloczynnikowa i 5 Whys
 - Wypełnij łańcuch przyczyn: Trigger, Amplifier, Detection Gap, Process Gap.
 - Przeprowadź analizę 5 Whys, drążąc aż do luk w procesie, testach lub architekturze.
 
-### Krok 4: Wypełnienie sekcji komunikacji i Status Page
+### Etap 4: Wypełnienie sekcji komunikacji i Status Page
 Odnotuj chronologię komunikatów publicznych oraz wpływ na umowne SLA.
 
-### Krok 5: Opracowanie Działań Naprawczych (Action Items)
+### Etap 5: Opracowanie Działań Naprawczych (Action Items)
 Zbuduj tabelę działań spełniających kryteria:
 - Konkretne i mierzalne,
 - Przypisane do właściciela (DRI),
 - Mające określony termin / sprint,
 - Posiadające ticket w Jira/GitHub Issues.
 
-### Krok 6: Weryfikacja przed publikacją
+### Etap 6: Weryfikacja przed publikacją
 Przejdź przez [checklistę weryfikacji raportu](./checklists/postmortem-review-checklist.md) przed udostępnieniem dokumentu.

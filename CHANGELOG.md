@@ -6,31 +6,20 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 
 ## [Unreleased]
 
-#### `client-pt-prd-writer` v2.2
-- **Tryb „Dokument końcowy bez dopisków”**: na życzenie użytkownika pełny dokument dokładnie w udostępnionym szablonie, bez oznaczeń źródeł i tematów otwartych; pochodzenie treści w osobnym rejestrze, luki rozstrzyga użytkownik.
+---
 
-#### `client-meeting-recap` v1.2
-- Część A i B w osobnych plikach; Radar Ryzyk wymaga cytatu z mówcą i czasem, oceny oznaczane jako `Interpretacja:`; przepisany przykład; pytanie o szablon użytkownika.
+## [1.3.0] — 2026-11-17
 
-#### `devops-incident-postmortem` v1.3
-- Szablon bez gotowych treści (same placeholdery); zasada `DO POTWIERDZENIA` dla całego raportu; pytanie o szablon użytkownika; progi DETECT/MITIGATE w zasadach.
+### Dodano
+- **Katalog Agentów (`agents/`)**: Wprowadzono pełny system 7 agentów (`agent-3x3` jako główny orkiestrator oraz 6 wyspecjalizowanych subagentów: Analyzer, Verifier, Planner, Implementer, DevOps, PM).
+- **Deterministyczny silnik obsługi dokumentów (.docx/.dotx)**: Dodano `references/docx-engine.md` z inteligentną detekcją zainstalowanych bibliotek w środowisku (`python-docx` jako priorytet 1, `mammoth`, `docx2txt`, `pypandoc`, fallback do Markdown).
+- **Instalator skilli i agentów**: Rozszerzono `install.ps1` oraz `install.sh` o obsługę instalacji agentów (`-AgentName all` / `agent all`) do `~/.claude/agents/`.
+- **Manifesty wtyczek**: Zaktualizowano `.claude-plugin/plugin.json` oraz `marketplace.json` do wersji 1.3.0 z definicjami sekcji `agents`.
 
-#### Wszystkie skille
-- Jedno oznaczenie braków `DO POTWIERDZENIA` i jedno oznaczenie źródeł `SRC-NNN`; frazy aktywacji „Użyj, gdy…” w `description`.
-
-#### Dokumentacja i Copilot
-- Prompt files dla `client-meeting-recap` i `devops-incident-postmortem` w `.github/prompts/`.
-- Szablon PR, README i DEVELOPMENT zgodne z faktycznymi wymaganiami walidatora (pola frontmatteru, wymagane pliki, format wersji skilli).
-
-### Naprawiono
-- `install.ps1`: ponowna instalacja nie zagnieżdża już skilla w `<skill>\<skill>`.
-- `install.sh`: nadany bit wykonywalności; usunięte zdublowane przypisanie `TARGET_DIR`.
-- `.gitignore`: wzorce `*secret*` / `*credential*` zawężone, aby nie ignorować skilli o takich nazwach.
-
-### Zmieniono
-- Manifest przeniesiony do `.claude-plugin/plugin.json` (format Claude Code: `author` jako obiekt, `keywords`); dodany `.claude-plugin/marketplace.json`.
-- CI uruchamia `scripts/validate_skills.py` zamiast kopii inline; walidator sprawdza dodatkowo `CHANGELOG.md`, `checklists/`, format wersji, liczbę tagów, kebab-case, wszystkie linki względne oraz zgodność wersji z README i `plugin.json`.
-- Ruleset `protect-main.json`: wymagany status check `validate`, usunięty bypass administratora.
+### Poprawiono i zabezpieczono
+- Naprawiono wykrywanie agenta domyślnego w VS Code (`agent-3x3`).
+- Zabezpieczenie autora w repozytorium publicznym: rozszerzono `.gitignore` (m.in. `agent-context/`, `AGENT_LOG.md`, pliki klientów, transkrypcje, klucze) oraz dodano dedykowaną sekcję bezpieczeństwa w `README.md`.
+- Wdrożono pełne 16 poprawek jakościowych audytu agentów (m.in. whitelist narzędzi `execute`, jawne raportowanie w trybie RE-CHECK, standalone mode dla DevOps).
 
 ---
 

@@ -1,16 +1,18 @@
 # GitHub Copilot Instructions for FlowKit
 
-This repository provides reusable **Agent Skills** for Business/Systems Analysts and DevOps Engineers. All skills operate strictly on user-provided source materials and never invent facts, dates, or requirements.
+This repository provides reusable **Agent Skills** and **Agents** for Business/Systems Analysts and DevOps Engineers. All skills operate strictly on user-provided source materials and never invent facts, dates, or requirements.
 
 ## Repository Structure
 
-Skills are located under `skills/<skill-name>/`. Each skill contains:
+**Skills** are located under `skills/<skill-name>/`. Each skill contains:
 - `SKILL.md` — main instructions with YAML frontmatter (`name`, `version`, `tags`, `description`).
 - `checklists/` — quality-gate checklists to run before delivering output.
 - `examples/` — concrete input → output transformations.
 - `references/` — supporting guides (formats, terminology, mapping rules).
 - `templates/` — fallback output templates when the user has no custom template.
 - `CHANGELOG.md` — version history of the skill.
+
+**Agents** are located under `agents/`. Each `*_agent.md` file is a Claude Code agent definition with YAML frontmatter. The main orchestrator is `agent-3x3_agent.md`.
 
 ## When to Activate a Skill
 
@@ -20,6 +22,15 @@ Activate a skill when the user requests an output that matches the skill's `desc
 - User asks for a **postmortem, RCA, incident report** → `devops-incident-postmortem`
 
 When activating a skill, read the full `SKILL.md` and all files referenced inside it before generating output.
+
+## Agent 3x3 — Orchestrator
+
+The `agent-3x3` orchestrator coordinates subagents using a strict 3-step iteration loop:
+- Each iteration: ≤3 steps → summarize → ask user → repeat
+- Supported prefixes: `ANALYZE:` `VERIFY:` `PLAN:` `SPEC:` `DRY:` `LOG:` `DEVOPS:`
+- Subagents: Analyzer, Verifier, Planner, Implementer, DevOps, PM
+
+See [`agents/agent-3x3_agent.md`](../agents/agent-3x3_agent.md) for full protocol.
 
 ## Core Rules (All Skills & AI Agents)
 

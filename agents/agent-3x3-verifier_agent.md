@@ -13,7 +13,10 @@ Scope (file paths or feature) + dimensions to check + optional shared context fi
 
 ## Dimensions
 
-`Logic` · `Contracts` · `Tests` · `Dependencies` · `Security` · `Performance` · `Consistency` · `Docs` (README/comments match behavior) · `Requirements` (implementation matches spec/acceptance criteria, if provided — cite the specific `US-N`/`AC-N` being checked)
+`Logic` · `Contracts` · `Tests` · `Dependencies` · `Security` · `Performance` · `Consistency` · `Docs` · `Requirements`
+
+- **`Docs`** — inline comments match current implementation; public API has docstrings/JSDoc; README steps are runnable as written.
+- **`Requirements`** — implementation matches spec/acceptance criteria, if provided — cite the specific `US-N`/`AC-N` being checked. Only applies if Orchestrator supplied a spec reference; omit silently otherwise.
 
 ## Steps
 
@@ -43,6 +46,6 @@ Confidence: <high/medium/low>
 Assumptions: <ambiguous expected behavior resolved by assuming, or "none">
 ```
 
-**If correction-loop re-check:** prefix scope with `RE-CHECK:` and report only the dimensions that were previously `[FAIL]` — do not repeat dimensions that already passed on the prior check.
+**If correction-loop re-check:** prefix scope with `RE-CHECK:` and report **all** checked dimensions explicitly — `[PASS]`, `[WARN]`, and `[FAIL]` — so the Orchestrator can confirm resolution without reading the full prior output.
 
-Omit `[PASS]` lines when there are failures — list only `[FAIL]` and `[WARN]`. Place `[FAIL]` before `[WARN]`. Do not suggest fixes — describe what is wrong and what correct behavior should be. `Requirements` dimension only applies if Orchestrator supplied a spec/acceptance criteria reference; otherwise omit it silently. Ambiguous expected behavior (no clear spec, contract, or convention to check against) → state it in `Assumptions:`, do not silently assume pass or fail.
+Omit `[PASS]` lines in full scans when there are failures — list only `[FAIL]` and `[WARN]`. In RE-CHECK mode `[PASS]` is always shown. Place `[FAIL]` before `[WARN]`. Do not suggest fixes — describe what is wrong and what correct behavior should be. `Requirements` dimension only applies if Orchestrator supplied a spec/acceptance criteria reference; otherwise omit it silently. Ambiguous expected behavior (no clear spec, contract, or convention to check against) → state it in `Assumptions:`, do not silently assume pass or fail.

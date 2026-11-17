@@ -64,7 +64,16 @@ Combinable left-to-right: `PLAN: LOG: task`, `SPEC: PLAN: task`.
 | PM | `agent-3x3-pm_agent.md` | `SPEC:`, unclear requirements, need for user stories/acceptance criteria |
 
 **Delegation rule:** pass only — task description + relevant file paths + prior findings (if any) + shared context filename (if `AGENT_CONTEXT` exists for this session, see below). No full session history.
-**Implementer is optional.** For `[LOW]` and straightforward `[MED]` steps, execute directly. Delegate to Implementer only when the step is risky, involves legacy code, or the Orchestrator needs isolation.
+
+**Implementer — when to delegate (checklist).** Use Implementer (instead of editing directly) when ANY of the following is true:
+- step risk label is `[HIGH]`
+- target file has no test coverage
+- step modifies >3 functions or spans a public API boundary
+- file has a `// LEGACY`, `# LEGACY`, or similar marker in its header
+- Orchestrator identifies the file as unfamiliar from Analyzer findings
+
+For `[LOW]` and straightforward `[MED]` steps outside the above, edit directly — Implementer is optional.
+
 Subagent `[CRITICAL]` or `[FAIL]` result → highlight at top of summary, propose recovery as next steps.
 
 ## Parallel fan-out (conditional)
@@ -136,10 +145,7 @@ Key facts: <max 5 bullets, condensed — not verbatim subagent output>
 - On task completion, update frontmatter `status:` to `done`.
 
 **Deduplication (cost optimization)**
-- Before invoking any subagent, Orchestrator checks the current `AGENT_CONTEXT` file for an existing entry covering the **same scope** (same file(s)/area, same or broader dimensions).
-- If found, and no `edit` has touched those files since that entry's timestamp, Orchestrator **reuses the existing entry** instead of re-invoking the subagent — it is surfaced to the user exactly as if freshly returned, with a one-line note: *"(reused from AGENT_CONTEXT, unchanged since <HH:MM>)"*.
-- If any file in scope was modified after that entry's timestamp, the entry is treated as stale and the subagent is invoked normally.
-- This check itself does not require a tool call beyond reading the already-open `AGENT_CONTEXT` file — it must not become an excuse to skip a genuinely-needed fresh check.
+- Before invoking any subagent, Orchestrator `read`s the current `AGENT_CONTEXT_*` file (using its known path for this session) to check for an existing entry covering the **same scope** (same file(s)/area, same or broader dimensions). Never assume the file is in the model's active window — always read it explicitly.
 
 **Compression (long sessions)**
 - If the file body (excluding frontmatter) exceeds ~40 lines, Orchestrator compresses all entries older than the two most recent subagent calls into a single block:
@@ -182,6 +188,8 @@ Step fails → mark `FAILED`, stop, propose 3 recovery options (retry/skip/rollb
 
 ## LOG: format (opt-in only)
 
+`AGENT_LOG.md` lives at the **workspace/repo root** (never inside `agent-context/`). Created on first `LOG:` use if it does not exist.
+
 ```
 ## N — YYYY-MM-DD
 Ref: <issue/story id, or "none">
@@ -190,6 +198,8 @@ Subagents: none/names · Outcome: done/partial/failed · Next: ...
 ```
 
 ## vscode_askQuestions — always call after every iteration
+
+Use `vscode_askQuestions` when running inside VS Code. **Fallback for CLI / non-VS Code environments:** output the same structured block as plain text and await the user's reply before continuing — never auto-proceed.
 
 **Standard:**
 ```

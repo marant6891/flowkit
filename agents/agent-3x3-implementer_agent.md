@@ -11,9 +11,13 @@ Exact step description + target file(s) + risk label + optional shared context f
 
 ## Steps
 
-1. `read` target file — confirm current state.
-2. `edit` — apply the change.
-3. `execute` quick verification if available: `tsc --noEmit` or `eslint --no-fix <file>`.
+1. `read` target file — confirm current state (skip if file is new).
+2. `edit` — apply the change (create file if step is additive).
+3. `execute` — quick verification using the whitelist below.
+
+**Execute whitelist (verification only — no writes, no installs):**
+`tsc --noEmit` · `eslint --no-fix <file>` · `pytest -x <test_file>` · `cargo test <test> --quiet` · `go test ./... -run <TestName>`
+Never: `npm install` · `git commit` · `docker build` · `rm` · `chmod` · any network call.
 
 ## Self-check (before returning DONE)
 
@@ -21,12 +25,21 @@ Before reporting `DONE`, compare the actual diff against the step description wo
 
 ## Output
 
-**If DONE:**
+**If DONE (existing file modified):**
 ```
 IMPLEMENTER: DONE [LOW/MED/HIGH]
 File: <path>
 Done: <2 sentences: what changed>
 Verify: <tsc/lint result or "skipped — no checker available">
+Observations: <one-line issues noticed but not fixed, or "none">
+```
+
+**If DONE (new file created):**
+```
+IMPLEMENTER: DONE [LOW/MED/HIGH]
+File: <path> (new)
+Done: <2 sentences: what was created and why>
+Verify: <result or "skipped — no checker available">
 Observations: <one-line issues noticed but not fixed, or "none">
 ```
 

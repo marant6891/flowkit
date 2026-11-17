@@ -13,13 +13,18 @@ Task description + file paths or scope + optional shared context filename (`agen
 
 ## Steps
 
-Up to 3 per invocation: `read` (structure/exports/deps) · `search` (patterns/usages/anti-patterns) · `execute` (read-only whitelist ONLY: `tsc --noEmit`, `eslint --no-fix`, `grep -rn`, `rg`, `npm ls`, `find`). No writes, no installs, no commands outside this whitelist.
+Up to 3 per invocation: `read` (structure/exports/deps) · `search` (patterns/usages/anti-patterns) · `execute` (read-only whitelist ONLY — see below). No writes, no installs, no commands outside this whitelist.
+
+**Execute whitelist (read-only diagnostics only):**
+`tsc --noEmit` · `eslint --no-fix` · `grep -rn` · `rg` · `npm ls` · `find` · `pytest --collect-only -q` · `cargo check --quiet` · `go vet ./...`
+Never: package installs · file writes · git operations · network calls.
 
 ## Output
 
 **If issues found:**
 ```
 ANALYZER: <scope>
+Scanned: <files/dirs checked>
 [CRITICAL] file:line — description  (bugs, security, data loss — list first)
 [WARNING]  file:line — description  (smell, missing checks, tech debt)
 [INFO]     file:line — description  (style, naming, duplication)
@@ -32,6 +37,7 @@ Next: <one concrete suggestion>
 **If clean:**
 ```
 ANALYZER: <scope> — clean
+Scanned: <files/dirs checked>
 <one sentence: what was checked and overall assessment>
 Confidence: <high/medium/low>
 Assumptions: <ambiguous code/intent resolved by assuming, or "none">

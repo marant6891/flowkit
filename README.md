@@ -43,11 +43,11 @@ Agenty to samodzielne jednostki AI orkiestrowane przez Claude Code. Wszystkie pl
 
 | Agent | Plik | Tryb | Opis |
 |---|---|---|---|
-| **agent-3x3-analyzer** | [`agent-3x3-analyzer_agent.md`](agents/agent-3x3-analyzer_agent.md) | read-only | Analiza kodu, zależności, struktury. Zwraca findings z poziomem pewności. |
-| **agent-3x3-verifier** | [`agent-3x3-verifier_agent.md`](agents/agent-3x3-verifier_agent.md) | read-only | Weryfikacja implementacji (PASS/WARN/FAIL per wymiar). Wspiera pętlę korekcji. |
-| **agent-3x3-planner** | [`agent-3x3-planner_agent.md`](agents/agent-3x3-planner_agent.md) | read-only | Plan iteracji 3x3 z etykietami ryzyka i estymacją. |
-| **agent-3x3-implementer** | [`agent-3x3-implementer_agent.md`](agents/agent-3x3-implementer_agent.md) | read+write | Realizuje jeden atomowy krok. Zwraca DONE/PARTIAL/BLOCKED + diff summary. |
-| **agent-3x3-devops** | [`agent-3x3-devops_agent.md`](agents/agent-3x3-devops_agent.md) | read+write | CI/CD, Docker, Kubernetes, Terraform, Azure/AWS/GCP, sekrety, monitoring. |
+| **agent-3x3-analyzer** | [`agent-3x3-analyzer_agent.md`](agents/agent-3x3-analyzer_agent.md) | read-only | Analiza kodu, zależności, struktury. Zwraca findings `[CRITICAL]/[WARNING]/[INFO]` z poziomem pewności i listą przeskanowanych plików. |
+| **agent-3x3-verifier** | [`agent-3x3-verifier_agent.md`](agents/agent-3x3-verifier_agent.md) | read-only | Weryfikacja implementacji (PASS/WARN/FAIL per 9 wymiarów). Wspiera pętlę korekcji z pełnym raportem PASS w RE-CHECK trybie. |
+| **agent-3x3-planner** | [`agent-3x3-planner_agent.md`](agents/agent-3x3-planner_agent.md) | read-only | Plan iteracji 3x3 z etykietami ryzyka i estymacją Effort per krok i per iterację. |
+| **agent-3x3-implementer** | [`agent-3x3-implementer_agent.md`](agents/agent-3x3-implementer_agent.md) | read+write | Realizuje jeden atomowy krok. Self-check przed DONE. Zwraca DONE/PARTIAL/BLOCKED + diff summary. Jawna whitelist `execute`. |
+| **agent-3x3-devops** | [`agent-3x3-devops_agent.md`](agents/agent-3x3-devops_agent.md) | read+write | CI/CD, Docker, Kubernetes, Terraform, Azure/AWS/GCP, sekrety, monitoring. Obsługuje tryb standalone (bez Orkiestratora). |
 | **agent-3x3-pm** | [`agent-3x3-pm_agent.md`](agents/agent-3x3-pm_agent.md) | read-only | User stories (US-N), acceptance criteria (AC-N), ADR, decyzje produktowe. |
 
 ### Prefiksy orkiestratora
@@ -176,10 +176,72 @@ claude plugin install flowkit@flowkit
 
 ---
 
-## 🔒 Bezpieczeństwo, zasady i licencja
+## 🔒 Bezpieczeństwo i ochrona autora
 
-- **Dostęp**: Repozytorium jest publiczne do przeglądania i pobierania.
+> [!IMPORTANT]
+> To repozytorium jest **publiczne**. Poniższe zasady chronią autora oraz użytkowników przed przypadkowym ujawnieniem danych wrażliwych.
+
+### Co nigdy nie trafia do repozytorium
+
+Plik [`.gitignore`](.gitignore) wyklucza następujące kategorie — **nie commituj ich nigdy**:
+
+| Kategoria | Przykłady | Ryzyko |
+|---|---|---|
+| Sekrety i klucze | `.env`, `*.key`, `*.pem`, `*.token`, `credentials.*` | Wycieki kluczy API, cloud access |
+| Dane klientów | `*.vtt`, `input/`, `source-materials/`, `client-data/` | GDPR, NDA, poufność |
+| Sesje agenta | `agent-context/`, `AGENT_LOG.md` | Dane robocze z projektów klientów |
+| Klucze chmurowe | `.aws/`, `.azure/`, `.gcloud/`, `service-account*.json` | Nieautoryzowany dostęp do infrastruktury |
+
+### Bezpieczne użytkowanie skilli i agentów
+
+```
+❌ Nie wklejaj:  transkrypcji spotkań klientów, danych osobowych, nazw klientów,
+                 kluczy API, haseł, production hostnames
+
+✅ Zamiast tego: używaj zanonimizowanych przykładów lub pliku lokalnego
+                 (agent odczyta z dysku, plik nie wejdzie do kontekstu publicznego)
+```
+
+### Pliki agentów a bezpieczeństwo
+
+- Pliki `*_agent.md` zawierają **wyłącznie instrukcje behawioralne** — żadnych danych, kluczy ani historii sesji.
+- `AGENT_CONTEXT_*.md` generowane podczas sesji **nie są commitowane** (`.gitignore`). Służą jako prywatna pamięć robocza.
+- Agent DevOps (`agent-3x3-devops`) ma jawną regułę: **nigdy nie hardkoduje sekretów** — zawsze używa referencji zmiennych (`${{ secrets.X }}`, vault paths).
+
+### Zasady dla kontrybutorów
+
+- **Brak bezpośredniego push do `main`**: wszystkie zmiany przez Pull Request na gałęziach `feat/*`, `fix/*`, `docs/*`.
+- **Brak danych klientów w przykładach**: pliki w `examples/` muszą używać fikcyjnych, zanonimizowanych danych.
+- **Walidacja CI przed merge**: `python scripts/validate_skills.py` musi przejść na zielono.
+- **Brak sekretów w commitach**: skonfiguruj lokalne `pre-commit` lub użyj [git-secrets](https://github.com/awslabs/git-secrets).
+
+### Zalecana konfiguracja pre-commit (opcjonalne, lokalne)
+
+```bash
+# Instalacja git-secrets (macOS)
+brew install git-secrets
+git secrets --install
+git secrets --register-aws
+
+# Instalacja detect-secrets (Python)
+pip install detect-secrets
+detect-secrets scan > .secrets.baseline
+```
+
+```powershell
+# Windows — skanowanie przed commitem (PowerShell)
+git diff --cached --name-only | ForEach-Object { Select-String -Path $_ -Pattern "password|secret|token|key" -CaseSensitive:$false }
+```
+
+### Ochrona gałęzi `main`
+
+Bezpośredni push do `main` jest zablokowany regułą GitHub Ruleset ([`protect-main.json`](.github/rulesets/protect-main.json) — wymaga zaimportowania w *Settings → Rules → Rulesets*), która wymaga też zielonego wyniku CI (`validate`). Wszystkie zmiany (zarówno społeczności, jak i właściciela) trafiają do `main` wyłącznie przez Pull Request.
+
+---
+
+## 📋 Zasady inżynierskie i licencja
+
 - **Zasady inżynierskie**: Wszystkie standardy pracy, konwencje commitów oraz strategię gałęzi opisuje dokument [**`DEVELOPMENT.md`**](DEVELOPMENT.md).
-- **Ochrona gałęzi `main`**: Bezpośredni push do `main` jest zablokowany regułą GitHub Ruleset ([`protect-main.json`](.github/rulesets/protect-main.json) — wymaga zaimportowania w *Settings → Rules → Rulesets*), która wymaga też zielonego wyniku CI (`validate`). Wszystkie zmiany (zarówno społeczności, jak i właściciela) trafiają do `main` wyłącznie przez Pull Request na gałęziach `feat/*`, `fix/*`.
-- **Ochrona danych**: Plik [`.gitignore`](.gitignore) wyklucza dane wrażliwe, sekrety, pliki `.env` oraz tymczasowe pliki edytorów.
-- **Licencja**: Kod udostępniany jest na bezpiecznej, otwartej licencji [MIT](LICENSE).
+- **Licencja**: Kod udostępniany jest na otwartej licencji [MIT](LICENSE).  
+  Skille i agenty są narzędziami generującymi treści — **odpowiedzialność za weryfikację wygenerowanych dokumentów spoczywa na użytkowniku**.
+- **Brak gwarancji**: Repozytorium jest udostępniane "as is". Autor nie ponosi odpowiedzialności za decyzje podjęte na podstawie output agentów bez weryfikacji przez człowieka.

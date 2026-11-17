@@ -166,6 +166,20 @@ claude plugin install flowkit@flowkit
 
 ---
 
+## 📄 Standard silnika dokumentacji (.docx / Markdown)
+
+Zarówno skille analityczne (`client-pt-prd-writer`, `client-meeting-recap`), jak i agenci (`agent-3x3`, `agent-3x3-implementer`) stosują **inteligentny, deterministyczny standard obsługi dokumentów**:
+
+1. **Priorytet 1: `python-docx` (`import docx`)** — podstawowa, wiodąca biblioteka do odczytu szablonów i generowania plików Word (`.docx`). Zapewnia pełne zachowanie stylów klienta, nagłówków, stopek i tabel.
+2. **Inteligentna detekcja środowiska**: Przed generowaniem agent/skill sprawdza, jakie biblioteki są rzeczywiście zainstalowane w bieżącym środowisku (`python-docx`, `mammoth`, `docx2txt`, `pypandoc`).
+3. **Korzystanie z bibliotek zainstalowanych**: Nigdy nie są doinstalowywane losowe biblioteki w tle — narzędzia korzystają z tego, czym dysponuje system użytkownika.
+4. **Spójność w sesji**: Wybrany silnik obowiązuje przez całą sesję (brak przełączania bibliotek między turami).
+5. **Czysty fallback**: W razie braku bibliotek `.docx` generowany jest w 100% ustrukturyzowany plik Markdown (`.md`) z czytelną informacją o możliwości zainstalowania `python-docx` (`pip install python-docx`).
+
+Szczegółowy przewodnik silnika znajduje się w [`skills/client-pt-prd-writer/references/docx-engine.md`](skills/client-pt-prd-writer/references/docx-engine.md).
+
+---
+
 ## ➕ Jak dodać nowy skill do repozytorium?
 
 1. Skopiuj folder [`skills/_template/`](skills/_template/) do nowego katalogu `skills/<nowa-nazwa>/`.

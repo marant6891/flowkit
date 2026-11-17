@@ -55,7 +55,9 @@ Anna Nowak: Możemy to zrobić do czwartku, jeśli dostaniemy dane dostępowe.
 
 ---
 
-## 4. Pliki `.docx` z automatyczną transkrypcją (Word, Teams)
+## 4. Pliki `.docx` z automatyczną transkrypcją (Word, Teams, Google Meet)
+
+Do odczytu plików `.docx` zastosuj [instrukcję wyboru silnika docx](./docx-engine.md) (priorytet 1: `python-docx` / `docx2txt` z bibliotek zainstalowanych w środowisku).
 
 Plik Word zawiera transkrypcję w tabeli lub jako ciągły tekst z nagłówkami mówców i znacznikami czasu w nawiasach, np. `[00:05:34]`. Usuń znaczniki czasu, zachowaj imiona mówców.
 

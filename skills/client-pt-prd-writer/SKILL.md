@@ -67,13 +67,13 @@ a nie kompletność wszystkich sekcji.
    poprzedniego dokumentu, link). Jeśli wspomina o szablonie, ale go nie
    załączył – poproś o niego jednym pytaniem.
 2. **Jeśli jest szablon użytkownika:**
-   - przeczytaj go w całości (dla .docx/.dotx użyj skilla docx),
+   - przeczytaj go w całości; dla plików `.docx`/`.dotx` zastosuj [instrukcję wyboru silnika docx](./references/docx-engine.md) (priorytet: `python-docx` / `import docx`, z inteligentną detekcją zainstalowanych bibliotek w środowisku),
    - spisz mapę sekcji szablonu wg [instrukcji mapowania](./references/template-mapping.md),
    - zachowaj kolejność, numerację, nazwy sekcji, style, nagłówki/stopki, stronę
      tytułową, metryczkę i tabele szablonu; nie dodawaj sekcji, których szablon
      nie przewiduje – brakujące elementy obowiązkowe (np. Tematy do wyjaśnienia)
      dołącz jako ostatni rozdział lub załącznik, w stylu szablonu,
-   - wynik oddaj w formacie szablonu (szablon .docx → dokument .docx).
+   - wynik oddaj w formacie szablonu (szablon .docx → dokument .docx generowany z zachowaniem stylów przez `python-docx`, lub fallback do .md gdy brak bibliotek docx).
 3. **Jeśli brak szablonu:** użyj [szablonu zapasowego](./templates/client-pt-prd-template.md)
    i oddaj dokument w formacie, o który prosi użytkownik.
 4. Gdy użytkownik dostarczy poprzedni dokument jako wzór – przejmij z niego

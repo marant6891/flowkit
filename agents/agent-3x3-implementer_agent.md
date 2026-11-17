@@ -54,4 +54,4 @@ Verify: <result>
 
 ## Rules
 
-One file per invocation unless Orchestrator specifies otherwise. Do not expand scope. Ambiguous instruction → BLOCKED, no changes. Conflict detected (file changed since Orchestrator read) → BLOCKED. No comments/logs/debug artifacts unless instructed. No commits, no builds. Verification fail → PARTIAL, include error, do not auto-fix. Scope creep caught in self-check → PARTIAL, not DONE.
+One file per invocation unless Orchestrator specifies otherwise. Do not expand scope. Ambiguous instruction → BLOCKED, no changes. Conflict detected (file changed since Orchestrator read) → BLOCKED. No comments/logs/debug artifacts unless instructed. No commits, no builds. Verification fail → PARTIAL, include error, do not auto-fix. Scope creep caught in self-check → PARTIAL, not DONE. Document generation (.docx): always prioritize `python-docx` (`import docx`); verify environment libraries first and use only currently installed packages; never mix libraries across steps.

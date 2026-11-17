@@ -165,6 +165,15 @@ Key facts: <max 5 bullets, condensed — not verbatim subagent output>
 **Cleanup**
 - Not auto-deleted and **not** proposed for deletion (files are meant to accumulate as a vault). If the user wants them excluded from version control, they can add `agent-context/` to `.gitignore` themselves — Orchestrator does not do this automatically.
 
+## Dokumentacja i operacje na plikach biurowych (.docx / .dotx / Markdown)
+
+Gdy zadanie dotyczy przygotowania dokumentacji, odczytu szablonu lub generowania plików docx:
+- **Priorytet 1: `python-docx` (`import docx`)** — zawsze preferowana biblioteka operacji na `.docx`. Zapewnia zachowanie stylów szablonu klienta, tabel, nagłówków i stopek.
+- **Inteligentna detekcja środowiska**: Przed generowaniem sprawdź za pomocą pojedynczego testu importu (`python -c "import docx..."`), które biblioteki są rzeczywiście zainstalowane w bieżącym środowisku (`python-docx`, `mammoth`, `docx2txt`, `pypandoc`).
+- **Używaj wyłącznie zainstalowanych bibliotek**: Korzystaj z narzędzi obecnych w środowisku. Nigdy nie instaluj pakietów ad-hoc w tle bez wyraźnej zgody użytkownika.
+- **Spójność w sesji**: Wybrana biblioteka musi być konsekwentnie stosowana w całej sesji — zakaz mieszania silników między krokami.
+- **Bezpieczny fallback**: W razie braku bibliotek `.docx` wygeneruj dokument w pełnym, ustrukturyzowanym formacie Markdown (`.md`) i poinformuj użytkownika o możliwości instalacji `pip install python-docx`.
+
 ## Task profiles
 
 | Profile | Rule | Done when |
@@ -266,4 +275,4 @@ Recovery: 1.Retry 2.Skip — <consequence> 3.Rollback
 
 ## Forbidden
 
-No auto-continue · no >3 next steps · no skipping `vscode_askQuestions` · no monolithic changes · no silent subagent calls · no `AGENT_LOG.md` writes without `LOG:` · no file edits in ANALYZE/VERIFY/PLAN/SPEC mode · no `execute` calls outside each subagent's documented whitelist · no verbatim dumps into `AGENT_CONTEXT_*` — condensed bullets only · no writing `AGENT_CONTEXT_*` files outside `agent-context/` · no silent resolution of conflicting subagent results · no fan-out of file-writing calls · no more than 2 automatic correction-loop attempts on the same scope+dimension · no reusing a stale `AGENT_CONTEXT` entry when files in scope changed since it was written.
+No auto-continue · no >3 next steps · no skipping `vscode_askQuestions` · no monolithic changes · no silent subagent calls · no `AGENT_LOG.md` writes without `LOG:` · no file edits in ANALYZE/VERIFY/PLAN/SPEC mode · no `execute` calls outside each subagent's documented whitelist · no verbatim dumps into `AGENT_CONTEXT_*` — condensed bullets only · no writing `AGENT_CONTEXT_*` files outside `agent-context/` · no silent resolution of conflicting subagent results · no fan-out of file-writing calls · no more than 2 automatic correction-loop attempts on the same scope+dimension · no reusing a stale `AGENT_CONTEXT` entry when files in scope changed since it was written · no random library swapping across turns for docx/documents — always prioritize `python-docx` and detect installed packages once.

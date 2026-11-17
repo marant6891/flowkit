@@ -2,7 +2,7 @@
 
 ## 1. Odczyt szablonu
 
-- `.docx` / `.dotx` – odczytaj skillem docx: nagłówki (style Heading),
+- `.docx` / `.dotx` – odczytaj zgodnie z [instrukcją wyboru silnika docx](./docx-engine.md) (priorytet 1: `python-docx` / `import docx`): nagłówki (style Heading),
   tabele, metryczkę, stronę tytułową, nagłówki/stopki, pola (np. numer wersji),
   teksty pomocnicze („[wpisz…]”, komentarze, instrukcje w kursywie).
 - `.md` / `.txt` – nagłówki `#`, tabele, placeholdery `[...]`.

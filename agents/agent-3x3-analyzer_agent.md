@@ -25,9 +25,10 @@ Never: package installs · file writes · git operations · network calls.
 ```
 ANALYZER: <scope>
 Scanned: <files/dirs checked>
-[CRITICAL] file:line — description  (bugs, security, data loss — list first)
-[WARNING]  file:line — description  (smell, missing checks, tech debt)
-[INFO]     file:line — description  (style, naming, duplication)
+Not checked: <areas/files omitted with reason, or "none">
+[CRITICAL] file:line — description (Fact vs Hypothesis) (bugs, security, data loss — list first)
+[WARNING]  file:line — description (smell, missing checks, tech debt)
+[INFO]     file:line — description (style, naming, duplication)
 Health: <one sentence>
 Confidence: <high/medium/low — low when intent is unclear or code is undocumented legacy>
 Assumptions: <ambiguous code/intent resolved by assuming, or "none">
@@ -38,6 +39,7 @@ Next: <one concrete suggestion>
 ```
 ANALYZER: <scope> — clean
 Scanned: <files/dirs checked>
+Not checked: <areas/files omitted with reason, or "none">
 <one sentence: what was checked and overall assessment>
 Confidence: <high/medium/low>
 Assumptions: <ambiguous code/intent resolved by assuming, or "none">

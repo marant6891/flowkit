@@ -1,0 +1,5 @@
+2026-11-17T14:02:11Z ALERT [DatabaseConnectionPoolExhausted] active_connections=100 max=100
+2026-11-17T14:02:45Z ERROR [OrderService] Failed to acquire DB connection after 30s timeout
+2026-11-17T14:05:00Z INCIDENT_COMMANDER [IC-Jan] Declared SEV-1 incident. Status page updated.
+2026-11-17T14:12:00Z MITIGATION [DevOps-Anna] Scaled read-replica pool and restarted unreleased connection leak.
+2026-11-17T14:15:22Z RESOLVED [AllServicesOperational] Error rate dropped to 0.01%

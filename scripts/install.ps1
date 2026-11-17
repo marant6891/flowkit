@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Bezpieczny instalator skilli i agentów z repozytorium FlowKit.
 .PARAMETER SkillName

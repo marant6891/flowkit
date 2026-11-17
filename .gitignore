@@ -84,6 +84,7 @@ __pycache__/
 # passed to skills must NEVER be committed.
 # =============================================
 *.vtt
+!tests/fixtures/**
 input/
 source-materials/
 client-data/

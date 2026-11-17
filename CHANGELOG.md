@@ -11,15 +11,32 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 ## [1.3.0] — 2026-11-17
 
 ### Dodano
-- **Katalog Agentów (`agents/`)**: Wprowadzono pełny system 7 agentów (`agent-3x3` jako główny orkiestrator oraz 6 wyspecjalizowanych subagentów: Analyzer, Verifier, Planner, Implementer, DevOps, PM).
+- **Dwuwarstwowa architektura agentów (`agents/core/` + `agents/adapters/`)**:
+  - `agents/core/`: 7 platformowo-neutralnych kontraktów architektonicznych definiujących stany, formaty wejścia/wyjścia i reguły (Orchestrator, Analyzer, Verifier, Planner, Implementer, DevOps, PM).
+  - `agents/adapters/claude-code/`: natywne konfiguracje dla Claude Code z oficjalnymi narzędziami (`Read`, `Grep`, `Glob`, `Edit`, `Bash`, `Agent`).
+  - `agents/adapters/vscode/`: natywne konfiguracje `.agent.md` dla VS Code Copilot Custom Agents.
+  - Pełna kompatybilność wsteczna w katalogu głównym `agents/`.
 - **Deterministyczny silnik obsługi dokumentów (.docx/.dotx)**: Dodano `references/docx-engine.md` z inteligentną detekcją zainstalowanych bibliotek w środowisku (`python-docx` jako priorytet 1, `mammoth`, `docx2txt`, `pypandoc`, fallback do Markdown).
-- **Instalator skilli i agentów**: Rozszerzono `install.ps1` oraz `install.sh` o obsługę instalacji agentów (`-AgentName all` / `agent all`) do `~/.claude/agents/`.
-- **Manifesty wtyczek**: Zaktualizowano `.claude-plugin/plugin.json` oraz `marketplace.json` do wersji 1.3.0 z definicjami sekcji `agents`.
+- **Kompleksowa suita walidacyjna i testowa (`scripts/validate_all.py`)**:
+  - `scripts/validate_agents.py`: automatyczna weryfikacja poprawności YAML, pól `name`/`description` i narzędzi.
+  - `scripts/validate_manifest.py`: weryfikacja integralności manifestów wtyczek i istnienia wszystkich deklarowanych ścieżek.
+  - `tests/test_flowkit.py` + fixtures (`buggy-code/`, `transcripts/`, `incident-scenarios/`): automatyczne testy jednostkowe kontraktów i integralności platformowej.
+- **Bezpieczny instalator (`install.ps1`, `install.sh`)**:
+  - Dodano flagi `--dry-run` / `-DryRun` do bezpiecznej symulacji operacji.
+  - Dodano flagi `--force` / `-Force` z ochroną przed przypadkowym nadpisaniem plików.
+  - Dodano wybór platformy docelowej: `--platform claude` oraz `--platform vscode`.
+  - Wprowadzono whitelistę nazw uniemożliwiającą path traversal.
+  - Dodano opcję kontrolowanej deinstalacji (`--uninstall`).
+- **Macierz kompatybilności platform w README**: Precyzyjne zdefiniowanie poziomu integracji dla Claude Code, VS Code Copilot, Antigravity, Cursor oraz OpenAI ChatGPT/Codex.
 
 ### Poprawiono i zabezpieczono
-- Naprawiono wykrywanie agenta domyślnego w VS Code (`agent-3x3`).
-- Zabezpieczenie autora w repozytorium publicznym: rozszerzono `.gitignore` (m.in. `agent-context/`, `AGENT_LOG.md`, pliki klientów, transkrypcje, klucze) oraz dodano dedykowaną sekcję bezpieczeństwa w `README.md`.
-- Wdrożono pełne 16 poprawek jakościowych audytu agentów (m.in. whitelist narzędzi `execute`, jawne raportowanie w trybie RE-CHECK, standalone mode dla DevOps).
+- **Naprawiono błąd YAML w nagłówku orkiestratora (`agent-3x3_agent.md`)**: Wprowadzono bezpieczny blok wieloliniowy YAML scalar (`description: >-`), eliminujący błąd parsowania `mapping values are not allowed in this context`.
+- **Neutralizacja zdarzeń procesowych orkiestratora**: Zastąpiono sztywne powiązanie z `vscode_askQuestions` neutralnymi zdarzeniami lifecycle: `REPORT_PROGRESS`, `ASK_USER`, `WAIT_FOR_APPROVAL`, `CONTINUE`, `STOP`.
+- **Wymuszenie reguł bezpieczeństwa i eliminacja fałszywych PASS-ów**:
+  - W Verifierze wprowadzono status `[NOT VERIFIED]` z zakazem raportowania sukcesu testów bez rzeczywistego uruchomienia suite testowego.
+  - W Analyzerze dodano techniczne ograniczenia i raportowanie `Not checked:`.
+  - W Implementerze dodano ścisłą whitelistę weryfikacji i ochronę przed scope creep.
+- **Zabezpieczenie autora w repozytorium publicznym**: Rozszerzono `.gitignore` (m.in. `agent-context/`, `AGENT_LOG.md`, dane klientów, transkrypcje, klucze) oraz dodano dedykowaną sekcję bezpieczeństwa w `README.md`.
 
 ---
 

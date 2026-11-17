@@ -26,8 +26,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyyaml
 
-      - name: Validate skills structure, frontmatter and versions
-        run: python scripts/validate_skills.py
+      - name: Validate skills, agents, and plugin manifests
+        run: python scripts/validate_all.py
 
       - name: Check installer is executable
         run: test -x scripts/install.sh

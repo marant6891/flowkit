@@ -29,24 +29,28 @@ Repozytorium spełnia standard otwartych skilli AI oraz posiada manifest [`.clau
 
 ---
 
-## 🤖 Katalog agentów (Agents Catalog)
+## 🤖 Architektura i katalog agentów (Agents Catalog)
 
-Agenty to samodzielne jednostki AI orkiestrowane przez Claude Code. Wszystkie pliki agentów znajdują się w katalogu [`agents/`](agents/).
+FlowKit realizuje dwuwarstwową architekturę agentów oddzielającą logikę domenową od specyfiki danego hosta:
+- **`agents/core/`** — platformowo neutralne kontrakty, reguły, formaty wyjściowe i stany procesowe (`DISCOVER`, `PLAN`, `EXECUTE`, `VERIFY`, `REPORT_PROGRESS`, `ASK_USER`, `WAIT_FOR_APPROVAL`).
+- **`agents/adapters/claude-code/`** — dedykowane adaptery Claude Code z oficjalnymi narzędziami (`Read`, `Grep`, `Glob`, `Edit`, `Bash`, `Agent`).
+- **`agents/adapters/vscode/`** — dedykowane agenci VS Code Copilot Custom Agents (`.agent.md`) z interaktywnymi promptami i handoffs.
+- **`agents/`** — zunifikowane pliki zapewniające pełną kompatybilność wsteczną.
 
 ### Orkiestrator
 
 | Agent | Plik | Opis |
 |---|---|---|
-| **agent-3x3** | [`agent-3x3_agent.md`](agents/agent-3x3_agent.md) | Główny orkiestrator. Iteracyjny development: max 3 kroki na iterację, wymuszone podsumowanie i potwierdzenie użytkownika. Obsługuje prefiksy `ANALYZE:` `VERIFY:` `PLAN:` `SPEC:` `DRY:` `LOG:` `DEVOPS:`. Koordynuje wszystkie subagenty poniżej. |
+| **agent-3x3** | [`agent-3x3_agent.md`](agents/agent-3x3_agent.md) | Główny orkiestrator. Iteracyjny development: max 3 kroki na iterację, wymuszone podsumowanie (`REPORT_PROGRESS`) i potwierdzenie użytkownika (`ASK_USER`). Obsługuje prefiksy `ANALYZE:` `VERIFY:` `PLAN:` `SPEC:` `DRY:` `LOG:` `DEVOPS:`. Koordynuje subagenty. |
 
 ### Subagenty (wywoływane przez orkiestratora)
 
 | Agent | Plik | Tryb | Opis |
 |---|---|---|---|
-| **agent-3x3-analyzer** | [`agent-3x3-analyzer_agent.md`](agents/agent-3x3-analyzer_agent.md) | read-only | Analiza kodu, zależności, struktury. Zwraca findings `[CRITICAL]/[WARNING]/[INFO]` z poziomem pewności i listą przeskanowanych plików. |
-| **agent-3x3-verifier** | [`agent-3x3-verifier_agent.md`](agents/agent-3x3-verifier_agent.md) | read-only | Weryfikacja implementacji (PASS/WARN/FAIL per 9 wymiarów). Wspiera pętlę korekcji z pełnym raportem PASS w RE-CHECK trybie. |
+| **agent-3x3-analyzer** | [`agent-3x3-analyzer_agent.md`](agents/agent-3x3-analyzer_agent.md) | read-only | Analiza kodu, zależności, struktury. Zwraca findings `[CRITICAL]/[WARNING]/[INFO]`, listę `Scanned:` i `Not checked:` oraz odróżnia fakty od hipotez. |
+| **agent-3x3-verifier** | [`agent-3x3-verifier_agent.md`](agents/agent-3x3-verifier_agent.md) | read-only | Weryfikacja implementacji per 9 wymiarów (`Logic`, `Contracts`, `Tests`, `Dependencies`, `Security`, `Performance`, `Consistency`, `Docs`, `Requirements`). Raportuje `[PASS]`, `[WARN]`, `[FAIL]` oraz `[NOT VERIFIED]` (zakaz fałszywych passów bez testów). |
 | **agent-3x3-planner** | [`agent-3x3-planner_agent.md`](agents/agent-3x3-planner_agent.md) | read-only | Plan iteracji 3x3 z etykietami ryzyka i estymacją Effort per krok i per iterację. |
-| **agent-3x3-implementer** | [`agent-3x3-implementer_agent.md`](agents/agent-3x3-implementer_agent.md) | read+write | Realizuje jeden atomowy krok. Self-check przed DONE. Zwraca DONE/PARTIAL/BLOCKED + diff summary. Jawna whitelist `execute`. |
+| **agent-3x3-implementer** | [`agent-3x3-implementer_agent.md`](agents/agent-3x3-implementer_agent.md) | read+write | Realizuje jeden atomowy krok. Self-check diffa przed zwrotem statusu. Zwraca DONE/PARTIAL/BLOCKED. Ścisła whitelist operacji. |
 | **agent-3x3-devops** | [`agent-3x3-devops_agent.md`](agents/agent-3x3-devops_agent.md) | read+write | CI/CD, Docker, Kubernetes, Terraform, Azure/AWS/GCP, sekrety, monitoring. Obsługuje tryb standalone (bez Orkiestratora). |
 | **agent-3x3-pm** | [`agent-3x3-pm_agent.md`](agents/agent-3x3-pm_agent.md) | read-only | User stories (US-N), acceptance criteria (AC-N), ADR, decyzje produktowe. |
 
@@ -63,6 +67,18 @@ Agenty to samodzielne jednostki AI orkiestrowane przez Claude Code. Wszystkie pl
 | `DEVOPS:` | wywołuje agenta DevOps |
 
 Prefiksy można łączyć od lewej do prawej: `PLAN: LOG: zadanie`, `SPEC: PLAN: zadanie`.
+
+---
+
+## 🌐 Macierz kompatybilności platform
+
+| Platforma | Skille | Agenty | Instalator | Poziom integracji |
+|---|---|---|---|---|
+| **Claude Code** | Natywne (`~/.claude/skills/`) | Dedykowane (`agents/adapters/claude-code/`) | `install.ps1` / `install.sh -Platform claude` | **Natywne / Pełne** (zweryfikowane CI) |
+| **VS Code Copilot** | Natywne (`.prompt.md`) | Dedykowane `.agent.md` (`agents/adapters/vscode/`) | `install.ps1` / `install.sh -Platform vscode` | **Natywne / Pełne** (zweryfikowane CI) |
+| **Antigravity** | Otwarty standard Agent Skills | Bundle wtyczki (`.claude-plugin/plugin.json`) | Marketplace / repo bundle | **Natywne / Pełne** (v1.3.0) |
+| **Cursor** | `.cursor/rules/<skill>.mdc` | Reguły workspace | Ręczny / skopiowanie reguł | **Instrukcja konfiguracji** |
+| **OpenAI Codex / ChatGPT** | Instructions + Knowledge files | Custom GPT System Prompt | Ręczny eksport | **Instrukcja konfiguracji** |
 
 ---
 
@@ -97,40 +113,38 @@ Prefiksy można łączyć od lewej do prawej: `PLAN: LOG: zadanie`, `SPEC: PLAN:
 
 Agenty instaluje się do `~/.claude/agents/` (globalni) lub `.claude/agents/` (lokalni w projekcie).
 
-#### Opcja A: Automatyczny instalator
+#### Opcja A: Automatyczny instalator (PowerShell / Bash)
 
 ```powershell
-# Windows — zainstaluj wszystkich agentów globalnie
-.\scripts\install.ps1 -AgentName all
+# Windows — instalacja agentów dla Claude Code (domyślnie ~/.claude/agents)
+.\scripts\install.ps1 -AgentName all -Platform claude
 
-# Tylko orkiestrator
-.\scripts\install.ps1 -AgentName agent-3x3
+# Windows — instalacja dedykowanych agentów dla VS Code Copilot (.github/agents/*.agent.md)
+.\scripts\install.ps1 -AgentName all -Platform vscode
 
-# Skill + agent jednocześnie
-.\scripts\install.ps1 -SkillName devops-incident-postmortem -AgentName agent-3x3-devops
+# Bezpieczna symulacja instalacji (dry-run)
+.\scripts\install.ps1 -AgentName all -DryRun
 
-# Lokalnie w projekcie
-.\scripts\install.ps1 -AgentName all -AgentTargetPath ./.claude/agents
+# Wymuszenie nadpisania istniejących konfiguracji
+.\scripts\install.ps1 -AgentName all -Force
 ```
 
 ```bash
-# Linux / macOS — wszystkich agentów globalnie
-./scripts/install.sh agent all
+# Linux / macOS — instalacja dla Claude Code
+./scripts/install.sh agent all --platform claude
 
-# Tylko orkiestrator
-./scripts/install.sh agent agent-3x3
+# Linux / macOS — instalacja dla VS Code Copilot
+./scripts/install.sh agent all --platform vscode
 
-# Lokalnie w projekcie
-./scripts/install.sh agent all ~/.claude/agents
+# Tryb symulacji (dry-run)
+./scripts/install.sh agent all --dry-run
 ```
 
 #### Opcja B: Ręczna instalacja agentów
 
-Skopiuj pliki `*_agent.md` z katalogu [`agents/`](agents/) do:
-- `~/.claude/agents/` — instalacja globalna (agent dostępny we wszystkich projektach)
-- `.claude/agents/` w katalogu projektu — instalacja lokalna
-
-Po instalacji globalnej Claude Code automatycznie wykryje agentów. **Domyślnym agentem startowym** w VS Code jest `agent-3x3` (orkiestrator).
+- Dla **Claude Code**: skopiuj pliki z [`agents/adapters/claude-code/`](agents/adapters/claude-code/) do `~/.claude/agents/` (globalnie) lub `.claude/agents/` (w projekcie).
+- Dla **VS Code Copilot**: skopiuj pliki z [`agents/adapters/vscode/`](agents/adapters/vscode/) do `.github/agents/`.
+- Pliki w [`agents/core/`](agents/core/) zawierają nadrzędne kontrakty zachowań i formatów wyjściowych niezależne od platformy.
 
 ---
 

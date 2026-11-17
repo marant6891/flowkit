@@ -1,14 +1,11 @@
 #!/usr/bin/env bash
-# FlowKit Installer — skille i agenty
-# Użycie:
-#   ./scripts/install.sh skill <skill-name> [target-dir]
-#   ./scripts/install.sh agent <agent-name|all> [target-dir]
-#   ./scripts/install.sh skill <skill-name> && ./scripts/install.sh agent all
+# FlowKit Safe Installer — skille i agenty
+# Obsługuje flagi: --dry-run, --force, --platform claude|vscode, --uninstall
 #
 # Przykłady:
-#   ./scripts/install.sh skill client-pt-prd-writer
-#   ./scripts/install.sh agent all
-#   ./scripts/install.sh agent agent-3x3
+#   ./scripts/install.sh skill client-pt-prd-writer --dry-run
+#   ./scripts/install.sh agent all --platform claude --force
+#   ./scripts/install.sh agent agent-3x3 --platform vscode
 
 set -e
 
@@ -17,97 +14,204 @@ REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 SKILLS_DIR="$REPO_ROOT/skills"
 AGENTS_DIR="$REPO_ROOT/agents"
 
-MODE="${1:-}"
-NAME="${2:-}"
+MODE=""
+NAME=""
+TARGET_DIR=""
+DRY_RUN=false
+FORCE=false
+UNINSTALL=false
+PLATFORM="claude"
 
-list_available() {
-    echo ""
-    echo "=== FlowKit Installer ==="
-    echo ""
-    echo "Dostępne SKILLE:"
-    for d in "$SKILLS_DIR"/*/; do
-        base="$(basename "$d")"
-        if [[ ! "$base" =~ ^_ ]]; then echo "  - $base"; fi
-    done
-    echo ""
-    echo "Dostępne AGENTY:"
-    for f in "$AGENTS_DIR"/*_agent.md; do
-        base="$(basename "$f" _agent.md)"
-        echo "  - $base"
-    done
-    echo "  (użyj 'all' aby zainstalować wszystkich agentów)"
-    echo ""
-}
+# Parsowanie argumentów
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        skill|agent)
+            MODE="$1"
+            shift
+            if [[ $# -gt 0 && ! "$1" =~ ^-- ]]; then
+                NAME="$1"
+                shift
+            fi
+            ;;
+        --dry-run)
+            DRY_RUN=true
+            shift
+            ;;
+        --force)
+            FORCE=true
+            shift
+            ;;
+        --uninstall)
+            UNINSTALL=true
+            shift
+            ;;
+        --platform)
+            PLATFORM="$2"
+            shift 2
+            ;;
+        --target)
+            TARGET_DIR="$2"
+            shift 2
+            ;;
+        -h|--help)
+            echo "Użycie: $0 [skill|agent] [nazwa|all] [--platform claude|vscode] [--dry-run] [--force] [--uninstall]"
+            exit 0
+            ;;
+        *)
+            if [ -z "$TARGET_DIR" ]; then
+                TARGET_DIR="$1"
+            fi
+            shift
+            ;;
+    esac
+done
+
+AVAILABLE_SKILLS=("client-pt-prd-writer" "client-meeting-recap" "devops-incident-postmortem")
+AVAILABLE_AGENTS=("agent-3x3" "agent-3x3-analyzer" "agent-3x3-verifier" "agent-3x3-planner" "agent-3x3-implementer" "agent-3x3-devops" "agent-3x3-pm")
 
 if [ -z "$MODE" ]; then
-    list_available
-    echo "Użycie: $0 skill <nazwa> | $0 agent <nazwa|all>"
+    echo ""
+    echo "=== FlowKit Safe Installer (Platform: $PLATFORM) ==="
+    echo ""
+    echo "Dostępne SKILLE:"
+    for s in "${AVAILABLE_SKILLS[@]}"; do echo "  - $s"; done
+    echo ""
+    echo "Dostępne AGENTY:"
+    for a in "${AVAILABLE_AGENTS[@]}"; do echo "  - $a"; done
+    echo "  (użyj 'all' aby wybrać wszystkich agentów)"
+    echo ""
+    echo "Użycie: $0 skill <nazwa> | $0 agent <nazwa|all> [--dry-run] [--force]"
     exit 0
 fi
 
-# --- Instalacja skilla ---
+# --- SKILLE ---
 if [ "$MODE" = "skill" ]; then
-    TARGET_DIR="${3:-$HOME/.claude/skills}"
-
-    if [ -z "$NAME" ]; then
-        echo "Dostępne skille:"
-        for d in "$SKILLS_DIR"/*/; do
-            base="$(basename "$d")"
-            if [[ ! "$base" =~ ^_ ]]; then echo "  - $base"; fi
-        done
-        read -rp "Podaj nazwę skilla: " NAME
+    if [ -z "$TARGET_DIR" ]; then
+        if [ "$PLATFORM" = "vscode" ]; then
+            TARGET_DIR="$REPO_ROOT/.github/skills"
+        else
+            TARGET_DIR="$HOME/.claude/skills"
+        fi
     fi
 
-    SOURCE_PATH="$SKILLS_DIR/$NAME"
-    if [ ! -d "$SOURCE_PATH" ]; then
-        echo "Błąd: Skill '$NAME' nie istnieje w $SKILLS_DIR." >&2
+    # Walidacja whitelist
+    VALID=false
+    for s in "${AVAILABLE_SKILLS[@]}"; do
+        if [ "$s" = "$NAME" ]; then VALID=true; break; fi
+    done
+    if [ "$VALID" = false ]; then
+        echo "Błąd: Nieprawidłowa nazwa skilla '$NAME'. Dozwolone: ${AVAILABLE_SKILLS[*]}" >&2
         exit 1
     fi
 
-    mkdir -p "$TARGET_DIR"
-    cp -r "$SOURCE_PATH" "$TARGET_DIR/"
-    echo "✓ Skill '$NAME' zainstalowany w: $TARGET_DIR/$NAME"
-    echo "  Claude Code ma teraz dostęp do tego skilla."
+    DEST="$TARGET_DIR/$NAME"
+    SRC="$SKILLS_DIR/$NAME"
 
-# --- Instalacja agenta/agentów ---
+    if [ "$UNINSTALL" = true ]; then
+        echo "[UNINSTALL] Usuwanie skilla '$NAME' z: $DEST"
+        if [ -d "$DEST" ]; then
+            if [ "$DRY_RUN" = true ]; then
+                echo "  [DRY-RUN] Usunięto by katalog $DEST"
+            else
+                rm -rf "$DEST"
+                echo "  ✓ Skill odinstalowany pomyślnie"
+            fi
+        else
+            echo "  Skill nie był zainstalowany w tej lokalizacji."
+        fi
+        exit 0
+    fi
+
+    echo "[INSTALL] Instalowanie skilla '$NAME' w: $DEST"
+    if [ -d "$DEST" ] && [ "$FORCE" = false ] && [ "$DRY_RUN" = false ]; then
+        read -rp "Katalog $DEST już istnieje. Nadpisać? (t/N) " confirm
+        if [[ ! "$confirm" =~ ^[tTyY]$ ]]; then
+            echo "Pominięto instalację."
+            exit 0
+        fi
+    fi
+
+    if [ "$DRY_RUN" = true ]; then
+        echo "  [DRY-RUN] Skopiowano by $SRC/* do $DEST"
+    else
+        mkdir -p "$DEST"
+        cp -r "$SRC/"* "$DEST/"
+        echo "  ✓ Skill '$NAME' zainstalowany pomyślnie"
+    fi
+
+# --- AGENTY ---
 elif [ "$MODE" = "agent" ]; then
-    TARGET_DIR="${3:-$HOME/.claude/agents}"
+    if [ -z "$TARGET_DIR" ]; then
+        if [ "$PLATFORM" = "vscode" ]; then
+            TARGET_DIR="$REPO_ROOT/.github/agents"
+        else
+            TARGET_DIR="$HOME/.claude/agents"
+        fi
+    fi
 
-    install_agent() {
-        local agent_name="$1"
-        local src="$AGENTS_DIR/${agent_name}_agent.md"
+    process_agent() {
+        local a="$1"
+        local src=""
+        local dest=""
+
+        if [ "$PLATFORM" = "vscode" ]; then
+            src="$AGENTS_DIR/adapters/vscode/${a}.agent.md"
+            if [ ! -f "$src" ]; then src="$AGENTS_DIR/${a}_agent.md"; fi
+            dest="$TARGET_DIR/${a}.agent.md"
+        else
+            src="$AGENTS_DIR/adapters/claude-code/${a}.md"
+            if [ ! -f "$src" ]; then src="$AGENTS_DIR/${a}_agent.md"; fi
+            dest="$TARGET_DIR/${a}.md"
+        fi
+
+        if [ "$UNINSTALL" = true ]; then
+            if [ -f "$dest" ]; then
+                if [ "$DRY_RUN" = true ]; then
+                    echo "  [DRY-RUN] Usunięto by $dest"
+                else
+                    rm -f "$dest"
+                    echo "  ✓ Usunięto agenta: $a"
+                fi
+            fi
+            return 0
+        fi
+
         if [ ! -f "$src" ]; then
-            echo "Błąd: Agent '$agent_name' nie istnieje (szukano: $src)" >&2
+            echo "Błąd: Brak pliku źródłowego: $src" >&2
             return 1
         fi
-        mkdir -p "$TARGET_DIR"
-        cp "$src" "$TARGET_DIR/${agent_name}_agent.md"
-        echo "  ✓ $agent_name"
+
+        if [ -f "$dest" ] && [ "$FORCE" = false ] && [ "$DRY_RUN" = false ]; then
+            read -rp "Plik $dest istnieje. Nadpisać agenta $a? (t/N) " confirm
+            if [[ ! "$confirm" =~ ^[tTyY]$ ]]; then
+                echo "  Pominięto agenta $a."
+                return 0
+            fi
+        fi
+
+        if [ "$DRY_RUN" = true ]; then
+            echo "  [DRY-RUN] Skopiowano by $src -> $dest"
+        else
+            mkdir -p "$TARGET_DIR"
+            cp "$src" "$dest"
+            echo "  ✓ Zainstalowano agenta: $a ($PLATFORM adapter)"
+        fi
     }
 
-    echo "Instalacja agentów w: $TARGET_DIR"
-
+    echo "Operacja na agentach w: $TARGET_DIR (Platforma: $PLATFORM)"
     if [ "$NAME" = "all" ]; then
-        echo "Instalowanie wszystkich agentów..."
-        for f in "$AGENTS_DIR"/*_agent.md; do
-            agent_name="$(basename "$f" _agent.md)"
-            install_agent "$agent_name"
+        for a in "${AVAILABLE_AGENTS[@]}"; do
+            process_agent "$a"
         done
-    elif [ -z "$NAME" ]; then
-        echo "Podaj nazwę agenta lub 'all'. Dostępne:"
-        for f in "$AGENTS_DIR"/*_agent.md; do
-            echo "  - $(basename "$f" _agent.md)"
-        done
-        exit 1
     else
-        install_agent "$NAME"
+        VALID=false
+        for a in "${AVAILABLE_AGENTS[@]}"; do
+            if [ "$a" = "$NAME" ]; then VALID=true; break; fi
+        done
+        if [ "$VALID" = false ]; then
+            echo "Błąd: Nieznany agent '$NAME'. Dostępne: ${AVAILABLE_AGENTS[*]}" >&2
+            exit 1
+        fi
+        process_agent "$NAME"
     fi
-
-    echo ""
-    echo "Claude Code automatycznie wykryje agentów z ~/.claude/agents/"
-    echo "Restart Claude Code może być wymagany do odświeżenia listy."
-
-else
-    echo "Nieznany tryb: '$MODE'. Użyj: skill | agent" >&2
-    exit 1
 fi

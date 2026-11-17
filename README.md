@@ -1,6 +1,6 @@
-# FlowKit — Agent Skills Library
+# FlowKit — Agent Skills & Agents Library
 
-> Uniwersalna biblioteka umiejętności (**Agent Skills**) dla **Claude Code**, **GitHub Copilot**, **OpenAI Codex / ChatGPT**, **Cursor** oraz **Antigravity**. Zoptymalizowana pod kątem automatyzacji zadań **Analityka Biznesowo-Systemowego** oraz **Inżyniera DevOps**.
+> Uniwersalna biblioteka umiejętności (**Agent Skills**) i agentów (**Agents**) dla **Claude Code**, **GitHub Copilot**, **OpenAI Codex / ChatGPT**, **Cursor** oraz **Antigravity**. Zoptymalizowana pod kątem automatyzacji zadań **Analityka Biznesowo-Systemowego** oraz **Inżyniera DevOps**.
 
 Repozytorium spełnia standard otwartych skilli AI oraz posiada manifest [`.claude-plugin/plugin.json`](.claude-plugin/plugin.json) kompatybilny z katalogami **Agent Marketplace**.
 
@@ -29,36 +29,112 @@ Repozytorium spełnia standard otwartych skilli AI oraz posiada manifest [`.clau
 
 ---
 
-## 🚀 Uniwersalna instalacja skilli
+## 🤖 Katalog agentów (Agents Catalog)
 
-Wszystkie skille z repozytorium instaluje się w identyczny, ustandaryzowany sposób. Zamień `<skill-name>` na nazwę wybranego skilla (np. `client-pt-prd-writer`).
+Agenty to samodzielne jednostki AI orkiestrowane przez Claude Code. Wszystkie pliki agentów znajdują się w katalogu [`agents/`](agents/).
 
-### 1. Claude Code
+### Orkiestrator
 
-#### Opcja A: Automatyczny instalator (rekomendowane)
-Repozytorium zawiera gotowe skrypty instalacyjne dla Windows i Linux/macOS:
+| Agent | Plik | Opis |
+|---|---|---|
+| **agent-3x3** | [`agent-3x3_agent.md`](agents/agent-3x3_agent.md) | Główny orkiestrator. Iteracyjny development: max 3 kroki na iterację, wymuszone podsumowanie i potwierdzenie użytkownika. Obsługuje prefiksy `ANALYZE:` `VERIFY:` `PLAN:` `SPEC:` `DRY:` `LOG:` `DEVOPS:`. Koordynuje wszystkie subagenty poniżej. |
 
-```powershell
-# Windows (PowerShell) - instalacja w ~/.claude/skills/<skill-name>
-.\scripts\install.ps1 -SkillName <skill-name>
+### Subagenty (wywoływane przez orkiestratora)
 
-# Opcjonalnie: instalacja w lokalnym projekcie
-.\scripts\install.ps1 -SkillName <skill-name> -TargetPath ./.claude/skills
-```
+| Agent | Plik | Tryb | Opis |
+|---|---|---|---|
+| **agent-3x3-analyzer** | [`agent-3x3-analyzer_agent.md`](agents/agent-3x3-analyzer_agent.md) | read-only | Analiza kodu, zależności, struktury. Zwraca findings z poziomem pewności. |
+| **agent-3x3-verifier** | [`agent-3x3-verifier_agent.md`](agents/agent-3x3-verifier_agent.md) | read-only | Weryfikacja implementacji (PASS/WARN/FAIL per wymiar). Wspiera pętlę korekcji. |
+| **agent-3x3-planner** | [`agent-3x3-planner_agent.md`](agents/agent-3x3-planner_agent.md) | read-only | Plan iteracji 3x3 z etykietami ryzyka i estymacją. |
+| **agent-3x3-implementer** | [`agent-3x3-implementer_agent.md`](agents/agent-3x3-implementer_agent.md) | read+write | Realizuje jeden atomowy krok. Zwraca DONE/PARTIAL/BLOCKED + diff summary. |
+| **agent-3x3-devops** | [`agent-3x3-devops_agent.md`](agents/agent-3x3-devops_agent.md) | read+write | CI/CD, Docker, Kubernetes, Terraform, Azure/AWS/GCP, sekrety, monitoring. |
+| **agent-3x3-pm** | [`agent-3x3-pm_agent.md`](agents/agent-3x3-pm_agent.md) | read-only | User stories (US-N), acceptance criteria (AC-N), ADR, decyzje produktowe. |
 
-```bash
-# Linux / macOS (Bash)
-./scripts/install.sh <skill-name>
-```
+### Prefiksy orkiestratora
 
-#### Opcja B: Ręczna instalacja
-- **Globalnie dla Twojego konta**: skopiuj folder wybranego skilla do `~/.claude/skills/<skill-name>`.
-- **W bieżącym projekcie**: skopiuj folder do `.claude/skills/<skill-name>`.
-- **W Claude.ai (Web Projects)**: załącz plik `SKILL.md` oraz szablony z katalogu `templates/` w sekcji **Project Knowledge**.
+| Prefiks | Akcja |
+|---|---|
+| `ANALYZE:` | wywołuje Analyzer jako pierwszy krok |
+| `VERIFY:` | wywołuje Verifier jako pierwszy krok |
+| `PLAN:` | wywołuje Planner jako pierwszy krok |
+| `SPEC:` | wywołuje PM agenta (user stories + acceptance criteria) |
+| `DRY:` | planuje ≤3 kroków i czeka na potwierdzenie |
+| `LOG:` | dołącza każdą iterację do `AGENT_LOG.md` |
+| `DEVOPS:` | wywołuje agenta DevOps |
+
+Prefiksy można łączyć od lewej do prawej: `PLAN: LOG: zadanie`, `SPEC: PLAN: zadanie`.
 
 ---
 
-### 2. GitHub Copilot
+## 🚀 Instalacja
+
+### Claude Code — skille
+
+#### Opcja A: Automatyczny instalator (rekomendowane)
+
+```powershell
+# Windows (PowerShell) — instalacja skilla globalnie
+.\scripts\install.ps1 -SkillName client-pt-prd-writer
+
+# Opcjonalnie: instalacja w lokalnym projekcie
+.\scripts\install.ps1 -SkillName client-pt-prd-writer -TargetPath ./.claude/skills
+```
+
+```bash
+# Linux / macOS
+./scripts/install.sh skill client-pt-prd-writer
+```
+
+#### Opcja B: Ręczna instalacja skilli
+
+- **Globalnie**: skopiuj folder wybranego skilla do `~/.claude/skills/<skill-name>`.
+- **W projekcie**: skopiuj folder do `.claude/skills/<skill-name>`.
+- **W Claude.ai (Web Projects)**: załącz plik `SKILL.md` oraz szablony z `templates/` w sekcji **Project Knowledge**.
+
+---
+
+### Claude Code — agenty
+
+Agenty instaluje się do `~/.claude/agents/` (globalni) lub `.claude/agents/` (lokalni w projekcie).
+
+#### Opcja A: Automatyczny instalator
+
+```powershell
+# Windows — zainstaluj wszystkich agentów globalnie
+.\scripts\install.ps1 -AgentName all
+
+# Tylko orkiestrator
+.\scripts\install.ps1 -AgentName agent-3x3
+
+# Skill + agent jednocześnie
+.\scripts\install.ps1 -SkillName devops-incident-postmortem -AgentName agent-3x3-devops
+
+# Lokalnie w projekcie
+.\scripts\install.ps1 -AgentName all -AgentTargetPath ./.claude/agents
+```
+
+```bash
+# Linux / macOS — wszystkich agentów globalnie
+./scripts/install.sh agent all
+
+# Tylko orkiestrator
+./scripts/install.sh agent agent-3x3
+
+# Lokalnie w projekcie
+./scripts/install.sh agent all ~/.claude/agents
+```
+
+#### Opcja B: Ręczna instalacja agentów
+
+Skopiuj pliki `*_agent.md` z katalogu [`agents/`](agents/) do:
+- `~/.claude/agents/` — instalacja globalna (agent dostępny we wszystkich projektach)
+- `.claude/agents/` w katalogu projektu — instalacja lokalna
+
+Po instalacji globalnej Claude Code automatycznie wykryje agentów. **Domyślnym agentem startowym** w VS Code jest `agent-3x3` (orkiestrator).
+
+---
+
+### GitHub Copilot
 
 Skille mogą być wykorzystywane przez Copilota w VS Code, Visual Studio oraz JetBrains:
 
@@ -69,16 +145,16 @@ Skille mogą być wykorzystywane przez Copilota w VS Code, Visual Studio oraz Je
 
 ---
 
-### 3. OpenAI Codex / ChatGPT / Cursor
+### OpenAI Codex / ChatGPT / Cursor
 
 - **Cursor**: Utwórz plik `.cursor/rules/<skill-name>.mdc` w swoim projekcie i wklej zawartość `skills/<skill-name>/SKILL.md`.
 - **Custom GPTs / OpenAI Assistant**: Wklej treść sekcji *Zasady nadrzędne* do pola **Instructions**, a szablony i checklisty załącz jako pliki w sekcji **Knowledge**.
 
 ---
 
-### 4. Agent Marketplace & Antigravity
+### Agent Marketplace & Antigravity
 
-Dzięki manifestom [`.claude-plugin/plugin.json`](.claude-plugin/plugin.json) i [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) repozytorium jest gotowym pakietem (bundle) udostępniającym wszystkie skille. W Claude Code:
+Dzięki manifestom [`.claude-plugin/plugin.json`](.claude-plugin/plugin.json) i [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) repozytorium jest gotowym pakietem (bundle) udostępniającym wszystkie skille i agentów. W Claude Code:
 
 ```bash
 claude plugin marketplace add marant6891/flowkit

@@ -1,6 +1,6 @@
 {
   "name": "flowkit",
-  "description": "Agent Skills dla analityków biznesowo-systemowych i inżynierów DevOps",
+  "description": "Agent Skills i agenci dla analityków biznesowo-systemowych i inżynierów DevOps",
   "owner": {
     "name": "Mariusz Antosiewicz"
   },
@@ -8,7 +8,7 @@
     {
       "name": "flowkit",
       "source": "./",
-      "description": "Skille: client-pt-prd-writer, client-meeting-recap, devops-incident-postmortem"
+      "description": "Skille: client-pt-prd-writer, client-meeting-recap, devops-incident-postmortem. Agenci: agent-3x3 (orkiestrator), agent-3x3-analyzer, agent-3x3-verifier, agent-3x3-planner, agent-3x3-implementer, agent-3x3-devops, agent-3x3-pm."
     }
   ]
 }

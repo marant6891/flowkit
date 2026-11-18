@@ -12,7 +12,7 @@ Repozytorium spełnia standard otwartych skilli AI oraz posiada manifest [`.clau
 
 | Skill | Wersja | Opis | Ścieżka |
 |---|---|---|---|
-| **client-pt-prd-writer** | `2.2` | Tworzy precyzyjną dokumentację techniczną (PT) i PRD wyłącznie na bazie materiałów źródłowych. Zawiera scenariusze akceptacyjne **Given-When-Then (Gherkin)**, **Definition of Done (DoD)**, wyłączenia **Non-Goals** oraz obsługę szablonów klienta (`.docx`, `.md`). Opcjonalny tryb **dokumentu końcowego bez dopisków** — czysty dokument w szablonie klienta. | [`skills/client-pt-prd-writer/`](skills/client-pt-prd-writer/) |
+| **client-pt-prd-writer** | `2.3` | Tworzy precyzyjną dokumentację techniczną (PT) i PRD wyłącznie na bazie materiałów źródłowych. Zawiera scenariusze akceptacyjne **Given-When-Then (Gherkin)**, **Definition of Done (DoD)**, wyłączenia **Non-Goals** oraz obsługę szablonów klienta (`.docx`, `.md`). Opcjonalny tryb **dokumentu końcowego bez dopisków** — czysty dokument w szablonie klienta. **Diagramy oparte na źródłach** (architektura, procesy, sekwencje, model danych) osadzane w DOCX i Markdown oraz polskie nazwy statusów w tabelach. | [`skills/client-pt-prd-writer/`](skills/client-pt-prd-writer/) |
 | **client-meeting-recap** | `1.2` | Przekształca surowe transkrypcje (`.vtt`, `.docx`, `.txt`) w 2-częściowe podsumowanie: **Część A (Wewnętrzny Radar Ryzyk / Scope Creep dla zespołu, z cytatami jako dowodami)** oraz **Część B (Oficjalny mail do klienta z zadaniami DRI i klauzulą weryfikacji 48h)** — w osobnych plikach. | [`skills/client-meeting-recap/`](skills/client-meeting-recap/) |
 
 ### ⚙️ DevOps i Infrastruktura

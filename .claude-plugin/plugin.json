@@ -1,7 +1,7 @@
 {
   "name": "flowkit",
   "displayName": "FlowKit - Analyst & DevOps Skills",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Kolekcja profesjonalnych umiejętności (Agent Skills) i agentów dla analityków biznesowo-systemowych i inżynierów DevOps zgodna ze standardami Anthropic, Atlassian, Google SRE i PagerDuty. Zero halucynacji, ścisłe śledzenie źródeł.",
   "author": {
     "name": "Mariusz Antosiewicz",

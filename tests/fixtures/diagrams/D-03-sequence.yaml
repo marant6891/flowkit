@@ -1,0 +1,47 @@
+diagram:
+  model_version: '1.0'
+  id: D-03
+  title: Przekazanie zamówienia do ERP
+  type: sequence
+  purpose: Kolejność komunikacji podczas przekazywania zamówienia do systemu ERP
+  caption: Kolejność komunikacji podczas przekazywania zamówienia do systemu ERP
+  explanation: kolejność wywołań między portalem, usługą zamówień i systemem ERP
+  alt: Portal klienta wysyła zamówienie do Usługi zamówień, usługa przekazuje je do Systemu ERP i zwraca potwierdzenie.
+  source:
+    section: 4. Integracje
+  nodes:
+  - id: p
+    label: Portal klienta
+    type: participant
+    source: SRC-001
+  - id: u
+    label: Usługa zamówień
+    type: participant
+    source: SRC-001
+  - id: x
+    label: System ERP
+    type: participant
+    source: SRC-002
+  connections:
+  - from: p
+    to: u
+    source: SRC-001
+    label: Złożenie zamówienia
+  - from: u
+    to: u
+    source: SRC-001
+    label: Walidacja danych
+  - from: u
+    to: x
+    source: SRC-002
+    label: Przekazanie zamówienia
+  - from: x
+    to: u
+    source: SRC-002
+    kind: reply
+    label: Numer zamówienia
+  - from: u
+    to: p
+    source: SRC-001
+    kind: reply
+    label: Potwierdzenie

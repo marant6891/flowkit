@@ -1,7 +1,7 @@
 ---
 name: client-pt-prd-writer
-version: "2.2"
-tags: [analyst, prd, pt, requirements, documentation, client, gherkin, dod]
+version: "2.3"
+tags: [analyst, prd, pt, requirements, documentation, client, gherkin, dod, diagrams]
 description: >
   Tworzy profesjonalną dokumentację PT/PRD (projekt techniczny, specyfikacja
   zmiany, analiza przedwdrożeniowa) dla klienta końcowego, opisującą rzeczywiste
@@ -11,7 +11,9 @@ description: >
   dokument PT, PRD, specyfikację lub dokumentację zmiany, change request,
   analizę wpływu lub dokumentację rozwoju aplikacji dla klienta. Na życzenie
   oddaje też wersję końcową bez dopisków (bez oznaczeń źródeł i tematów
-  otwartych) dokładnie w udostępnionym szablonie.
+  otwartych) dokładnie w udostępnionym szablonie. Gdy poprawia to zrozumienie,
+  dodaje do dokumentu diagramy oparte wyłącznie na źródłach (architektura,
+  procesy, sekwencje, model danych i inne).
 ---
 
 # Cel
@@ -47,7 +49,8 @@ a nie kompletność wszystkich sekcji.
    opisuj tylko, jeśli zostały przeanalizowane w repozytorium lub dokumentacji.
    W przeciwnym razie: „Nie analizowano – brak dostępu do <czego>”.
 7. **Diagramy rysuj wyłącznie z przeanalizowanych komponentów.** Nigdy nie kopiuj
-   przykładowego diagramu. Każdy węzeł diagramu musi występować w tekście.
+   przykładowego diagramu. Każdy węzeł diagramu musi występować w tekście. Diagram
+   powstaje tylko wtedy, gdy poprawia zrozumienie (patrz Etap 5a).
 8. Język zrozumiały dla klienta biznesowego, precyzyjny technicznie, jedna
    terminologia domenowa (zgodna z materiałami klienta – nie zmieniaj jego nazw).
 9. Identyfikatory zawsze trzycyfrowe: `GOAL-001`, `SC-001`, `OOS-001`, `CHG-001`,
@@ -60,6 +63,10 @@ a nie kompletność wszystkich sekcji.
     dopisków” (patrz osobny rozdział): oznaczenia znikają z dokumentu, ale
     zasady 1, 3, 6 i 7 obowiązują bez zmian – pochodzenie treści prowadzisz
     wtedy poza dokumentem.
+13. **Polskie nazwy w tabelach.** Statusy, priorytety i wymagalność zapisuj po polsku
+    według [słownika statusów](./references/status-vocabulary.md), także gdy źródło
+    podaje je po angielsku (np. `Must` → `Wymagane`, `In Progress` → `W toku`).
+    Wyjątkiem są wartości narzucone przez szablon klienta.
 
 # Etap 0: Ustal szablon i format wyjściowy
 
@@ -137,7 +144,8 @@ Przed napisaniem pełnego dokumentu przedstaw użytkownikowi krótko:
 1. jak rozumiesz zmianę (3–5 zdań, ze wskazaniem źródeł),
 2. które sekcje szablonu zostaną wypełnione, które oznaczysz „Nie dotyczy”,
    a które „Brak danych”,
-3. listę pytań (Etap 2) i proponowanych `ASSUMPTION`.
+3. listę pytań (Etap 2) i proponowanych `ASSUMPTION`,
+4. plan diagramów albo informację, że dokument ich nie wymaga (patrz Etap 5a).
 
 Pełny dokument generuj po odpowiedzi użytkownika. Jeśli użytkownik prosi wprost
 o wersję roboczą od razu – wygeneruj ją ze statusem „Roboczy”, z wszystkimi
@@ -177,12 +185,30 @@ Zasady pisania:
 - Każde FR, US, NFR, INT, DATA, RISK w tabeli ma kolumnę „Źródło”.
 - Priorytet, właściciel, termin i miara są wpisywane **tylko ze źródła**; inaczej
   `DO POTWIERDZENIA` + OPEN.
+- Gdy źródło określa wymagalność w skali MoSCoW, użyj kolumny „Wymagalność” z wartościami
+  `Wymagane`, `Zalecane`, `Opcjonalne`, `Wyłączone z zakresu`. Nie przeliczaj ich na
+  Wysoki/Średni/Niski.
 - Kryteria akceptacji formułuj tak, aby były sprawdzalne; jeśli źródło nie daje
   podstaw do kryterium, nie wymyślaj progu – oznacz OPEN.
 - Streszczenie zarządcze pisz na końcu, z treści dokumentu, bez nowych faktów.
 - Zobacz [przykłady: źródło vs zmyślenie](./examples/sourced-vs-invented.md).
 
+# Etap 5a: Diagramy (tylko gdy poprawiają zrozumienie)
+
+1. **Oceń potrzebę i dobierz typ** według [zasad wyboru diagramów](./references/diagram-selection.md).
+   Lista, tabela i pojedyncza informacja pozostają w tekście. Dokument bez diagramów jest poprawny.
+2. **Przygotuj model** każdego diagramu na podstawie [wzoru](./templates/diagram-model.yaml). Każdy
+   element ma oznaczenie pochodzenia. Niewiadomą oznacz `DO POTWIERDZENIA` i `OPEN-NNN`; nie zgaduj
+   elementów, kierunków ani mechanizmów.
+3. **Wygeneruj, sprawdź i osadź** diagramy zgodnie z [instrukcją silnika](./references/diagram-engine.md).
+   Styl opisuje [system wizualny](./references/diagram-design-system.md); szablon klienta ma pierwszeństwo.
+4. **Tryb końcowy:** najpierw rozstrzygnij wszystkie niewiadome z użytkownikiem, potem uruchom skrypty
+   z `--mode final`. Na grafice nie może zostać żadne oznaczenie robocze.
+
 # Etap 6: Weryfikacja przed oddaniem
+
+Uruchom `scripts/check_status_labels.py` na gotowym dokumencie, a jeśli są diagramy, przejdź też przez
+[checklistę jakości diagramów](./checklists/diagram-quality-checklist.md).
 
 Przejdź przez [checklistę końcową](./checklists/final-review-checklist.md),
 w tym **test pochodzenia treści**: przejrzyj dokument zdanie po zdaniu i dla
@@ -249,4 +275,5 @@ pominięte.
 2. Rozumienie zmiany + rejestr źródeł + plan sekcji + pytania (Etapy 1–4).
 3. Po odpowiedzi: pełny dokument w formacie szablonu.
 4. Pod dokumentem (w odpowiedzi, nie w dokumencie): liczba otwartych tematów
-   OPEN, lista ASSUMPTION do potwierdzenia, sekcje oznaczone „Nie dotyczy”.
+   OPEN, lista ASSUMPTION do potwierdzenia, sekcje oznaczone „Nie dotyczy”,
+   lista diagramów z katalogiem ich plików oraz pominięte kontrole.

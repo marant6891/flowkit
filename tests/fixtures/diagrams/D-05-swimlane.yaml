@@ -1,0 +1,45 @@
+diagram:
+  model_version: '1.0'
+  id: D-05
+  title: Akceptacja zamówienia
+  type: swimlane
+  purpose: Akceptacja zamówienia z podziałem na role
+  caption: Akceptacja zamówienia z podziałem na role
+  explanation: zadania klienta, konsultanta i systemu ERP podczas akceptacji zamówienia
+  alt: Klient składa zamówienie, Konsultant je akceptuje, a System ERP rejestruje zamówienie.
+  source:
+    section: 3. Proces reklamacji
+  lanes:
+  - id: k
+    label: Klient
+    source: SRC-001
+  - id: o
+    label: Konsultant
+    source: SRC-001
+  - id: x
+    label: System ERP
+    source: SRC-002
+  nodes:
+  - id: a
+    label: Złożenie zamówienia
+    type: process
+    source: SRC-001
+    lane: k
+  - id: b
+    label: Akceptacja zamówienia
+    type: process
+    source: SRC-001
+    lane: o
+    focus: true
+  - id: c
+    label: Rejestracja zamówienia
+    type: process
+    source: SRC-002
+    lane: x
+  connections:
+  - from: a
+    to: b
+    source: SRC-001
+  - from: b
+    to: c
+    source: SRC-002

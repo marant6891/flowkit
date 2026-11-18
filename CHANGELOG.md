@@ -8,6 +8,15 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 
 ---
 
+## [1.4.0] — 2026-11-18
+
+### Dodano
+- **Silnik diagramów w `client-pt-prd-writer` (2.3)**: 15 typów diagramów opartych wyłącznie na źródłach, eksport SVG/PNG/HTML, walidacja jakości oraz osadzanie w DOCX i Markdown.
+- **Polskie nazwy statusów, priorytetów i wymagalności** w tabelach dokumentów PT/PRD wraz z automatyczną kontrolą.
+- `tests/test_diagrams.py`: testy silnika diagramów i słownika statusów.
+
+---
+
 ## [1.3.0] — 2026-11-17
 
 ### Dodano

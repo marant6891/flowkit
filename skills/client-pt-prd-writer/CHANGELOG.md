@@ -1,5 +1,17 @@
 # Historia zmian skilla client-pt-prd-writer
 
+## 2.3 (18.11.2026)
+
+### Silnik diagramów
+- Nowy Etap 5a: ocena potrzeby, plan, model pośredni YAML, generowanie, walidacja i osadzanie diagramów.
+- 15 typów diagramów, 3 motywy oraz kolor i czcionka pobierane z szablonu klienta.
+- Eksport SVG, PNG i HTML; osadzanie w DOCX i Markdown z numeracją, podpisem i tekstem alternatywnym.
+- Każdy element diagramu ma oznaczenie pochodzenia; niewiadome są widoczne na grafice i blokują tryb końcowy.
+- Ponowne generowanie pojedynczego diagramu bez przebudowy dokumentu.
+
+### Polskie nazwy w tabelach
+- Nowy słownik `references/status-vocabulary.md` (m.in. `Must` → `Wymagane`) i kontrola `scripts/check_status_labels.py`.
+
 ## 2.2 (14.11.2026)
 
 ### Tryb „Dokument końcowy bez dopisków”

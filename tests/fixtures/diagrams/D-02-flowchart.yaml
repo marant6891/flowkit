@@ -1,0 +1,59 @@
+diagram:
+  model_version: '1.0'
+  id: D-02
+  title: Obsługa reklamacji
+  type: flowchart
+  purpose: Przebieg obsługi reklamacji wraz z punktem decyzyjnym
+  caption: Przebieg obsługi reklamacji wraz z punktem decyzyjnym
+  explanation: kolejne kroki obsługi reklamacji i decyzję o jej uznaniu
+  alt: Po zgłoszeniu reklamacji następuje weryfikacja. Reklamacja uznana prowadzi do zwrotu środków, a nieuznana
+    do wysłania odmowy.
+  source:
+    section: 3. Proces reklamacji
+  nodes:
+  - id: s
+    label: Zgłoszenie reklamacji
+    type: start
+    source: SRC-001
+  - id: v
+    label: Weryfikacja reklamacji
+    type: process
+    source: SRC-001
+  - id: d
+    label: Czy uznana?
+    type: decision
+    source: SRC-001
+    focus: true
+  - id: r
+    label: Zwrot środków
+    type: process
+    source: SRC-001
+  - id: o
+    label: Wysłanie odmowy
+    type: process
+    source: SRC-001
+  - id: k
+    label: Zamknięcie sprawy
+    type: end
+    source: SRC-001
+  connections:
+  - from: s
+    to: v
+    source: SRC-001
+  - from: v
+    to: d
+    source: SRC-001
+  - from: d
+    to: r
+    source: SRC-001
+    label: Tak
+  - from: d
+    to: o
+    source: SRC-001
+    label: Nie
+  - from: r
+    to: k
+    source: SRC-001
+  - from: o
+    to: k
+    source: SRC-001

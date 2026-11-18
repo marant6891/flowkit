@@ -1,0 +1,48 @@
+diagram:
+  model_version: '1.0'
+  id: D-06
+  title: Uprawnienia ról
+  type: security-matrix
+  purpose: Uprawnienia ról do zasobów systemu
+  caption: Uprawnienia ról do zasobów systemu
+  explanation: uprawnienia ról do zasobów systemu
+  alt: Konsultant odczytuje i edytuje zamówienia. Uprawnienia Administratora do raportów wymagają potwierdzenia.
+  source:
+    section: 6. Bezpieczeństwo
+  nodes:
+  - id: r1
+    label: Konsultant
+    type: item
+    source: SRC-001
+    axis: row
+  - id: r2
+    label: Administrator
+    type: item
+    source: SRC-001
+    axis: row
+  - id: c1
+    label: Zamówienia
+    type: item
+    source: SRC-001
+    axis: column
+  - id: c2
+    label: Raporty
+    type: item
+    source: SRC-001
+    axis: column
+  connections:
+  - from: r1
+    to: c1
+    source: SRC-001
+    direction: none
+    label: Odczyt i edycja
+  - from: r2
+    to: c1
+    source: SRC-001
+    direction: none
+    label: Odczyt
+  - from: r2
+    to: c2
+    source: OPEN-001
+    direction: none
+    label: DO POTWIERDZENIA

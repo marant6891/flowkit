@@ -3,6 +3,10 @@ Szablon ZAPASOWY. Używaj go tylko, gdy użytkownik nie dostarczył własnego sz
 Sekcje oznaczone (warunkowa) wypełniaj tylko, gdy dotyczą zmiany; inaczej wpisz
 „Nie dotyczy – <uzasadnienie>” albo „Brak danych – patrz OPEN-NNN”.
 Usuń wszystkie komentarze i placeholdery [..] przed oddaniem dokumentu.
+Statusy, priorytety i wymagalność zapisuj po polsku (references/status-vocabulary.md).
+Gdy źródło stosuje MoSCoW, zamień kolumnę „Priorytet” na „Wymagalność”
+(Wymagane / Zalecane / Opcjonalne / Wyłączone z zakresu).
+Diagramy dodawaj tylko, gdy poprawiają zrozumienie (SKILL.md, Etap 5a).
 -->
 
 # Dokument PT/PRD: [Nazwa zmiany]

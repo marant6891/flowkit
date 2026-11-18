@@ -1,5 +1,10 @@
 # Historia zmian skilla client-pt-prd-writer
 
+## 2.5 (18.11.2026)
+
+### Krytyczny przegląd
+- Etap 6 zaczyna się od przeglądu przypadków brzegowych, sprzeczności, sprawdzalności wymagań i ukrytych założeń.
+
 ## 2.4 (18.11.2026)
 
 ### Obraz tylko z potwierdzonymi informacjami

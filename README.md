@@ -12,8 +12,14 @@ Repozytorium spełnia standard otwartych skilli AI oraz posiada manifest [`.clau
 
 | Skill | Wersja | Opis | Ścieżka |
 |---|---|---|---|
-| **client-pt-prd-writer** | `2.4` | Tworzy precyzyjną dokumentację techniczną (PT) i PRD wyłącznie na bazie materiałów źródłowych. Zawiera scenariusze akceptacyjne **Given-When-Then (Gherkin)**, **Definition of Done (DoD)**, wyłączenia **Non-Goals** oraz obsługę szablonów klienta (`.docx`, `.md`). Opcjonalny tryb **dokumentu końcowego bez dopisków** — czysty dokument w szablonie klienta. **Diagramy oparte na źródłach** (architektura, procesy, sekwencje, model danych) osadzane w DOCX i Markdown oraz polskie nazwy statusów w tabelach. | [`skills/client-pt-prd-writer/`](skills/client-pt-prd-writer/) |
+| **client-pt-prd-writer** | `2.5` | Tworzy precyzyjną dokumentację techniczną (PT) i PRD wyłącznie na bazie materiałów źródłowych. Zawiera scenariusze akceptacyjne **Given-When-Then (Gherkin)**, **Definition of Done (DoD)**, wyłączenia **Non-Goals** oraz obsługę szablonów klienta (`.docx`, `.md`). Opcjonalny tryb **dokumentu końcowego bez dopisków** — czysty dokument w szablonie klienta. **Diagramy oparte na źródłach** (architektura, procesy, sekwencje, model danych) osadzane w DOCX i Markdown oraz polskie nazwy statusów w tabelach. | [`skills/client-pt-prd-writer/`](skills/client-pt-prd-writer/) |
 | **client-meeting-recap** | `1.3` | Przekształca surowe transkrypcje (`.vtt`, `.docx`, `.txt`) w 2-częściowe podsumowanie: **Część A (Wewnętrzny Radar Ryzyk / Scope Creep dla zespołu, z cytatami jako dowodami)** oraz **Część B (Oficjalny mail do klienta z zadaniami DRI i klauzulą weryfikacji 48h)** — w osobnych plikach. | [`skills/client-meeting-recap/`](skills/client-meeting-recap/) |
+
+### 🗄️ Dane i SQL
+
+| Skill | Wersja | Opis | Ścieżka |
+|---|---|---|---|
+| **sql-data-assistant** | `1.0` | Przygotowuje bezpieczne zapytania, zestawienia i skrypty poprawy danych dla PostgreSQL, SQL Server, Oracle, MySQL i MariaDB: typ bazy, zmienne, transakcja, ochrona przed nadpisaniem, domyślne `ROLLBACK` i proste instrukcje dla testera lub serwisanta. Agent nigdy nie łączy się z bazą. | [`skills/sql-data-assistant/`](skills/sql-data-assistant/) |
 
 ### ⚙️ DevOps i Infrastruktura
 
@@ -52,8 +58,12 @@ FlowKit realizuje dwuwarstwową architekturę agentów oddzielającą logikę do
 | **agent-3x3-implementer** | [`agent-3x3-implementer_agent.md`](agents/agent-3x3-implementer_agent.md) | read+write | Realizuje jeden atomowy krok. Self-check diffa przed zwrotem statusu. Zwraca DONE/PARTIAL/BLOCKED. Ścisła whitelist operacji. |
 | **agent-3x3-devops** | [`agent-3x3-devops_agent.md`](agents/agent-3x3-devops_agent.md) | read+write | CI/CD, Docker, Kubernetes, Terraform, Azure/AWS/GCP, sekrety, monitoring. Obsługuje tryb standalone (bez Orkiestratora). |
 | **agent-3x3-pm** | [`agent-3x3-pm_agent.md`](agents/agent-3x3-pm_agent.md) | read-only | User stories (US-N), acceptance criteria (AC-N), ADR, decyzje produktowe. |
+| **agent-3x3-diagnostics** | [`agent-3x3-diagnostics_agent.md`](agents/agent-3x3-diagnostics_agent.md) | read-only | Diagnostyka logów, klastra, kontenerów i konfiguracji oraz runbooki. Bez zmian w środowisku. |
+| **agent-3x3-analyst** | [`agent-3x3-analyst_agent.md`](agents/agent-3x3-analyst_agent.md) | read+write | Analiza wymagań, procesu i wpływu zmiany, backlog, przypadki testowe i UAT na lokalnych dokumentach Word, Excel, PDF i tekstowych. |
 
 ### Prefiksy orkiestratora
+
+Prefiksy są opcjonalne. Bez prefiksu `agent-3x3` sam rozpoznaje rodzaj zadania, informuje o wybranym trybie i uruchamia właściwy skill lub subagenta.
 
 | Prefiks | Akcja |
 |---|---|
@@ -64,9 +74,24 @@ FlowKit realizuje dwuwarstwową architekturę agentów oddzielającą logikę do
 | `DRY:` | planuje ≤3 kroków i czeka na potwierdzenie |
 | `LOG:` | dołącza każdą iterację do `AGENT_LOG.md` |
 | `DEVOPS:` | wywołuje agenta DevOps |
+| `DIAG:` | uruchamia diagnostykę tylko do odczytu |
+| `BA:` | uruchamia analityka biznesowo-systemowego |
+| `SQL:` | przygotowuje bezpieczne zapytanie, zestawienie lub skrypt poprawy danych |
 | `SHIP:` | po weryfikacji i Twojej zgodzie przygotowuje gałąź, commit, push i PR |
 
 Prefiksy można łączyć od lewej do prawej: `PLAN: LOG: zadanie`, `SPEC: PLAN: zadanie`.
+
+---
+
+## 🛡️ Praca lokalna i bezpieczeństwo
+
+- **Bez MCP i narzędzi webowych:** agenci mają jawne listy narzędzi i pracują na plikach oraz poleceniach lokalnych.
+- **Kontrolowane polecenia:** agenci uruchamiają polecenia tylko przez `runtime/flowkit_exec.py`, bez powłoki i według listy dozwolonej dla roli.
+- **Twarda blokada w Claude Code:** hook `runtime/guard_bash.py` odrzuca każde inne polecenie agenta FlowKit. Zwykłe sesje nie są objęte tym hookiem.
+- **Ochrona danych:** wyniki poleceń są skracane, sekrety ukrywane, a pliki takie jak `.env` i klucze prywatne niedostępne.
+- **VS Code:** Copilot nie korzysta z tego hooka, dlatego zostaw włączone potwierdzanie poleceń w terminalu.
+- **Zasady projektu:** skopiuj [`docs/flowkit-project.template.md`](docs/flowkit-project.template.md) do projektu jako `flowkit-project.md`.
+- **Testy skilli:** `python scripts/run_evals.py triggers --dry-run` pokazuje scenariusze, a uruchomienie bez `--dry-run` korzysta z lokalnego Claude Code.
 
 ---
 

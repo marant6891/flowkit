@@ -1,6 +1,6 @@
 ---
 name: client-pt-prd-writer
-version: "2.4"
+version: "2.5"
 tags: [analyst, prd, pt, requirements, documentation, client, gherkin, dod, diagrams]
 description: >
   Tworzy profesjonalną dokumentację PT/PRD (projekt techniczny, specyfikacja
@@ -214,6 +214,10 @@ Zasady pisania:
    z `--mode final`. Uwagi pod rysunkiem mogą zawierać tylko neutralne sformułowania zaakceptowane przez użytkownika.
 
 # Etap 6: Weryfikacja przed oddaniem
+
+Najpierw wykonaj **krytyczny przegląd** dokumentu z perspektywy osoby, która ma go podważyć: przypadki
+brzegowe, sprzeczności, wymagania niesprawdzalne, niejawne założenia i treści wykraczające poza źródła.
+Znalezione braki popraw albo zapisz jako `OPEN-NNN`.
 
 Uruchom `${CLAUDE_SKILL_DIR}/scripts/check_status_labels.py` na gotowym dokumencie, a jeśli są diagramy, przejdź też przez
 [checklistę jakości diagramów](./checklists/diagram-quality-checklist.md).

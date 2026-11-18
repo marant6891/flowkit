@@ -62,7 +62,7 @@ class TestFlowKitContracts(unittest.TestCase):
         self.assertTrue(manifest_file.exists())
         manifest = json.loads(manifest_file.read_text(encoding="utf-8"))
 
-        self.assertEqual(len(manifest["agents"]), 7)
+        self.assertEqual(len(manifest["agents"]), 9)
         for a in manifest["agents"]:
             self.assertTrue(a.startswith("./agents/adapters/claude-code/"), a)
             self.assertTrue((ROOT / a).exists(), f"Agent path must exist: {a}")

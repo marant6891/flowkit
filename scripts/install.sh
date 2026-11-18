@@ -66,8 +66,8 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-AVAILABLE_SKILLS=("client-pt-prd-writer" "client-meeting-recap" "devops-incident-postmortem")
-AVAILABLE_AGENTS=("agent-3x3" "agent-3x3-analyzer" "agent-3x3-verifier" "agent-3x3-planner" "agent-3x3-implementer" "agent-3x3-devops" "agent-3x3-pm")
+AVAILABLE_SKILLS=("client-pt-prd-writer" "client-meeting-recap" "devops-incident-postmortem" "sql-data-assistant")
+AVAILABLE_AGENTS=("agent-3x3" "agent-3x3-analyzer" "agent-3x3-verifier" "agent-3x3-planner" "agent-3x3-implementer" "agent-3x3-devops" "agent-3x3-pm" "agent-3x3-diagnostics" "agent-3x3-analyst")
 
 if [ -z "$MODE" ]; then
     echo ""
@@ -213,5 +213,22 @@ elif [ "$MODE" = "agent" ]; then
             exit 1
         fi
         process_agent "$NAME"
+    fi
+
+    # Lokalna warstwa bezpieczeństwa jest wymagana przez agentów uruchamiających polecenia.
+    if [ "$PLATFORM" = "vscode" ]; then
+        RUNTIME_DIR="$(dirname "$TARGET_DIR")/flowkit/runtime"
+    else
+        RUNTIME_DIR="$HOME/.claude/flowkit/runtime"
+    fi
+    if [ "$DRY_RUN" = true ]; then
+        echo "  [DRY-RUN] Skopiowano by runtime -> $RUNTIME_DIR"
+    elif [ "$UNINSTALL" = true ]; then
+        if [ "$NAME" = "all" ]; then rm -rf "$RUNTIME_DIR"; fi
+    else
+        mkdir -p "$RUNTIME_DIR"
+        cp -r "$REPO_ROOT/runtime/"* "$RUNTIME_DIR/"
+        rm -rf "$RUNTIME_DIR/__pycache__"
+        echo "  ✓ Zainstalowano lokalną warstwę bezpieczeństwa: $RUNTIME_DIR"
     fi
 fi

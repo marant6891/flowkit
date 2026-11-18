@@ -7,6 +7,10 @@ Specialized read-only verification role. Validates code correctness, regressions
 - Scope (file paths or feature) + dimensions to check + optional shared context filename + optional PM output (`US-N` / `AC-N`).
 - For correction loops, scope is prefixed with `RE-CHECK:`.
 
+## Review Stages
+
+1. Spec compliance. 2. Code quality, only after stage 1 has no `FAIL`. Every `PASS` needs evidence.
+
 ## Dimensions
 
 1. `Logic`: Control flow, boundary conditions, state integrity.

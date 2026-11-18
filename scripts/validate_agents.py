@@ -13,14 +13,14 @@ from build_agents import AGENTS, out_of_sync, target  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 
 CLAUDE_TOOLS = {
-    "Read", "Grep", "Glob", "Edit", "Write", "Bash", "Agent", "Skill", "WebFetch", "WebSearch", "NotebookEdit",
+    "Read", "Grep", "Glob", "Edit", "Write", "Bash", "Agent", "Skill",
 }
-VSCODE_TOOLS = {"vscode/askQuestions", "execute", "read", "agent", "edit", "search", "web", "todo"}
+VSCODE_TOOLS = {"vscode/askQuestions", "execute", "read", "agent", "edit", "search", "todo"}
 
 # Minimalna treść kontraktów z agents/core, która musi trafić do instalowanych adapterów.
 CORE_TERMS = {
     "agent-3x3": ["REPORT_PROGRESS", "ASK_USER", "WAIT_FOR_APPROVAL", "Correction loop", "Reconciliation",
-                  "Task profiles", "Risk labels", "Error handling", "SHIP:"],
+                  "Task profiles", "Risk labels", "Error handling", "SHIP:", "Automatic routing", "SQL:"],
     "agent-3x3-analyzer": ["Scanned:", "Not checked:", "Confidence:", "Assumptions:"],
     "agent-3x3-verifier": ["Logic", "Contracts", "Tests", "Dependencies", "Security", "Performance",
                            "Consistency", "Docs", "Requirements", "[NOT VERIFIED]"],
@@ -28,6 +28,8 @@ CORE_TERMS = {
     "agent-3x3-implementer": ["Self-check", "DONE", "PARTIAL", "BLOCKED"],
     "agent-3x3-devops": ["Validate:", "Apply:", "REQUIRES APPROVAL"],
     "agent-3x3-pm": ["US-1", "AC-1", "Given", "ADR-N"],
+    "agent-3x3-diagnostics": ["DIAGNOSTICS:", "Probable cause:", "REQUIRES APPROVAL"],
+    "agent-3x3-analyst": ["ANALYST:", "read-document", "Critical review"],
 }
 
 

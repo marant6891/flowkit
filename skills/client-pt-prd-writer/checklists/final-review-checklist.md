@@ -35,7 +35,13 @@
 - [ ] Każdy proces, przepływ, integracja i relacja między systemami ma w planie decyzję „Diagram” albo „Bez diagramu” z powodem.
 - [ ] Diagramy (jeśli są) przeszły `diagram-quality-checklist.md`.
 
-## E. Jakość dla klienta
+## E. Krytyczny przegląd
+- [ ] Sprawdzono przypadki brzegowe, błędy i ścieżki alternatywne każdego kluczowego wymagania.
+- [ ] Każde wymaganie można zweryfikować testem lub obserwacją.
+- [ ] Nie ma sprzeczności między wymaganiami, procesem, diagramami i planem testów.
+- [ ] Założenia ukryte w treści zapisano jako `ASSUMPTION-NNN` albo `OPEN-NNN`.
+
+## E1. Jakość dla klienta
 - [ ] Dokument zrozumiały dla osoby nietechnicznej; skróty w słowniku.
 - [ ] Wskazano, kto musi podjąć jakie decyzje.
 - [ ] Długość adekwatna do wielkości zmiany – brak treści „na wypełnienie”.

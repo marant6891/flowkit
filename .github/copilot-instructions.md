@@ -20,6 +20,7 @@ Activate a skill when the user requests an output that matches the skill's `desc
 - User asks for a **PT, PRD, change spec, or requirements document** → `client-pt-prd-writer`
 - User provides a **meeting transcript (.vtt, .docx)** and asks for a **summary or email** → `client-meeting-recap`
 - User asks for a **postmortem, RCA, incident report** → `devops-incident-postmortem`
+- User asks for a **SQL query, database report, data check, INSERT, UPDATE or DELETE** → `sql-data-assistant`
 
 When activating a skill, read the full `SKILL.md` and all files referenced inside it before generating output.
 
@@ -27,7 +28,7 @@ When activating a skill, read the full `SKILL.md` and all files referenced insid
 
 The `agent-3x3` orchestrator coordinates subagents using a strict 3-step iteration loop:
 - Each iteration: ≤3 steps → summarize → ask user → repeat
-- Supported prefixes: `ANALYZE:` `VERIFY:` `PLAN:` `SPEC:` `DRY:` `LOG:` `DEVOPS:` `SHIP:`
+- Supported prefixes: `ANALYZE:` `VERIFY:` `PLAN:` `SPEC:` `DRY:` `LOG:` `DEVOPS:` `DIAG:` `BA:` `SQL:` `SHIP:`. Prefixes are optional: without one the orchestrator selects the action from the request
 - Subagents: Analyzer, Verifier, Planner, Implementer, DevOps, PM
 
 See [`agents/agent-3x3_agent.md`](../agents/agent-3x3_agent.md) for full protocol.

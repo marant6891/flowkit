@@ -1,7 +1,7 @@
 {
   "name": "flowkit",
   "displayName": "FlowKit - Analyst & DevOps Skills",
-  "version": "1.5.0",
+  "version": "1.7.0",
   "description": "Kolekcja profesjonalnych umiejętności (Agent Skills) i agentów dla analityków biznesowo-systemowych i inżynierów DevOps zgodna ze standardami Anthropic, Atlassian, Google SRE i PagerDuty. Zero halucynacji, ścisłe śledzenie źródeł.",
   "author": {
     "name": "Mariusz Antosiewicz",
@@ -34,7 +34,9 @@
     "./agents/adapters/claude-code/agent-3x3-planner.md",
     "./agents/adapters/claude-code/agent-3x3-implementer.md",
     "./agents/adapters/claude-code/agent-3x3-devops.md",
-    "./agents/adapters/claude-code/agent-3x3-pm.md"
+    "./agents/adapters/claude-code/agent-3x3-pm.md",
+    "./agents/adapters/claude-code/agent-3x3-diagnostics.md",
+    "./agents/adapters/claude-code/agent-3x3-analyst.md"
   ],
   "metadata": {
     "suggestedPrompts": [

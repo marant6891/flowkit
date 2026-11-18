@@ -37,6 +37,7 @@ Przed pisaniem utwórz mapę (wewnętrznie, pokaż użytkownikowi w Etapie 4):
 - Metryczkę wypełniaj tylko danymi ze źródła (autor, klient, wersja, data).
   Nieznane pola: `DO POTWIERDZENIA`.
 - Nie dodawaj sekcji „na zapas” spoza szablonu.
+- Diagram umieszczaj w sekcji szablonu opisującej dany proces, przepływ lub relację. Nie twórz osobnej sekcji na diagramy.
 
 ## 4. Tryb końcowy bez dopisków
 

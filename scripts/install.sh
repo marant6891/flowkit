@@ -88,7 +88,7 @@ fi
 if [ "$MODE" = "skill" ]; then
     if [ -z "$TARGET_DIR" ]; then
         if [ "$PLATFORM" = "vscode" ]; then
-            TARGET_DIR="$REPO_ROOT/.github/skills"
+            TARGET_DIR="$PWD/.github/skills"
         else
             TARGET_DIR="$HOME/.claude/skills"
         fi
@@ -143,7 +143,7 @@ if [ "$MODE" = "skill" ]; then
 elif [ "$MODE" = "agent" ]; then
     if [ -z "$TARGET_DIR" ]; then
         if [ "$PLATFORM" = "vscode" ]; then
-            TARGET_DIR="$REPO_ROOT/.github/agents"
+            TARGET_DIR="$PWD/.github/agents"
         else
             TARGET_DIR="$HOME/.claude/agents"
         fi

@@ -1,5 +1,7 @@
 # Wzór modelu diagramu. Zastąp wszystkie wartości treścią z materiałów źródłowych.
 # Nie kopiuj elementów tego wzoru do dokumentu: każdy węzeł musi wynikać ze źródeł.
+# Na obrazie są wyłącznie elementy potwierdzone źródłem SRC-NNN.
+# Niewiadome i założenia opisz w polu remarks: trafią do tekstu pod rysunkiem.
 diagram:
   model_version: "1.0"
   id: D-01                          # stały identyfikator diagramu
@@ -34,23 +36,19 @@ diagram:
       group: grupa
       focus: true                   # najwyżej 2 elementy na diagram
       source: SRC-001
-    - id: element-c
-      label: DO POTWIERDZENIA       # nieznana wartość zawsze w parze z OPEN-NNN
-      type: external
-      source: OPEN-001
 
   connections:
     - from: element-a
       to: element-b
       label: "[Co jest przekazywane]"
-      direction: forward            # forward, both, unknown (none tylko w er i macierzach)
+      direction: forward            # forward, both (none tylko w er i macierzach)
       source: SRC-001
-    - from: element-b
-      to: element-c
-      direction: unknown            # kierunek nieznany: linia bez grotów
-      source: OPEN-001
 
   annotations: []
+
+  remarks:                          # tekst pod rysunkiem, nigdy na obrazie
+    - text: "[Czego nie potwierdzają materiały i czego dotyczy brak]"
+      source: OPEN-001
 
   output:
     formats: [svg, png, html]

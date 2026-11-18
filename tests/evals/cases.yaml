@@ -1,0 +1,27 @@
+# Scenariusze oceny odpowiedzi agentów i skilli na materiałach z tests/fixtures.
+# evidence: fakty, które muszą występować w materiale źródłowym.
+# must_contain / must_not_contain: wyrażenia regularne sprawdzane w odpowiedzi modelu.
+cases:
+  - id: recap-scope-creep
+    target: client-meeting-recap
+    fixture: transcripts/sample_meeting.vtt
+    prompt: Przygotuj podsumowanie spotkania z tej transkrypcji.
+    evidence: [ERP, makiety, piątku]
+    must_contain: ["ERP", "(?i)scope creep", "48 godzin", "DO POTWIERDZENIA"]
+    must_not_contain: ["(?i)słychać mnie", "(?i)zadanie.*integracj\\w* z (systemem )?ERP"]
+
+  - id: postmortem-sev1
+    target: devops-incident-postmortem
+    fixture: incident-scenarios/sample_incident.log
+    prompt: Przygotuj raport postmortem na podstawie tego logu.
+    evidence: ["SEV-1", "14:02:11", "14:15:22", "DatabaseConnectionPoolExhausted"]
+    must_contain: ["SEV-1", "14:02:11", "14:15:22", "PREVENT", "DO POTWIERDZENIA"]
+    must_not_contain: ["(?i)datadog", "(?i)pagerduty alert", "JIRA-\\d+"]
+
+  - id: analyzer-sql-injection
+    target: agent-3x3-analyzer
+    fixture: buggy-code/sample_auth.py
+    prompt: "ANALYZE: oceń bezpieczeństwo tego pliku."
+    evidence: ["SELECT * FROM users", "password"]
+    must_contain: ["\\[CRITICAL\\]", "(?i)sql injection|wstrzykni", "sample_auth\\.py", "Not checked:"]
+    must_not_contain: ["ANALYZER: .* — clean"]

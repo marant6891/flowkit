@@ -1,6 +1,6 @@
 ---
 name: client-pt-prd-writer
-version: "2.3"
+version: "2.4"
 tags: [analyst, prd, pt, requirements, documentation, client, gherkin, dod, diagrams]
 description: >
   Tworzy profesjonalną dokumentację PT/PRD (projekt techniczny, specyfikacja
@@ -11,9 +11,9 @@ description: >
   dokument PT, PRD, specyfikację lub dokumentację zmiany, change request,
   analizę wpływu lub dokumentację rozwoju aplikacji dla klienta. Na życzenie
   oddaje też wersję końcową bez dopisków (bez oznaczeń źródeł i tematów
-  otwartych) dokładnie w udostępnionym szablonie. Gdy poprawia to zrozumienie,
-  dodaje do dokumentu diagramy oparte wyłącznie na źródłach (architektura,
-  procesy, sekwencje, model danych i inne).
+  otwartych) dokładnie w udostępnionym szablonie. Ocenia procesy, przepływy,
+  integracje i relacje między systemami lub komponentami, a gdy poprawia to
+  zrozumienie, dodaje do dokumentu diagramy oparte wyłącznie na źródłach.
 ---
 
 # Cel
@@ -49,8 +49,9 @@ a nie kompletność wszystkich sekcji.
    opisuj tylko, jeśli zostały przeanalizowane w repozytorium lub dokumentacji.
    W przeciwnym razie: „Nie analizowano – brak dostępu do <czego>”.
 7. **Diagramy rysuj wyłącznie z przeanalizowanych komponentów.** Nigdy nie kopiuj
-   przykładowego diagramu. Każdy węzeł diagramu musi występować w tekście. Diagram
-   powstaje tylko wtedy, gdy poprawia zrozumienie (patrz Etap 5a).
+   przykładowego diagramu. Każdy węzeł diagramu musi występować w tekście. Każdy
+   proces, przepływ, integrację i relację między systemami lub komponentami oceń pod
+   kątem diagramu; diagram powstaje, gdy poprawia zrozumienie (patrz Etap 5a).
 8. Język zrozumiały dla klienta biznesowego, precyzyjny technicznie, jedna
    terminologia domenowa (zgodna z materiałami klienta – nie zmieniaj jego nazw).
 9. Identyfikatory zawsze trzycyfrowe: `GOAL-001`, `SC-001`, `OOS-001`, `CHG-001`,
@@ -145,7 +146,8 @@ Przed napisaniem pełnego dokumentu przedstaw użytkownikowi krótko:
 2. które sekcje szablonu zostaną wypełnione, które oznaczysz „Nie dotyczy”,
    a które „Brak danych”,
 3. listę pytań (Etap 2) i proponowanych `ASSUMPTION`,
-4. plan diagramów albo informację, że dokument ich nie wymaga (patrz Etap 5a).
+4. plan diagramów z decyzją dla każdego procesu, przepływu, integracji i relacji między
+   systemami lub komponentami (patrz Etap 5a).
 
 Pełny dokument generuj po odpowiedzi użytkownika. Jeśli użytkownik prosi wprost
 o wersję roboczą od razu – wygeneruj ją ze statusem „Roboczy”, z wszystkimi
@@ -162,15 +164,15 @@ odpowiednich sekcjach szablonu – **tylko jeśli dotyczą zmiany**:
 | Streszczenie zarządcze | zawsze |
 | Kontekst i cel zmiany | zawsze |
 | Zakres (w zakresie / poza zakresem i Non-Goals) | zawsze |
-| Proces obecny i docelowy, różnice | gdy zmienia się proces lub zachowanie |
+| Proces obecny i docelowy, różnice | gdy zmienia się proces lub zachowanie; oceń diagram procesu |
 | Role i uprawnienia | gdy zmiana dotyka ról/uprawnień |
 | Wymagania funkcjonalne | zawsze |
 | User stories z kryteriami akceptacji (Given-When-Then) | gdy są zmiany widoczne dla użytkownika |
 | Wymagania niefunkcjonalne | tylko te wynikające ze źródeł |
 | Analiza wpływu na aplikację | zawsze (lub „Nie analizowano”) |
-| Architektura i diagram | gdy zmienia się architektura i jest analiza |
-| Integracje | gdy zmiana dotyka integracji |
-| Model danych i migracje | gdy zmieniają się dane/schemat |
+| Architektura | gdy zmienia się architektura i jest analiza; oceń diagram architektury lub komponentów |
+| Integracje | gdy zmiana dotyka integracji; oceń diagram sekwencji, integracji lub przepływu danych |
+| Model danych i migracje | gdy zmieniają się dane/schemat; oceń diagram ER |
 | Bezpieczeństwo, RODO, audyt | gdy zmiana dotyka danych osobowych, dostępu, audytu |
 | Plan testów | zawsze |
 | Kryteria ukończenia (Definition of Done - DoD) | zawsze |
@@ -193,21 +195,27 @@ Zasady pisania:
 - Streszczenie zarządcze pisz na końcu, z treści dokumentu, bez nowych faktów.
 - Zobacz [przykłady: źródło vs zmyślenie](./examples/sourced-vs-invented.md).
 
-# Etap 5a: Diagramy (tylko gdy poprawiają zrozumienie)
+# Etap 5a: Diagramy (obowiązkowa ocena, diagram gdy poprawia zrozumienie)
 
-1. **Oceń potrzebę i dobierz typ** według [zasad wyboru diagramów](./references/diagram-selection.md).
-   Lista, tabela i pojedyncza informacja pozostają w tekście. Dokument bez diagramów jest poprawny.
+1. **Przejrzyj wszystkie tematy i zapisz decyzje.** Znajdź w materiałach procesy, przepływy danych,
+   komunikację, integracje oraz relacje między systemami lub komponentami. Według
+   [zasad wyboru diagramów](./references/diagram-selection.md) przypisz każdemu tematowi decyzję „Diagram”
+   z typem albo „Bez diagramu” z powodem. Gdy temat spełnia kryterium, domyślną decyzją jest diagram.
+   Lista, tabela i pojedyncza informacja pozostają w tekście.
 2. **Przygotuj model** każdego diagramu na podstawie [wzoru](./templates/diagram-model.yaml). Każdy
-   element ma oznaczenie pochodzenia. Niewiadomą oznacz `DO POTWIERDZENIA` i `OPEN-NNN`; nie zgaduj
-   elementów, kierunków ani mechanizmów.
+   element na obrazie musi być potwierdzony źródłem `SRC-NNN`. Niewiadomych i założeń nie rysuj: opisz je
+   w polu `remarks`, które trafia do tekstu „Uwagi do rysunku” pod grafiką. Nie zgaduj elementów,
+   kierunków ani mechanizmów.
 3. **Wygeneruj, sprawdź i osadź** diagramy zgodnie z [instrukcją silnika](./references/diagram-engine.md).
+   Skrypty uruchamiaj ścieżką bezwzględną z katalogu skilla: `${CLAUDE_SKILL_DIR}/scripts/`. Poza Claude Code
+   jest to folder `scripts/` obok tego pliku `SKILL.md`.
    Styl opisuje [system wizualny](./references/diagram-design-system.md); szablon klienta ma pierwszeństwo.
 4. **Tryb końcowy:** najpierw rozstrzygnij wszystkie niewiadome z użytkownikiem, potem uruchom skrypty
-   z `--mode final`. Na grafice nie może zostać żadne oznaczenie robocze.
+   z `--mode final`. Uwagi pod rysunkiem mogą zawierać tylko neutralne sformułowania zaakceptowane przez użytkownika.
 
 # Etap 6: Weryfikacja przed oddaniem
 
-Uruchom `scripts/check_status_labels.py` na gotowym dokumencie, a jeśli są diagramy, przejdź też przez
+Uruchom `${CLAUDE_SKILL_DIR}/scripts/check_status_labels.py` na gotowym dokumencie, a jeśli są diagramy, przejdź też przez
 [checklistę jakości diagramów](./checklists/diagram-quality-checklist.md).
 
 Przejdź przez [checklistę końcową](./checklists/final-review-checklist.md),
@@ -276,4 +284,4 @@ pominięte.
 3. Po odpowiedzi: pełny dokument w formacie szablonu.
 4. Pod dokumentem (w odpowiedzi, nie w dokumencie): liczba otwartych tematów
    OPEN, lista ASSUMPTION do potwierdzenia, sekcje oznaczone „Nie dotyczy”,
-   lista diagramów z katalogiem ich plików oraz pominięte kontrole.
+   lista diagramów z katalogiem ich plików, tematy bez diagramu z powodem oraz pominięte kontrole.

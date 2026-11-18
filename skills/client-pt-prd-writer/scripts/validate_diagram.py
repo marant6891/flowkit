@@ -12,12 +12,14 @@ from __future__ import annotations
 import argparse
 import re
 import sys
+import unicodedata
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from diagram_core import (  # noqa: E402
     ModelError, UNKNOWN, contrast, build_theme, load_model, sources_of, validate_model, visible_texts,
 )
+from docx_support import open_document  # noqa: E402
 from export_diagram import open_browser  # noqa: E402
 from generate_diagram import base_name, render  # noqa: E402
 
@@ -53,8 +55,7 @@ def normalize(text: str) -> str:
 
 def document_text(path: Path) -> str:
     if path.suffix.lower() in (".docx", ".dotx"):
-        from docx import Document
-        doc = Document(str(path))
+        doc = open_document(path)
         parts = [p.text for p in doc.paragraphs]
         for table in doc.tables:
             for row in table.rows:
@@ -63,19 +64,58 @@ def document_text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+STOP_WORDS = {"oraz", "przez", "przy", "jest", "dla", "lub", "albo", "między", "miedzy", "pomiędzy", "pomiedzy"}
+
+
+def fold(text: str) -> str:
+    """Porównanie bez wielkości liter i polskich znaków."""
+    text = text.replace("ł", "l").replace("Ł", "L")
+    decomposed = unicodedata.normalize("NFKD", text)
+    return "".join(ch for ch in decomposed if not unicodedata.combining(ch)).casefold()
+
+
+def words(text: str) -> list[str]:
+    return re.findall(r"[^\W_]+", fold(text))
+
+
+def missing_words(text: str, document_words: set[str]) -> list[str]:
+    """Słowa bez odpowiednika w dokumencie; rdzeń dopuszcza polską odmianę."""
+    missing = []
+    for word in words(text.replace(UNKNOWN, " ")):
+        if len(word) < 4 or word.isdigit() or word in STOP_WORDS:
+            continue
+        stem = word[:max(4, len(word) - 3)]
+        if not any(candidate.startswith(stem) for candidate in document_words):
+            missing.append(word)
+    return missing
+
+
 def check_against_document(model: dict, text: str, mode: str) -> list[str]:
-    """Każdy węzeł musi występować w tekście, a oznaczenia źródeł w dokumencie roboczym."""
+    """Treść grafiki musi wynikać z dokumentu, a oznaczenia źródeł być w dokumencie roboczym."""
     errors = []
     haystack = normalize(text)
+    folded = " ".join(words(text))
+    document_words = set(folded.split())
     for node in model.get("nodes") or []:
         label = str(node.get("label", ""))
-        if UNKNOWN not in label and normalize(label) not in haystack:
+        pattern = r"(?<![^\W_])" + r"\s+".join(re.escape(w) for w in words(label)) + r"(?![^\W_])"
+        if UNKNOWN not in label and not re.search(pattern, folded):
             errors.append(f"węzeł '{label}' nie występuje w tekście dokumentu")
+    details = [("połączenie", c.get("label")) for c in model.get("connections") or []]
+    details += [("grupa", g.get("label")) for g in model.get("groups") or []]
+    details += [("rola", l.get("label")) for l in model.get("lanes") or []]
+    details += [("adnotacja", a.get("text")) for a in model.get("annotations") or []]
+    for node in model.get("nodes") or []:
+        details += [("opis węzła", node.get("sublabel")), ("data", node.get("date"))]
+        details += [("atrybut", a) for a in node.get("attributes") or []]
+    for kind, value in details:
+        for word in missing_words(str(value or ""), document_words):
+            errors.append(f"{kind} '{value}': słowo '{word}' nie występuje w dokumencie")
     section = str((model.get("source") or {}).get("section", ""))
     if section and normalize(re.sub(r"^\d+(\.\d+)*\.?\s*", "", section)) not in haystack:
         errors.append(f"sekcja źródłowa '{section}' nie istnieje w dokumencie")
     if mode == "working":
-        elements = list(model.get("nodes") or []) + list(model.get("connections") or [])
+        elements = list(model.get("nodes") or []) + list(model.get("connections") or []) + list(model.get("remarks") or [])
         for ref in sorted({r for e in elements for r in sources_of(e)}):
             if ref not in text:
                 errors.append(f"oznaczenie {ref} nie występuje w dokumencie")

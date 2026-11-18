@@ -32,6 +32,7 @@
 - [ ] Brak sprzecznych wymagań; sprzeczności w źródłach są w OPEN.
 - [ ] Każde OPEN i ASSUMPTION z treści występuje w sekcji końcowej.
 - [ ] Statusy, priorytety i wymagalność w tabelach mają polskie nazwy (`check_status_labels.py` bez uwag).
+- [ ] Każdy proces, przepływ, integracja i relacja między systemami ma w planie decyzję „Diagram” albo „Bez diagramu” z powodem.
 - [ ] Diagramy (jeśli są) przeszły `diagram-quality-checklist.md`.
 
 ## E. Jakość dla klienta

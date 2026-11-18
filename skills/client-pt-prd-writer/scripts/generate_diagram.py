@@ -20,8 +20,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from diagram_core import (  # noqa: E402
-    LAYERED_TYPES, MATRIX_TYPES, SEQUENCE_TYPES, TIMELINE_TYPES, TYPE_LABELS, UNKNOWN,
-    ModelError, block_width, build_theme, certainty, load_model, snap, text_width,
+    LAYERED_TYPES, MATRIX_TYPES, SEQUENCE_TYPES, TIMELINE_TYPES, TYPE_LABELS, UNCERTAIN_RE,
+    ModelError, block_width, build_theme, load_model, snap, text_width,
     validate_model, wrap,
 )
 
@@ -46,7 +46,6 @@ class Canvas:
         self.width = 0.0
         self.height = 0.0
         self.top = 0.0
-        self.uncertain = False
 
     def text(self, lines, x, y, size, *, anchor="start", weight=400, fill=None, family=None,
              owner=None, box=None, kind="label", layer="text", line_h=None, spacing=None):
@@ -82,18 +81,13 @@ class Canvas:
             attrs += f' stroke-dasharray="{dash}"'
         self.layers[layer].append(f"<rect {attrs}/>")
 
-    def edge(self, points, source, target, *, start_arrow=False, end_arrow=True, state="confirmed",
-             color=None, conn_id=""):
-        color = color or (self.t["warn"] if state != "confirmed" else self.t["line"])
-        marker = "warn" if state != "confirmed" else "line"
+    def edge(self, points, source, target, *, start_arrow=False, end_arrow=True, color=None, conn_id=""):
         extra = ""
         if end_arrow:
-            extra += f'marker-end="url(#arrow-{marker})" '
+            extra += 'marker-end="url(#arrow-line)" '
         if start_arrow:
-            extra += f'marker-start="url(#arrow-{marker}-start)" '
-        dash = "5 4" if state != "confirmed" else None
-        self.uncertain = self.uncertain or state != "confirmed"
-        self.path(_rounded(points), stroke=color, width=1.25, dash=dash, extra=extra)
+            extra += 'marker-start="url(#arrow-line-start)" '
+        self.path(_rounded(points), stroke=color or self.t["line"], width=1.25, extra=extra)
         self.edges.append({"points": points, "source": source, "target": target, "id": conn_id})
 
     def to_svg(self, model: dict) -> str:
@@ -103,7 +97,7 @@ class Canvas:
         vb_y = self.top - MARGIN
         title, desc = escape(str(model["title"])), escape(str(model["alt"]))
         defs = []
-        for name, color in (("line", t["line"]), ("warn", t["warn"])):
+        for name, color in (("line", t["line"]),):
             defs.append(f'<marker id="arrow-{name}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" '
                         f'markerHeight="8" orient="auto"><path d="M0 0.8 L9.5 5 L0 9.2 Z" fill="{color}"/></marker>')
             defs.append(f'<marker id="arrow-{name}-start" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" '
@@ -173,7 +167,6 @@ def draw_node(c: Canvas, node: dict, m: dict, x: float, y: float) -> None:
     t = c.t
     w, h = m["w"], m["h"]
     ntype = node.get("type", "service")
-    state = certainty(node)
     fill, stroke, width, dash = t["node"], t["rule"], 1, None
     ink = t["ink"]
     if ntype == "external":
@@ -182,9 +175,6 @@ def draw_node(c: Canvas, node: dict, m: dict, x: float, y: float) -> None:
         fill, stroke, width = t["accent_tint"], t["accent"], 1.5
     if ntype in ("start", "end"):
         fill, stroke, ink = t["ink"], t["ink"], t["paper"]
-    if state != "confirmed":
-        fill, stroke, dash, ink = t["warn_tint"], t["warn"], "5 4", t["ink"]
-        c.uncertain = True
     box = (x, y, w, h)
     c.nodes.append({"id": node["id"], "x": x, "y": y, "w": w, "h": h, "group": node.get("group")})
 
@@ -514,10 +504,7 @@ def layout_layered(c: Canvas, model: dict, node_gap: int) -> None:
         x1 = max(m["x"] + m["w"] for m in members) + 16
         y0 = min(m["y"] for m in members) - 30
         y1 = max(m["y"] + m["h"] for m in members) + 14
-        state = certainty(group)
-        c.uncertain = c.uncertain or state != "confirmed"
-        c.rect(x0, y0, x1 - x0, y1 - y0, rx=8, fill=c.t["paper2"], stroke=c.t["warn"] if state != "confirmed" else c.t["rule"],
-               dash="5 4" if state != "confirmed" else None, layer="group")
+        c.rect(x0, y0, x1 - x0, y1 - y0, rx=8, fill=c.t["paper2"], stroke=c.t["rule"], layer="group")
         c.text(group["label"], x0 + 12, y0 + 19, FS_SUB, weight=700, fill=c.t["muted"], kind="group", layer="group")
         c.groups.append({"id": group["id"], "x": x0, "y": y0, "w": x1 - x0, "h": y1 - y0})
 
@@ -550,8 +537,7 @@ def layout_layered(c: Canvas, model: dict, node_gap: int) -> None:
         if id(ch) in label_lines:
             lines = label_lines[id(ch)]
             x = ports_down[(id(ch), first)] + 7
-            state = certainty(conn)
-            c.text(lines, x, gaps[verts[first]["rank"]]["top"] + 11, FS_EDGE, fill=c.t["warn"] if state != "confirmed" else c.t["muted"],
+            c.text(lines, x, gaps[verts[first]["rank"]]["top"] + 11, FS_EDGE, fill=c.t["muted"],
                    kind="edge", owner=conn.get("label"), line_h=LINE_EDGE)
         direction = conn.get("direction", "forward")
         end_arrow = direction in ("forward", "both")
@@ -559,7 +545,7 @@ def layout_layered(c: Canvas, model: dict, node_gap: int) -> None:
         if ch["rev"]:
             points = list(reversed(points))
             first, last = last, first
-        c.edge(points, first, last, start_arrow=start_arrow, end_arrow=end_arrow, state=certainty(conn),
+        c.edge(points, first, last, start_arrow=start_arrow, end_arrow=end_arrow,
                conn_id=f'{conn["from"]}>{conn["to"]}')
 
     for vid, v in verts.items():
@@ -597,25 +583,23 @@ def layout_sequence(c: Canvas, model: dict, _gap: int) -> None:
         draw_node(c, node, m, x - m["w"] / 2, 0)
     for conn, lines, arrow_y in rows:
         a, b = xs[conn["from"]], xs[conn["to"]]
-        state = certainty(conn)
         direction = conn.get("direction", "forward")
-        color = t["warn"] if state != "confirmed" else t["muted"] if conn.get("kind") == "reply" else t["line"]
-        label_fill = t["warn"] if state != "confirmed" else t["ink"]
+        color = t["muted"] if conn.get("kind") == "reply" else t["line"]
         if conn["from"] == conn["to"]:
             pts = [(a, arrow_y), (a + 36, arrow_y), (a + 36, arrow_y + 22), (a + 4, arrow_y + 22)]
             tx, anchor = a + 8, "start"
-            c.edge(pts, conn["from"], conn["to"], state=state, color=color)
+            c.edge(pts, conn["from"], conn["to"], color=color)
         else:
             sign = 1 if b > a else -1
             pts = [(a + 3 * sign, arrow_y), (b - 3 * sign, arrow_y)]
             tx, anchor = (a + b) / 2, "middle"
-            c.edge(pts, conn["from"], conn["to"], state=state, color=color, end_arrow=direction in ("forward", "both"),
+            c.edge(pts, conn["from"], conn["to"], color=color, end_arrow=direction in ("forward", "both"),
                    start_arrow=direction == "both")
         width = block_width(lines, FS_EDGE)
         top = arrow_y - len(lines) * LINE_EDGE - 3
         left = tx - width / 2 if anchor == "middle" else tx
         c.rect(left - 4, top, width + 8, len(lines) * LINE_EDGE, rx=2, fill=t["paper"], stroke=t["paper"], layer="edge")
-        c.text(lines, tx, top + 12, FS_EDGE, anchor=anchor, fill=label_fill, kind="edge", line_h=LINE_EDGE)
+        c.text(lines, tx, top + 12, FS_EDGE, anchor=anchor, kind="edge", line_h=LINE_EDGE)
     c.width = step * len(nodes)
     c.height = bottom
 
@@ -643,10 +627,10 @@ def layout_timeline(c: Canvas, model: dict, _gap: int) -> None:
                extra='marker-end="url(#arrow-line)"' if arrow else "", layer="back")
         for i, (node, (lines, sub, _)) in enumerate(zip(row, cards)):
             x = i * (card_w + gap)
-            state = certainty(node)
             marker = str(node.get("date") or (f"Krok {start + i + 1}" if numbered else ""))
-            color = t["warn"] if state != "confirmed" else t["accent"] if node.get("focus") else t["ink"]
-            c.text(wrap(marker, FS_SUB, card_w), x, axis - 14, FS_SUB, weight=700, fill=color, kind="node")
+            color = t["accent"] if node.get("focus") else t["ink"]
+            if marker:
+                c.text(wrap(marker, FS_SUB, card_w), x, axis - 14, FS_SUB, weight=700, fill=color, kind="node")
             c.layers["node"].append(f'<circle cx="{x + 6:g}" cy="{axis:g}" r="5" fill="{color}"/>')
             m = {"w": card_w, "h": card_h, "lines": lines, "sub": sub, "attrs": []}
             draw_node(c, {**node, "type": "step"}, m, x, axis + 16)
@@ -684,16 +668,12 @@ def layout_matrix(c: Canvas, model: dict, _gap: int) -> None:
         for i, col in enumerate(cols):
             x = head_w + i * col_w
             cell = cells.get((row["id"], col["id"])) or cells.get((col["id"], row["id"]))
-            state = certainty(cell) if cell else "confirmed"
-            fill = t["warn_tint"] if state != "confirmed" else t["node"]
-            c.uncertain = c.uncertain or state != "confirmed"
-            c.rect(x, y, col_w, row_h, rx=0, fill=fill, stroke=t["warn"] if state != "confirmed" else t["rule"],
-                   dash="5 4" if state != "confirmed" else None)
-            value = str(cell.get("label") or "●") if cell else "–"
-            cell_lines = wrap(value, FS_SUB, col_w - 12)
-            box = (x, y, col_w, row_h)
-            c.text(cell_lines, x + col_w / 2, y + 21, FS_SUB, anchor="middle", fill=t["ink"] if cell else t["muted"],
-                   owner=f'{row["id"]}:{col["id"]}', box=box, kind="node", line_h=LINE_SUB)
+            c.rect(x, y, col_w, row_h, rx=0, fill=t["node"], stroke=t["rule"])
+            if cell:  # Pusta komórka nie stwierdza braku relacji ani uprawnienia.
+                cell_lines = wrap(str(cell.get("label") or "●"), FS_SUB, col_w - 12)
+                box = (x, y, col_w, row_h)
+                c.text(cell_lines, x + col_w / 2, y + 21, FS_SUB, anchor="middle", fill=t["ink"],
+                       owner=f'{row["id"]}:{col["id"]}', box=box, kind="node", line_h=LINE_SUB)
         y += row_h
     c.width = head_w + col_w * len(cols)
     c.height = y
@@ -717,12 +697,6 @@ def add_header_and_notes(c: Canvas, model: dict) -> None:
         c.width = max(c.width, block_width(lines, FS_SUB))
         c.text(lines, 0, y, FS_SUB, fill=t["muted"], kind="note", line_h=LINE_SUB)
         y += len(lines) * LINE_SUB + 6
-    if c.uncertain:
-        legend = f"Element oznaczony przerywaną linią: {UNKNOWN.lower()}"
-        c.width = max(c.width, 36 + text_width(legend, FS_SUB))
-        c.path(f"M0 {y - 4:g} H28", stroke=t["warn"], width=1.25, dash="5 4", layer="back")
-        c.text(legend, 36, y, FS_SUB, fill=t["muted"], kind="note")
-        y += 18
     c.height = y - 14 if y > c.height + 22 else c.height
 
 
@@ -741,6 +715,9 @@ def _hits(seg, box, inset=1.0) -> bool:
 def check_scene(c: Canvas, model: dict) -> list[str]:
     """Kontrola geometrii: nachodzenie, kadrowanie, kolizje linii i czytelność."""
     issues = []
+    for text in c.texts:
+        if UNCERTAIN_RE.search(text["text"]):
+            issues.append(f"niepewna treść na obrazie: '{text['text']}'")
     width = c.width + 2 * MARGIN
     if width > MAX_WIDTH + 2 * MARGIN:
         issues.append(f"diagram ma {width:.0f}px szerokości (limit {MAX_WIDTH + 2 * MARGIN}px): podziel go na przegląd i szczegóły")

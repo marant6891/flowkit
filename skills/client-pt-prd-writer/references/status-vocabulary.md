@@ -84,7 +84,7 @@ Formę dopasuj do rzeczownika w nagłówku tabeli.
 ## Kontrola
 
 ```bash
-python scripts/check_status_labels.py dokument.docx
+python "<SKILL_DIR>/scripts/check_status_labels.py" dokument.docx
 ```
 
 Skrypt sprawdza całe komórki tabel w plikach `.md` i `.docx` i podaje polski odpowiednik.

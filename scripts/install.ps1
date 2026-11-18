@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Bezpieczny instalator skilli i agentów z repozytorium FlowKit.
 .PARAMETER SkillName
@@ -6,7 +6,7 @@
 .PARAMETER AgentName
     Nazwa agenta do zainstalowania (np. agent-3x3 lub 'all').
 .PARAMETER Platform
-    Docelowa platforma: 'claude' (domyślnie, ~/.claude/) lub 'vscode' (.github/agents/ w workspace).
+    Docelowa platforma: 'claude' (domyślnie, ~/.claude/) lub 'vscode' (.github/ w bieżącym katalogu projektu).
 .PARAMETER TargetPath
     Katalog docelowy dla skilli.
 .PARAMETER AgentTargetPath
@@ -46,7 +46,7 @@ if (-not $TargetPath) {
     if ($Platform -eq 'claude') {
         $TargetDir = Join-Path $HOME ".claude\skills"
     } else {
-        $TargetDir = Join-Path $RepoRoot ".github\skills"
+        $TargetDir = Join-Path (Get-Location).Path ".github\skills"
     }
 } else {
     $TargetDir = (Resolve-Path -Path $TargetPath -ErrorAction SilentlyContinue)
@@ -57,7 +57,7 @@ if (-not $AgentTargetPath) {
     if ($Platform -eq 'claude') {
         $AgentTargetDir = Join-Path $HOME ".claude\agents"
     } else {
-        $AgentTargetDir = Join-Path $RepoRoot ".github\agents"
+        $AgentTargetDir = Join-Path (Get-Location).Path ".github\agents"
     }
 } else {
     $AgentTargetDir = (Resolve-Path -Path $AgentTargetPath -ErrorAction SilentlyContinue)

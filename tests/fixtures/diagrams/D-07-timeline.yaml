@@ -6,7 +6,7 @@ diagram:
   purpose: Etapy wdrożenia zmiany
   caption: Etapy wdrożenia zmiany
   explanation: kolejne etapy wdrożenia zmiany
-  alt: Wdrożenie obejmuje analizę, implementację, testy akceptacyjne oraz uruchomienie, którego termin wymaga potwierdzenia.
+  alt: Wdrożenie obejmuje analizę, implementację, testy akceptacyjne oraz uruchomienie.
   source:
     section: 7. Wdrożenie
   nodes:
@@ -28,6 +28,8 @@ diagram:
   - id: d
     label: Uruchomienie
     type: item
-    source: OPEN-002
-    date: DO POTWIERDZENIA
+    source: SRC-004
   connections: []
+  remarks:
+  - text: Materiały nie podają terminu uruchomienia
+    source: OPEN-002

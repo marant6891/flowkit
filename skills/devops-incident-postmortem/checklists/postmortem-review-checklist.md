@@ -12,6 +12,9 @@ Przed publikacją raportu (Slack / Confluence / Jira / Status Page) zweryfikuj p
 - [ ] Czasy przybliżone oznaczono jako `[SZACUNEK]`.
 - [ ] Oś czasu odczytana chronologicznie jest logicznie spójna i kompletna.
 
+- [ ] Sekrety, dane osobowe i identyfikatory użytkowników w cytatach logów zastąpiono znacznikiem `[UKRYTO]`.
+- [ ] Wykryte sekrety zgłoszono do rotacji bez powtarzania ich wartości.
+
 ## C. Analiza wieloczynnikowa (RCA)
 - [ ] Zidentyfikowano bezpośredni Wyzwalacz (Trigger).
 - [ ] Zidentyfikowano czynniki wzmacniające (Amplifiers / Cascading failure).

@@ -6,7 +6,7 @@ Usuń wszystkie komentarze i placeholdery [..] przed oddaniem dokumentu.
 Statusy, priorytety i wymagalność zapisuj po polsku (references/status-vocabulary.md).
 Gdy źródło stosuje MoSCoW, zamień kolumnę „Priorytet” na „Wymagalność”
 (Wymagane / Zalecane / Opcjonalne / Wyłączone z zakresu).
-Diagramy dodawaj tylko, gdy poprawiają zrozumienie (SKILL.md, Etap 5a).
+Procesy, przepływy, integracje i relacje oceń pod kątem diagramu (SKILL.md, Etap 5a).
 -->
 
 # Dokument PT/PRD: [Nazwa zmiany]
@@ -71,7 +71,7 @@ efekt dla klienta, kluczowe ryzyka i decyzje oczekujące.]
 [As-is – ze źródła / z analizy kodu.]
 
 ### 4.2 Stan docelowy
-[To-be – ze źródła.]
+[To-be – ze źródła. Diagram procesu, gdy spełnia kryteria z Etapu 5a.]
 
 ### 4.3 Różnice
 
@@ -129,16 +129,20 @@ efekt dla klienta, kluczowe ryzyka i decyzje oczekujące.]
 
 ## 10. Architektura (warunkowa)
 
-[Opis tylko przeanalizowanych komponentów. Diagram tylko, jeśli zmiana dotyka
-architektury; każdy węzeł musi występować w tekście i tabeli wpływu.]
+[Opis tylko przeanalizowanych komponentów. Diagram architektury lub komponentów, gdy
+spełnia kryteria z Etapu 5a; każdy węzeł musi występować w tekście i tabeli wpływu.]
 
 ## 11. Integracje (warunkowa)
+
+[Diagram sekwencji, integracji lub przepływu danych, gdy spełnia kryteria z Etapu 5a.]
 
 | ID | System | Kierunek | Dane | Format | Obsługa błędów | Źródło |
 |---|---|---|---|---|---|---|
 | INT-001 | [System] | [We/Wy] | [Dane] | [Format] | [Ze źródła lub DO POTWIERDZENIA] | SRC-001 |
 
 ## 12. Model danych i migracje (warunkowa)
+
+[Diagram ER, gdy spełnia kryteria z Etapu 5a.]
 
 | ID | Encja / tabela | Zmiana | Wpływ na dane | Migracja | Źródło |
 |---|---|---|---|---|---|

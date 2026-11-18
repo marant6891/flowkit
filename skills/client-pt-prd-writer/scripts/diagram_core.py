@@ -9,6 +9,8 @@ from pathlib import Path
 
 import yaml
 
+from check_status_labels import lookup as english_status
+
 MODEL_VERSION = "1.0"
 UNKNOWN = "DO POTWIERDZENIA"
 
@@ -34,11 +36,16 @@ NODE_TYPES = {
     "application", "service", "database", "external", "actor", "queue", "process",
     "decision", "state", "start", "end", "entity", "step", "item", "participant",
 }
-DIRECTIONS = {"forward", "both", "none", "unknown"}
+DIRECTIONS = {"forward", "both", "none"}
 THEMES = {"minimal-light", "minimal-dark", "full-editorial"}
 SOURCE_RE = re.compile(r"^(SRC|ASSUMPTION|OPEN)-\d{3}$")
 ID_RE = re.compile(r"^D-\d{2,3}$")
-PLACEHOLDER_RE = re.compile(r"\b(TBD|TODO|N/A|lorem ipsum)\b", re.IGNORECASE)
+# Obraz i jego opisy zawierają wyłącznie informacje potwierdzone. Uwagi trafiają do pola remarks.
+UNCERTAIN_RE = re.compile(
+    r"\b(TBD|TBC|TODO|N/A|lorem ipsum)\b|\bdo\s+(potwierdzenia|ustalenia|uzgodnienia|wyjaśnienia|weryfikacji)\b"
+    r"|\b(nieokreślon|nieustalon|niepotwierdzon|nieznan)\w*|\b(SRC|ASSUMPTION|OPEN|Q|REC)-\d{3}\b",
+    re.IGNORECASE,
+)
 # Etykiety nie mogą przemycać mechanizmów bez źródła tylko przez brak pola "source".
 MARKER_RE = re.compile(r"(SRC|ASSUMPTION|OPEN|Q|REC)-\d{3}|DO POTWIERDZENIA|Nie analizowano|Brak danych")
 
@@ -50,17 +57,17 @@ THEME_TOKENS = {
     "minimal-light": {
         "paper": "#FFFFFF", "paper2": "#F5F4F1", "node": "#FFFFFF", "ink": "#262A31",
         "muted": "#59616D", "rule": "#BFC4CB", "line": "#59616D", "accent": "#B4492F",
-        "warn": "#8A5A00", "warn_tint": "#FCF4E3", "external": "#F1F0ED",
+        "external": "#F1F0ED",
     },
     "minimal-dark": {
         "paper": "#1D2128", "paper2": "#272C35", "node": "#242932", "ink": "#ECEEF1",
         "muted": "#B3BBC7", "rule": "#535C69", "line": "#A5AEBB", "accent": "#EE9379",
-        "warn": "#E8C06A", "warn_tint": "#392F1E", "external": "#2B313B",
+        "external": "#2B313B",
     },
     "full-editorial": {
         "paper": "#FBF9F5", "paper2": "#F2EEE6", "node": "#FFFFFF", "ink": "#23262C",
         "muted": "#59606B", "rule": "#BDB9AF", "line": "#59606B", "accent": "#A8412A",
-        "warn": "#855500", "warn_tint": "#FBF1DC", "external": "#EFEBE3",
+        "external": "#EFEBE3",
     },
 }
 
@@ -80,16 +87,6 @@ def sources_of(element: dict) -> list[str]:
     return [value] if isinstance(value, str) else list(value)
 
 
-def certainty(element: dict) -> str:
-    """confirmed / assumption / open: wynika wprost z oznaczeń pochodzenia."""
-    refs = sources_of(element)
-    if any(r.startswith("OPEN-") for r in refs):
-        return "open"
-    if any(r.startswith("ASSUMPTION-") for r in refs):
-        return "assumption"
-    return "confirmed"
-
-
 def load_model(path: str | Path) -> dict:
     data = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
     if not isinstance(data, dict) or not isinstance(data.get("diagram"), dict):
@@ -97,21 +94,22 @@ def load_model(path: str | Path) -> dict:
     return data["diagram"]
 
 
-def _check_source(element: dict, where: str, errors: list[str]) -> None:
+def _check_source(element: dict, where: str, errors: list[str], known_only: bool = True) -> None:
     refs = sources_of(element)
     if not refs:
         errors.append(f"{where}: brak pola 'source' (SRC-NNN, ASSUMPTION-NNN lub OPEN-NNN)")
     for ref in refs:
         if not SOURCE_RE.match(str(ref)):
             errors.append(f"{where}: niepoprawne oznaczenie źródła '{ref}'")
+        elif known_only and not str(ref).startswith("SRC-"):
+            errors.append(f"{where}: na obrazie mogą być tylko elementy potwierdzone SRC-NNN; "
+                          f"przenieś {ref} do pola 'remarks'")
 
 
-def _check_text(text: object, element: dict, where: str, errors: list[str]) -> None:
+def _check_text(text: object, where: str, errors: list[str]) -> None:
     value = str(text or "")
-    if PLACEHOLDER_RE.search(value):
-        errors.append(f"{where}: użyj '{UNKNOWN}' zamiast '{value}'")
-    if UNKNOWN in value and certainty(element) != "open":
-        errors.append(f"{where}: '{UNKNOWN}' wymaga źródła OPEN-NNN")
+    if UNCERTAIN_RE.search(value):
+        errors.append(f"{where}: niepewna treść '{value}' nie może być na diagramie; przenieś ją do pola 'remarks'")
 
 
 def validate_model(model: dict, mode: str = "working") -> list[str]:
@@ -120,6 +118,8 @@ def validate_model(model: dict, mode: str = "working") -> list[str]:
     for key in ("id", "title", "type", "purpose", "caption", "explanation", "alt"):
         if not str(model.get(key) or "").strip():
             errors.append(f"brak wymaganego pola '{key}'")
+    for key in ("title", "caption", "explanation", "alt"):
+        _check_text(model.get(key), f"pole '{key}'", errors)
     if str(model.get("model_version")) != MODEL_VERSION:
         errors.append(f"'model_version' musi mieć wartość \"{MODEL_VERSION}\"")
     if model.get("id") and not ID_RE.match(str(model["id"])):
@@ -153,14 +153,14 @@ def validate_model(model: dict, mode: str = "working") -> list[str]:
             errors.append(f"{where}: nieznany typ '{node.get('type')}'")
         _check_source(node, where, errors)
         for field in ("label", "sublabel", "date"):
-            _check_text(node.get(field), node, where, errors)
+            _check_text(node.get(field), where, errors)
 
     containers = {}
     for key in ("groups", "lanes"):
         for item in model.get(key) or []:
             containers[item.get("id")] = key
             _check_source(item, f"{key} '{item.get('id')}'", errors)
-            _check_text(item.get("label"), item, f"{key} '{item.get('id')}'", errors)
+            _check_text(item.get("label"), f"{key} '{item.get('id')}'", errors)
     for node in nodes:
         for field, key in (("group", "groups"), ("lane", "lanes")):
             if node.get(field) and containers.get(node[field]) != key:
@@ -185,17 +185,27 @@ def validate_model(model: dict, mode: str = "working") -> list[str]:
             errors.append(f"{where}: pętla własna jest obsługiwana tylko w diagramie sekwencji")
         direction = conn.get("direction", "forward")
         if direction not in DIRECTIONS:
-            errors.append(f"{where}: nieznany kierunek '{direction}'")
+            errors.append(f"{where}: niedozwolony kierunek '{direction}'; połączenie o nieznanym kierunku opisz w polu 'remarks'")
         if direction == "none" and dtype != "er" and dtype not in MATRIX_TYPES:
             errors.append(f"{where}: brak kierunku dozwolony tylko w ER i macierzach; "
-                          "dla nieznanego kierunku użyj 'direction: unknown' i OPEN-NNN")
-        if direction == "unknown" and certainty(conn) != "open":
-            errors.append(f"{where}: 'direction: unknown' wymaga źródła OPEN-NNN")
+                          "połączenie o nieznanym kierunku opisz w polu 'remarks'")
         _check_source(conn, where, errors)
-        _check_text(conn.get("label"), conn, where, errors)
+        _check_text(conn.get("label"), where, errors)
     for i, note in enumerate(model.get("annotations") or []):
         _check_source(note, f"adnotacja {i + 1}", errors)
-        _check_text(note.get("text"), note, f"adnotacja {i + 1}", errors)
+        _check_text(note.get("text"), f"adnotacja {i + 1}", errors)
+    for i, remark in enumerate(model.get("remarks") or []):
+        _check_source(remark, f"uwaga {i + 1}", errors, known_only=False)
+        if not str(remark.get("text") or "").strip():
+            errors.append(f"uwaga {i + 1}: brak pola 'text'")
+
+    labelled = [(n.get(f), n) for n in nodes for f in ("label", "sublabel", "date")]
+    labelled += [(c.get("label"), c) for c in conns]
+    labelled += [(i.get("label"), i) for key in ("groups", "lanes") for i in model.get(key) or []]
+    for text, _element in labelled:
+        polish = english_status(str(text)) if text else None
+        if polish:
+            errors.append(f"użyj polskiej nazwy '{polish}' zamiast '{text}'")
 
     if mode == "final":
         errors.extend(final_mode_errors(model))
@@ -218,17 +228,11 @@ def visible_texts(model: dict) -> list[str]:
 
 def final_mode_errors(model: dict) -> list[str]:
     errors = []
-    elements = list(model.get("nodes") or []) + list(model.get("connections") or [])
-    for key in ("groups", "lanes", "annotations"):
-        elements += list(model.get(key) or [])
-    for element in elements:
-        if certainty(element) != "confirmed":
-            name = element.get("id") or element.get("label") or element.get("text")
-            errors.append(f"tryb końcowy: element '{name}' ma nierozstrzygnięte źródło "
-                          f"{sources_of(element)}; potrzebna decyzja użytkownika")
-    for text in visible_texts(model):
+    document_texts = [str(model.get(k) or "") for k in ("title", "caption", "explanation", "alt")]
+    document_texts += [str(r.get("text") or "") for r in model.get("remarks") or []]
+    for text in visible_texts(model) + document_texts:
         if MARKER_RE.search(text):
-            errors.append(f"tryb końcowy: oznaczenie robocze na grafice: '{text}'")
+            errors.append(f"tryb końcowy: oznaczenie robocze w treści diagramu: '{text}'")
     return errors
 
 

@@ -1,38 +1,42 @@
 # Silnik diagramów: przebieg pracy
 
-Skrypty znajdują się w `scripts/`. Wzór modelu: [`templates/diagram-model.yaml`](../templates/diagram-model.yaml).
+Skrypty znajdują się w folderze `scripts/` skilla. W poleceniach zastąp `<SKILL_DIR>` bezwzględną ścieżką katalogu zawierającego `SKILL.md`, a polecenia uruchamiaj z katalogu projektu. Wzór modelu: [`templates/diagram-model.yaml`](../templates/diagram-model.yaml).
 
 ## Przebieg
 
 ```bash
 # 1. Wygeneruj SVG i HTML (powstają tylko po przejściu walidacji)
-python scripts/generate_diagram.py modele/D-*.yaml --out output/diagrams
+python "<SKILL_DIR>/scripts/generate_diagram.py" modele/D-*.yaml --out output/diagrams
 
 # 2. Wyeksportuj PNG
-python scripts/export_diagram.py output/diagrams/D-*.svg
+python "<SKILL_DIR>/scripts/export_diagram.py" output/diagrams/D-*.svg
 
 # 3. Sprawdź zgodność z dokumentem i wygląd po wyrenderowaniu
-python scripts/validate_diagram.py output/diagrams/D-*.yaml --document output/dokument.docx --svg-dir output/diagrams
+python "<SKILL_DIR>/scripts/validate_diagram.py" output/diagrams/D-*.yaml --document output/dokument.docx --svg-dir output/diagrams
 
 # 4. Osadź diagramy w dokumencie
-python scripts/insert_diagrams.py output/dokument.docx --diagrams output/diagrams --output output/dokument.docx
+python "<SKILL_DIR>/scripts/insert_diagrams.py" output/dokument.docx --diagrams output/diagrams --output output/dokument.docx
 ```
 
-W trybie „Dokument końcowy bez dopisków” dodaj `--mode final` w krokach 1 i 3.
+W trybie „Dokument końcowy bez dopisków” dodaj `--mode final` w krokach 1, 3 i 4.
 
 ## Model
 
-Każdy element ma pole `source` z oznaczeniem `SRC-NNN`, `ASSUMPTION-NNN` albo `OPEN-NNN`.
+**Obraz zawiera wyłącznie potwierdzone informacje.** Każdy element na obrazie ma źródło `SRC-NNN`. Słowa typu
+„do potwierdzenia”, „do ustalenia” lub „TBD” i oznaczenia źródeł są na grafice odrzucane.
 
 | Sytuacja w źródłach | Zapis w modelu |
 |---|---|
 | Element potwierdzony | `source: SRC-001` |
-| Założenie | `source: ASSUMPTION-001` (rysowane linią przerywaną) |
-| Nieznana wartość | `label: DO POTWIERDZENIA`, `source: OPEN-001` |
-| Nieznany kierunek komunikacji | `direction: unknown`, `source: OPEN-001` |
+| Założenie | Nie rysuj; dodaj do `remarks` z `source: ASSUMPTION-001` |
+| Nieznana wartość lub element | Nie rysuj; dodaj do `remarks` z `source: OPEN-001` |
+| Nieznany kierunek komunikacji | Nie rysuj połączenia; dodaj do `remarks` z `source: OPEN-001` |
 | Mechanizm niewymieniony w źródłach (np. OAuth2) | Nie dodawaj go do modelu |
 
-Kierunki (`direction`): `forward`, `both`, `unknown`; `none` tylko w `er` i macierzach.
+Kierunki (`direction`): `forward`, `both`; `none` tylko w `er` i macierzach.
+
+Uwagi zapisuj jako `remarks: [{text: "...", source: OPEN-001}]`. Pod podpisem powstaje akapit „Uwagi do rysunku N: ...”.
+Gdy bez niepewnego elementu diagram byłby mylący, nie twórz go i zapisz temat jako `OPEN-NNN`.
 
 Pola zależne od typu:
 
@@ -51,14 +55,16 @@ Typy węzłów: `application`, `service`, `database`, `external`, `actor`, `queu
 ## Osadzanie
 
 Domyślnie diagram trafia za pierwszy blok treści w sekcji `placement.section` (lub `source.section`).
-Znacznik `[[DIAGRAM:D-01]]` w osobnym akapicie wskazuje dokładne miejsce. Opcja
+Zapowiedź zakończona dwukropkiem pozostaje razem z tabelą lub listą, a diagram trafia za nie.
+Znacznik `[[DIAGRAM:D-01]]` w osobnym akapicie wskazuje dokładne miejsce i jest zachowywany przy ponownym
+generowaniu. Aby przenieść taki diagram, wstaw nowy znacznik. Opcja
 `placement.position: after-heading` umieszcza diagram zaraz po nagłówku.
 
-Skrypt dodaje zdanie wprowadzające, grafikę, tekst alternatywny i podpis „Rysunek N.”. Numeracja wynika
-z kolejności w dokumencie. Uruchomienie skryptu ponownie podmienia diagramy, zamiast je powielać, więc po zmianie jednego
+Skrypt dodaje zdanie wprowadzające w stylu tekstu dokumentu, grafikę, tekst alternatywny i podpis „Rysunek N.”.
+Numeracja wynika z kolejności w dokumencie i uwzględnia rysunki już obecne w szablonie klienta. Uruchomienie skryptu ponownie podmienia diagramy, zamiast je powielać, więc po zmianie jednego
 modelu wystarczy powtórzyć kroki 1–4 dla tego diagramu.
 
-- **DOCX:** osadzany jest PNG (3×), dopasowany do marginesów sekcji. Style, nagłówki i stopki szablonu pozostają bez zmian.
+- **DOCX i DOTX:** szablon `.dotx` pozostaje bez zmian, a wynik zapisywany jest jako `.docx`. Osadzany jest PNG (3×), dopasowany do marginesów sekcji. Style, nagłówki i stopki szablonu pozostają bez zmian.
 - **Markdown:** dokument odwołuje się względną ścieżką do pliku SVG.
 
 ## Artefakty

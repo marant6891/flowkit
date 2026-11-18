@@ -1,57 +1,53 @@
 # Kiedy i jaki diagram
 
-Diagram powstaje tylko wtedy, gdy poprawia zrozumienie. Jakość dokumentu ma pierwszeństwo przed liczbą diagramów.
+Skill zawsze ocenia, czy procesy, przepływy i relacje opisane w dokumencie warto pokazać graficznie.
+Diagram powstaje, gdy poprawia zrozumienie. Jakość dokumentu ma pierwszeństwo przed liczbą diagramów.
 
-## Test przydatności
+## Obowiązkowy przegląd tematów
 
-Zaplanuj diagram tylko, gdy odpowiedź na **wszystkie** pytania brzmi „tak”:
+Przed pisaniem dokumentu znajdź w materiałach poniższe tematy. Dla każdego znalezionego tematu zapisz decyzję w planie diagramów.
 
-1. Czy zagadnienie ma charakter strukturalny, procesowy lub relacyjny?
-2. Czy ma co najmniej 3 powiązane elementy albo punkt decyzyjny?
-3. Czy sam tekst lub tabela utrudniają zobaczenie zależności?
-4. Czy źródła potwierdzają elementy i relacje, które mają znaleźć się na grafice?
-
-| Treść | Forma |
-|---|---|
-| Prosta lista wymagań | Lista lub tabela, bez diagramu |
-| Zestawienie parametrów | Tabela, bez diagramu |
-| Pojedyncza informacja lub integracja A → B bez dodatkowej logiki | Zdanie, bez diagramu |
-| Proces z decyzjami, wyjątkami lub wieloma rolami | Diagram |
-| Kilka komponentów z kierunkami komunikacji | Diagram |
-
-Dokument bez uzasadnionych diagramów jest poprawnym wynikiem.
-
-## Dobór typu
-
-| Pytanie, na które odpowiada diagram | Typ (`type`) | Typowy dokument |
+| Temat w materiałach | Diagram jest zasadny, gdy | Typ (`type`) |
 |---|---|---|
-| Z czego składa się system i jak łączą się części? | `architecture` | PT, PRD (kontekst) |
-| Jakie moduły mają jakie odpowiedzialności? | `component` | PT |
-| Jak przebiega proces i gdzie są decyzje? | `flowchart` | PRD, proces |
-| Kto za co odpowiada w procesie? | `swimlane` | PRD, proces |
-| W jakiej kolejności systemy wymieniają komunikaty? | `sequence` | PT |
-| Jakie stany ma obiekt i co je zmienia? | `state-machine` | PRD, PT |
-| Jakie są encje i relacje danych? | `er` | PT |
-| Którędy płyną dane? | `data-flow` | PT |
-| Jakie systemy są zintegrowane i w którą stronę? | `integration` | PT |
-| Gdzie uruchomione są komponenty? | `deployment` | PT, DevOps |
-| Co od czego zależy? | `dependency` | PT, DevOps |
-| Jakie są etapy i terminy? | `timeline` | PRD, wdrożenie |
-| Jaką drogę przechodzi użytkownik? | `user-journey` | PRD |
-| Jak wymagania łączą się z testami lub komponentami? | `requirement-traceability` | PRD, PT |
-| Jakie role mają dostęp do jakich zasobów? | `security-matrix` | PT, bezpieczeństwo |
+| Proces biznesowy lub systemowy | Ma co najmniej 3 kroki, decyzję, wyjątek lub ścieżkę alternatywną | `flowchart` |
+| Proces z podziałem odpowiedzialności | Zadania przechodzą między co najmniej 2 rolami, zespołami lub systemami | `swimlane` |
+| Komunikacja między systemami | Występują co najmniej 3 komunikaty, odpowiedź zwrotna, obsługa błędu lub ważna kolejność, także przy 2 systemach | `sequence` |
+| Przepływ danych | Dane przechodzą przez co najmniej 2 etapy lub systemy albo są przekształcane | `data-flow` |
+| Integracje | Występują co najmniej 2 integracje albo kierunki komunikacji są istotne dla zmiany | `integration` |
+| Relacje między systemami lub komponentami | Co najmniej 3 elementy mają wzajemne zależności | `architecture`, `component`, `dependency` |
+| Zmiana stanów obiektu | Obiekt ma co najmniej 3 stany lub przejścia zależne od warunków | `state-machine` |
+| Model danych | Co najmniej 3 encje albo 2 relacje | `er` |
+| Infrastruktura i wdrożenie | Komponenty działają w co najmniej 2 środowiskach, strefach lub węzłach | `deployment` |
+| Etapy i terminy | Co najmniej 3 etapy mają ustaloną kolejność | `timeline` |
+| Ścieżka użytkownika | Użytkownik przechodzi przez co najmniej 3 kroki | `user-journey` |
+| Powiązania wymagań | Macierz daje więcej niż zwykła tabela dokumentu | `requirement-traceability` |
+| Role i dostęp do zasobów | Macierz daje więcej niż zwykła tabela dokumentu | `security-matrix` |
 
-Macierz śledzenia i macierz uprawnień stosuj jako grafikę tylko wtedy, gdy układ daje więcej niż zwykła tabela dokumentu.
+Gdy temat spełnia kryterium, domyślną decyzją jest **diagram**. Jeden temat może wymagać dwóch diagramów tylko wtedy, gdy odpowiadają na różne pytania, np. architektura i sekwencja wywołań.
+
+## Kiedy nie dodawać diagramu
+
+Rezygnację z diagramu uzasadnij w planie jednym z powodów:
+
+| Powód | Przykład | Co zrobić |
+|---|---|---|
+| Treść nie ma struktury ani relacji | Lista wymagań, zestawienie parametrów, pojedyncza informacja | Zostaw listę lub tabelę |
+| Temat nie spełnia kryterium | Jeden komunikat A → B bez dodatkowej logiki | Opisz w zdaniu |
+| Źródła nie potwierdzają głównych elementów ani relacji | Wiadomo, że integracja istnieje, ale nie wiadomo między czym | Dodaj `OPEN-NNN`, bez diagramu |
+| Diagram powieliłby inny diagram | Ten sam przepływ pokazano już w tej samej sekcji | Odwołaj się do istniejącego rysunku |
+
+Gdy główna struktura jest potwierdzona, a brakuje szczegółu, narysuj tylko potwierdzone elementy, a brak opisz w uwagach pod rysunkiem z `OPEN-NNN`. Niewiadome nigdy nie trafiają na obraz.
+
+Dokument, w którym żaden temat nie spełnia kryteriów, poprawnie pozostaje bez diagramów.
 
 ## Plan diagramów
 
-Plan pokaż użytkownikowi w Etapie 4, razem z tematami pominiętymi:
+Plan pokaż użytkownikowi w Etapie 4. Obejmuje tematy z diagramem i tematy bez diagramu:
 
-| ID | Sekcja | Typ | Priorytet | Uzasadnienie | Źródła |
-|---|---|---|---|---|---|
-| D-01 | 10. Architektura | Architektura | Wysoki | 5 komponentów i 2 integracje | SRC-001, SRC-002 |
-
-Pominięte: „Wymagania niefunkcjonalne”, ponieważ tabela wystarcza.
+| ID | Temat | Sekcja | Decyzja | Typ | Priorytet | Uzasadnienie | Źródła |
+|---|---|---|---|---|---|---|---|
+| D-01 | Komunikacja portalu z systemem ERP | 11. Integracje | Diagram | Sekwencja | Wysoki | 4 komunikaty i obsługa błędu | SRC-001, SRC-002 |
+| – | Parametry eksportu | 8. Wymagania niefunkcjonalne | Bez diagramu | – | – | Zestawienie parametrów, tabela wystarcza | SRC-003 |
 
 Identyfikator `D-NN` jest stały przez cały cykl życia dokumentu, także po zmianie kolejności rysunków.
 

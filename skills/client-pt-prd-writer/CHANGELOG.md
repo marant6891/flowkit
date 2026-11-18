@@ -1,12 +1,40 @@
 # Historia zmian skilla client-pt-prd-writer
 
+## 2.4 (18.11.2026)
+
+### Obraz tylko z potwierdzonymi informacjami
+- Na grafice są wyłącznie elementy potwierdzone źródłem `SRC-NNN`; niepewna treść jest odrzucana.
+- Niewiadome i założenia trafiają do akapitu „Uwagi do rysunku” pod grafiką.
+
+### Dobór diagramów
+- Obowiązkowa ocena procesów, przepływów, komunikacji, integracji i relacji między systemami lub komponentami.
+- Mierzalne kryteria dla każdego typu diagramu, także dla komunikacji dwóch systemów.
+- Plan zawiera decyzję „Diagram” albo „Bez diagramu” z powodem.
+- Szablon zapasowy, discovery i checklisty wskazują miejsca oraz informacje potrzebne do diagramów.
+
+### Zgodność ze źródłami
+- Kontrola obejmuje etykiety połączeń, grupy, role, atrybuty, opisy, daty i adnotacje, a nie tylko nazwy węzłów.
+- Tryb końcowy blokuje oznaczenia robocze w tytule, podpisie, opisie i tekście alternatywnym.
+- Angielskie statusy na diagramach są odrzucane.
+
+### Szablony klienta
+- Obsługa szablonów `.dotx` oraz nagłówków w stylach własnych klienta.
+- Zdanie wprowadzające przejmuje styl tekstu dokumentu.
+- Zapowiedź tabeli lub listy nie jest oddzielana od zapowiadanej treści.
+- Diagram wstawiony znacznikiem zachowuje miejsce przy ponownym generowaniu.
+- Numeracja uwzględnia rysunki istniejące w szablonie.
+- Instrukcja wypełniania placeholderów zachowuje formatowanie.
+
+### Uruchamianie
+- Polecenia używają ścieżki katalogu skilla, dzięki czemu działają po instalacji w dowolnym projekcie.
+
 ## 2.3 (18.11.2026)
 
 ### Silnik diagramów
 - Nowy Etap 5a: ocena potrzeby, plan, model pośredni YAML, generowanie, walidacja i osadzanie diagramów.
 - 15 typów diagramów, 3 motywy oraz kolor i czcionka pobierane z szablonu klienta.
 - Eksport SVG, PNG i HTML; osadzanie w DOCX i Markdown z numeracją, podpisem i tekstem alternatywnym.
-- Każdy element diagramu ma oznaczenie pochodzenia; niewiadome są widoczne na grafice i blokują tryb końcowy.
+- Każdy element diagramu ma oznaczenie pochodzenia.
 - Ponowne generowanie pojedynczego diagramu bez przebudowy dokumentu.
 
 ### Polskie nazwy w tabelach

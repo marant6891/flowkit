@@ -6,7 +6,7 @@ diagram:
   purpose: Uprawnienia ról do zasobów systemu
   caption: Uprawnienia ról do zasobów systemu
   explanation: uprawnienia ról do zasobów systemu
-  alt: Konsultant odczytuje i edytuje zamówienia. Uprawnienia Administratora do raportów wymagają potwierdzenia.
+  alt: Konsultant odczytuje i edytuje zamówienia, a Administrator odczytuje zamówienia.
   source:
     section: 6. Bezpieczeństwo
   nodes:
@@ -41,8 +41,6 @@ diagram:
     source: SRC-001
     direction: none
     label: Odczyt
-  - from: r2
-    to: c2
+  remarks:
+  - text: Materiały nie określają uprawnień roli Administrator do zasobu Raporty
     source: OPEN-001
-    direction: none
-    label: DO POTWIERDZENIA

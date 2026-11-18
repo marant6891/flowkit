@@ -18,16 +18,15 @@ Kolor ma w całym dokumencie stałe znaczenie.
 |---|---|
 | Akcent | Główny punkt skupienia (`focus: true`), najwyżej 2 elementy |
 | Tło przygaszone | System zewnętrzny, grupa lub rola |
-| Bursztyn i linia przerywana | Element niepotwierdzony (`ASSUMPTION-NNN`, `OPEN-NNN`) |
 | Grafit | Tekst i linie |
 
-Linia przerywana oznacza wyłącznie niepewność. Legenda pojawia się automatycznie, gdy na grafice jest taki element.
+Na obrazie nie ma elementów niepotwierdzonych. Uwagi do diagramu są zwykłym tekstem pod rysunkiem.
 
 ## Zasady
 
 - Bez cieni, gradientów i ikon dekoracyjnych.
 - Siatka 4 px, cienkie linie, subtelne zaokrąglenia.
-- Strzałka zawsze wskazuje kierunek. Nieznany kierunek to linia bez grotów i `OPEN-NNN`.
+- Strzałka zawsze wskazuje potwierdzony kierunek.
 - Tytuł i numer rysunku są w podpisie dokumentu, nie na grafice (wyjątek: `full-editorial`).
 
 ## Szablon klienta
@@ -35,7 +34,7 @@ Linia przerywana oznacza wyłącznie niepewność. Legenda pojawia się automaty
 Kolor akcentu i czcionkę pobierz z motywu szablonu, bez modyfikowania pliku:
 
 ```bash
-python scripts/generate_diagram.py model.yaml --out diagrams/ --brand-from szablon.docx
+python "<SKILL_DIR>/scripts/generate_diagram.py" model.yaml --out diagrams/ --brand-from szablon.docx
 ```
 
 Można też podać `output.accent` i `output.font` w modelu. Zbyt jasny akcent jest automatycznie

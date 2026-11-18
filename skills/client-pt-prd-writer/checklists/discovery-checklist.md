@@ -28,6 +28,13 @@ Pytaj tylko o punkty `BRAK`, które dotyczą tej zmiany.
 - [ ] Przypadki brzegowe, walidacje, komunikaty – czy są określone?
 - [ ] Czy zmieniają się role lub uprawnienia?
 
+## Przepływy i relacje (podstawa decyzji o diagramach)
+- [ ] Jakie procesy opisują materiały i kto za co w nich odpowiada?
+- [ ] Jakie są decyzje, wyjątki i ścieżki alternatywne?
+- [ ] Które systemy lub komponenty się komunikują, w jakim kierunku i w jakiej kolejności?
+- [ ] Jakie dane przepływają między systemami i gdzie są przekształcane?
+- [ ] Jakie są relacje między komponentami, encjami lub stanami?
+
 ## Technologia (tylko przy dostępie do kodu/dokumentacji)
 - [ ] Które moduły / pliki / endpointy są dotknięte?
 - [ ] Jakie dane są tworzone, zmieniane, usuwane? Czy potrzebna migracja?

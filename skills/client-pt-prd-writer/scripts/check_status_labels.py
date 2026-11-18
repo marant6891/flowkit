@@ -13,6 +13,8 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
 TERMS = {
     # Wymagalność (MoSCoW)
     "must": "Wymagane", "must have": "Wymagane", "mandatory": "Wymagane", "required": "Wymagane",
@@ -57,15 +59,15 @@ def markdown_cells(path: Path):
 
 
 def docx_cells(path: Path):
-    from docx import Document
-    for t, table in enumerate(Document(str(path)).tables, 1):
+    from docx_support import open_document
+    for t, table in enumerate(open_document(path).tables, 1):
         for r, row in enumerate(table.rows, 1):
             for cell in row.cells:
                 yield f"tabela {t}, wiersz {r}", cell.text
 
 
 def find_issues(path: Path) -> list[str]:
-    cells = docx_cells(path) if path.suffix.lower() == ".docx" else markdown_cells(path)
+    cells = docx_cells(path) if path.suffix.lower() in (".docx", ".dotx") else markdown_cells(path)
     issues = []
     for where, cell in cells:
         polish = lookup(cell)

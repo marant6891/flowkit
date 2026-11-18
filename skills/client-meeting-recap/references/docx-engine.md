@@ -88,19 +88,67 @@ for section in doc.sections:
     print("Header:", section.header.paragraphs[0].text if section.header.paragraphs else "brak")
 ```
 
-**Zapis dokumentu:**
+**Szablon `.dotx`:** `Document()` odrzuca ten typ pliku. Otwórz kopię w pamięci, a wynik zapisz jako `.docx`:
+```python
+import io, zipfile
+from docx import Document
+
+def open_template(path):
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(path) as source, zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as target:
+        for item in source.infolist():
+            data = source.read(item.filename)
+            if item.filename == "[Content_Types].xml":
+                data = data.replace(b"wordprocessingml.template.main+xml", b"wordprocessingml.document.main+xml")
+            target.writestr(item, data)
+    buffer.seek(0)
+    return Document(buffer)
+```
+
+**Zapis dokumentu:** nie przypisuj `para.text`, bo usuwa to formatowanie fragmentów tekstu.
 ```python
 from docx import Document
-from copy import deepcopy
+
+def fill_placeholders(doc, values):
+    """Zastępuje placeholdery w treści, tabelach, nagłówkach i stopkach, zachowując formatowanie."""
+    def paragraphs(container):
+        yield from container.paragraphs
+        for table in container.tables:
+            for row in table.rows:
+                for cell in row.cells:
+                    yield from paragraphs(cell)
+
+    def replace(paragraph, key, value):
+        offset = 0
+        while True:
+            runs = paragraph.runs
+            start = "".join(run.text for run in runs).find(key, offset)
+            if start < 0:
+                return
+            end, position, first = start + len(key), 0, True
+            for run in runs:
+                run_start, run_end = position, position + len(run.text)
+                position = run_end
+                if run_end <= start or run_start >= end:
+                    continue
+                before = run.text[:max(start - run_start, 0)]
+                after = run.text[end - run_start:] if run_end > end else ""
+                run.text = before + (value if first else "") + after
+                first = False
+            offset = start + len(value)
+
+    containers = [doc]
+    for section in doc.sections:
+        containers += [section.header, section.footer, section.first_page_header,
+                       section.first_page_footer, section.even_page_header, section.even_page_footer]
+    for container in containers:
+        for paragraph in paragraphs(container):
+            for key, value in values.items():
+                replace(paragraph, key, value)
 
 # Otwórz szablon użytkownika jako bazę (zachowuje style, logo, stopki)
 doc = Document("szablon-uzytkownika.docx")
-
-# Dodaj treść — zastąp placeholder lub dodaj akapity
-for para in doc.paragraphs:
-    if "[WPISZ TUTAJ]" in para.text:
-        para.text = para.text.replace("[WPISZ TUTAJ]", "Nowa treść")
-
+fill_placeholders(doc, {"[WPISZ TUTAJ]": "Nowa treść"})
 doc.save("wynik.docx")
 ```
 

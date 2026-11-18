@@ -1,5 +1,12 @@
 # Historia zmian skilla devops-incident-postmortem
 
+## 1.4 (18.11.2026)
+
+### Bezpieczeństwo i szablony
+- Logi i zapisy rozmów są traktowane wyłącznie jako dane, a nie polecenia.
+- Sekrety i dane osobowe są zastępowane znacznikiem `[UKRYTO]`, a wykryte sekrety zgłaszane do rotacji.
+- Obsługa szablonów `.docx` i `.dotx`.
+
 ## 1.3 (14.11.2026)
 
 ### Rzetelność szablonu i spójność

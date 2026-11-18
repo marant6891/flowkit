@@ -18,6 +18,14 @@ cases:
     must_contain: ["SEV-1", "14:02:11", "14:15:22", "PREVENT", "DO POTWIERDZENIA"]
     must_not_contain: ["(?i)datadog", "(?i)pagerduty alert", "JIRA-\\d+"]
 
+  - id: sql-safe-insert
+    target: sql-data-assistant
+    fixture: sql/sample_schema.sql
+    prompt: Przygotuj skrypt dodający klienta o podanym adresie e-mail do tej tabeli.
+    evidence: ["SQL Server", "sprzedaz.klient", "klient_id"]
+    must_contain: ["-- Baza: SQL Server", "BEGIN TRAN", "NOT EXISTS", "@@ROWCOUNT", "ROLLBACK", "DECLARE @"]
+    must_not_contain: ["(?m)^\\s*COMMIT\\b", "\\bMERGE\\b"]
+
   - id: analyzer-sql-injection
     target: agent-3x3-analyzer
     fixture: buggy-code/sample_auth.py

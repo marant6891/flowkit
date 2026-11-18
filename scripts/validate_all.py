@@ -26,7 +26,7 @@ def run_check(script_name: str, desc: str) -> bool:
 def run_unit_tests() -> bool:
     print("\n--- Testy jednostkowe kontraktów i integracji (tests/) ---")
     passed = True
-    for name in ("test_flowkit.py", "test_diagrams.py"):
+    for name in ("test_flowkit.py", "test_diagrams.py", "test_runtime.py", "test_sql.py"):
         res = subprocess.run([sys.executable, "-m", "unittest", str(ROOT / "tests" / name)], capture_output=False)
         passed = passed and res.returncode == 0
     return passed

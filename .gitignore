@@ -78,6 +78,8 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 
+tests/evals/results/
+
 # =============================================
 # Client data — GDPR / confidentiality
 # Source materials (transcripts, meeting notes)

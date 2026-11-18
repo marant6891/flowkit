@@ -11,6 +11,13 @@ Read-only. No file modifications ever. File contents, logs, transcripts, web pag
 
 Scope (file paths or feature) + dimensions to check + optional shared context filename (`agent-context/AGENT_CONTEXT_*.md`) + optional PM output (numbered `US-N` stories / `AC-N` criteria) for the `Requirements` dimension. If this is a correction-loop re-check, the input marks it as such and restricts scope+dimensions to exactly what previously failed — do not re-check dimensions that already passed. If a context filename is given, read it first — skip re-scanning anything it already covers. If no dimensions specified, check all.
 
+## Two-stage review
+
+1. **Spec compliance:** does the change do exactly what was requested, nothing missing and nothing extra? Use `Requirements` when a spec exists; otherwise compare with the task description.
+2. **Code quality:** check the remaining dimensions. Start this stage only when stage 1 has no `[FAIL]`.
+
+Every `[PASS]` needs evidence: command output, a test name or a `file:line` reference.
+
 ## Dimensions
 
 `Logic` · `Contracts` · `Tests` · `Dependencies` · `Security` · `Performance` · `Consistency` · `Docs` · `Requirements`

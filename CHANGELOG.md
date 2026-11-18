@@ -8,6 +8,31 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 
 ---
 
+## [1.7.0] — 2026-11-18
+
+### Dodano
+- **Automatyczny dobór działania:** `agent-3x3` bez prefiksu rozpoznaje rodzaj zadania i uruchamia właściwy skill lub subagenta.
+- **Skill `sql-data-assistant`:** bezpieczne zapytania, zestawienia i skrypty poprawy danych dla PostgreSQL, SQL Server, Oracle, MySQL i MariaDB.
+- **Lokalna kontrola `check_sql.py`:** typ bazy, zmienne, transakcja, ochrona przed nadpisaniem, kontrola liczby wierszy i domyślne `ROLLBACK`.
+
+---
+
+## [1.6.0] — 2026-11-18
+
+### Dodano
+- **Lokalna warstwa bezpieczeństwa:** `runtime/flowkit_exec.py` i hook `runtime/guard_bash.py` ograniczają polecenia agentów do listy dozwolonej dla roli, ukrywają sekrety i skracają wyniki.
+- **Agent `agent-3x3-diagnostics`:** diagnostyka tylko do odczytu oraz szablon runbooka.
+- **Agent `agent-3x3-analyst`:** analiza wymagań, procesu i wpływu zmiany, backlog, przypadki testowe i UAT na lokalnych dokumentach.
+- **Testy aktywacji skilli** i `scripts/run_evals.py` z pomiarem tokenów oraz porównaniem bez wtyczki.
+- Plik zasad projektu `flowkit-project.md`, tryb szybki dla prostych zmian i dwuetapowy przegląd Verifiera.
+
+### Zmieniono
+- Agenci pracują wyłącznie lokalnie: usunięto narzędzia webowe, a rozwiązanie nie używa MCP.
+- Subagenci Claude Code mają przypisany model i limit kroków.
+- Rzadkie procedury orkiestratora są ładowane tylko wtedy, gdy są potrzebne.
+
+---
+
 ## [1.5.0] — 2026-11-18
 
 ### Naprawiono

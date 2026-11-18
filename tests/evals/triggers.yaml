@@ -1,0 +1,54 @@
+# Testy aktywacji skilli: czy właściwy skill uruchamia się, a niewłaściwy pozostaje nieaktywny.
+skills:
+  client-pt-prd-writer:
+    should_trigger:
+      - Przygotuj dokument PT dla zmiany w formularzu zamówienia na podstawie załączonego zgłoszenia.
+      - Napisz PRD dla nowej funkcji eksportu raportów.
+      - Potrzebuję specyfikacji zmiany dla klienta z tych materiałów.
+      - Opracuj analizę przedwdrożeniową integracji z systemem ERP.
+      - Zrób dokumentację change requestu w szablonie klienta.
+      - Przygotuj projekt techniczny tej modyfikacji aplikacji.
+    should_not_trigger:
+      - Napraw błąd walidacji w pliku orders.py.
+      - Podsumuj to spotkanie w mailu do klienta.
+      - Przygotuj raport postmortem z awarii bazy danych.
+      - Wyjaśnij różnicę między REST a GraphQL.
+  client-meeting-recap:
+    should_trigger:
+      - Podsumuj to spotkanie na podstawie transkrypcji VTT.
+      - Przygotuj mail z ustaleniami po spotkaniu z klientem.
+      - Zrób recap z notatek ze spotkania i wypisz zadania.
+      - Mam transkrypcję z Teams, potrzebuję listy decyzji i właścicieli zadań.
+      - Przygotuj notatkę po spotkaniu oraz radar ryzyk dla zespołu.
+      - Stwórz podsumowanie rozmowy z klientem z tego pliku.
+    should_not_trigger:
+      - Napisz PRD dla modułu raportów.
+      - Zaplanuj agendę przyszłego spotkania.
+      - Przetłumacz ten mail na angielski.
+      - Przeanalizuj logi aplikacji z ostatniej godziny.
+  sql-data-assistant:
+    should_trigger:
+      - Przygotuj zapytanie SQL pokazujące zamówienia klienta z ostatniego miesiąca.
+      - Potrzebuję zestawienia z bazy z liczbą zgłoszeń według statusu.
+      - Sprawdź w bazie, czy dane z tego zgłoszenia są poprawne, przygotuj SELECT.
+      - Napisz INSERT dodający brakujący rekord do tabeli klientów.
+      - Przygotuj bezpieczny UPDATE poprawiający adres e-mail klienta.
+      - Znajdź duplikaty w tabeli zamówień zapytaniem SQL.
+    should_not_trigger:
+      - Napisz PRD dla modułu raportów.
+      - Przygotuj Dockerfile dla bazy PostgreSQL.
+      - Podsumuj spotkanie o migracji bazy danych.
+      - Wyjaśnij, czym jest normalizacja danych.
+  devops-incident-postmortem:
+    should_trigger:
+      - Przygotuj postmortem po wczorajszej awarii produkcji.
+      - Zrób RCA tego incydentu na podstawie logów i alertów.
+      - Napisz raport z awarii SEV-1 z osią czasu.
+      - Przeanalizuj przyczyny incydentu i zaproponuj działania naprawcze.
+      - Opracuj blameless postmortem z zapisu kanału incydentowego.
+      - Potrzebuję analizy 5 Whys dla tej awarii usługi płatności.
+    should_not_trigger:
+      - Napisz Dockerfile dla aplikacji Node.js.
+      - Przygotuj pipeline CI w GitHub Actions.
+      - Podsumuj spotkanie zespołu DevOps.
+      - Dodaj alert dla wysokiego użycia pamięci.

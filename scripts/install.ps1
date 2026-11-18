@@ -73,7 +73,9 @@ $AvailableAgents = @(
     "agent-3x3-planner",
     "agent-3x3-implementer",
     "agent-3x3-devops",
-    "agent-3x3-pm"
+    "agent-3x3-pm",
+    "agent-3x3-diagnostics",
+    "agent-3x3-analyst"
 )
 
 if (-not $SkillName -and -not $AgentName) {
@@ -209,5 +211,21 @@ if ($AgentName) {
             exit 1
         }
         Process-Agent -Name $AgentName
+    }
+
+    # Lokalna warstwa bezpieczeństwa jest wymagana przez agentów uruchamiających polecenia.
+    if ($Platform -eq 'claude') {
+        $RuntimeDir = Join-Path $HOME ".claude\flowkit\runtime"
+    } else {
+        $RuntimeDir = Join-Path (Split-Path -Parent $AgentTargetDir) "flowkit\runtime"
+    }
+    if ($DryRun) {
+        Write-Host "  [DRY-RUN] Skopiowano by runtime -> $RuntimeDir" -ForegroundColor Gray
+    } elseif (-not $Uninstall) {
+        New-Item -ItemType Directory -Force -Path $RuntimeDir | Out-Null
+        Copy-Item -Path (Join-Path $RepoRoot "runtime\*") -Destination $RuntimeDir -Recurse -Force -Exclude "__pycache__"
+        Write-Host "  ✓ Zainstalowano lokalną warstwę bezpieczeństwa: $RuntimeDir" -ForegroundColor Green
+    } elseif ($AgentName -eq "all" -and (Test-Path $RuntimeDir)) {
+        Remove-Item -Path $RuntimeDir -Recurse -Force
     }
 }

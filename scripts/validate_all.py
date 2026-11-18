@@ -24,10 +24,12 @@ def run_check(script_name: str, desc: str) -> bool:
 
 
 def run_unit_tests() -> bool:
-    print("\n--- Testy jednostkowe kontraktów i integracji (tests/test_flowkit.py) ---")
-    test_path = ROOT / "tests" / "test_flowkit.py"
-    res = subprocess.run([sys.executable, "-m", "unittest", str(test_path)], capture_output=False)
-    return res.returncode == 0
+    print("\n--- Testy jednostkowe kontraktów i integracji (tests/) ---")
+    passed = True
+    for name in ("test_flowkit.py", "test_diagrams.py"):
+        res = subprocess.run([sys.executable, "-m", "unittest", str(ROOT / "tests" / name)], capture_output=False)
+        passed = passed and res.returncode == 0
+    return passed
 
 
 def main() -> int:
@@ -38,7 +40,7 @@ def main() -> int:
             failed.append(script_name)
 
     if not run_unit_tests():
-        failed.append("tests/test_flowkit.py")
+        failed.append("tests/")
 
     print("\n" + "=" * 46)
     if failed:

@@ -1,0 +1,47 @@
+diagram:
+  model_version: '1.0'
+  id: D-04
+  title: Model danych zamówienia
+  type: er
+  purpose: Encje zamówienia i relacje między nimi
+  caption: Encje zamówienia i relacje między nimi
+  explanation: encje modelu danych zamówienia i ich liczności
+  alt: Klient ma wiele Zamówień, a Zamówienie składa się z wielu Pozycji zamówienia.
+  source:
+    section: 5. Model danych
+  nodes:
+  - id: k
+    label: Klient
+    type: entity
+    source: SRC-003
+    attributes:
+    - 'id: PK'
+    - 'email: tekst'
+  - id: z
+    label: Zamówienie
+    type: entity
+    source: SRC-003
+    focus: true
+    attributes:
+    - 'id: PK'
+    - 'klient_id: FK'
+    - 'status: tekst'
+  - id: p
+    label: Pozycja zamówienia
+    type: entity
+    source: SRC-003
+    attributes:
+    - 'id: PK'
+    - 'zamowienie_id: FK'
+    - 'ilosc: liczba'
+  connections:
+  - from: k
+    to: z
+    source: SRC-003
+    direction: none
+    label: '1 : N'
+  - from: z
+    to: p
+    source: SRC-003
+    direction: none
+    label: '1 : N'

@@ -1,0 +1,55 @@
+# Wzór modelu diagramu. Zastąp wszystkie wartości treścią z materiałów źródłowych.
+# Nie kopiuj elementów tego wzoru do dokumentu: każdy węzeł musi wynikać ze źródeł.
+# Na obrazie są wyłącznie elementy potwierdzone źródłem SRC-NNN.
+# Niewiadome i założenia opisz w polu remarks: trafią do tekstu pod rysunkiem.
+diagram:
+  model_version: "1.0"
+  id: D-01                          # stały identyfikator diagramu
+  title: "[Tytuł diagramu]"
+  type: architecture                # lista typów: references/diagram-selection.md
+  purpose: "[Na jakie pytanie odpowiada diagram]"
+  caption: "[Treść podpisu bez numeru rysunku]"
+  explanation: "[co przedstawia rysunek, dokończenie zdania: Rysunek N przedstawia ...]"
+  alt: "[Opis zawartości diagramu dla osób niewidzących grafiki]"
+
+  source:
+    section: "[Numer i nazwa sekcji dokumentu]"
+
+  placement:
+    section: "[Numer i nazwa sekcji dokumentu]"
+    position: after-first-block     # albo after-heading
+
+  groups:
+    - id: grupa
+      label: "[Nazwa grupy]"
+      source: SRC-001
+
+  nodes:
+    - id: element-a
+      label: "[Nazwa elementu A]"
+      type: application
+      group: grupa
+      source: SRC-001
+    - id: element-b
+      label: "[Nazwa elementu B]"
+      type: service
+      group: grupa
+      focus: true                   # najwyżej 2 elementy na diagram
+      source: SRC-001
+
+  connections:
+    - from: element-a
+      to: element-b
+      label: "[Co jest przekazywane]"
+      direction: forward            # forward, both (none tylko w er i macierzach)
+      source: SRC-001
+
+  annotations: []
+
+  remarks:                          # tekst pod rysunkiem, nigdy na obrazie
+    - text: "[Czego nie potwierdzają materiały i czego dotyczy brak]"
+      source: OPEN-001
+
+  output:
+    formats: [svg, png, html]
+    theme: minimal-light            # minimal-light, minimal-dark, full-editorial

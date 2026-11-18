@@ -65,6 +65,7 @@ git checkout -b feat/moj-nowy-skill
 
 # 2. Skopiuj szablon skilla
 cp -r skills/_template skills/moj-nowy-skill
+mv skills/moj-nowy-skill/SKILL.template.md skills/moj-nowy-skill/SKILL.md
 
 # 3. Wypełnij SKILL.md i usuń komentarze szablonu
 # 4. Dodaj szablony, checklists i przykłady

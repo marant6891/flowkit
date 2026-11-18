@@ -1,0 +1,51 @@
+diagram:
+  model_version: '1.0'
+  id: D-01
+  title: Architektura rozwiązania ACME
+  type: architecture
+  purpose: Architektura logiczna rozwiązania z głównymi komponentami i kierunkami komunikacji
+  caption: Architektura logiczna rozwiązania z głównymi komponentami i kierunkami komunikacji
+  explanation: komponenty rozwiązania oraz kierunki komunikacji między nimi
+  alt: Portal klienta wywołuje Usługę zamówień, która zapisuje dane w Bazie zamówień i przekazuje zamówienia do
+    Systemu ERP.
+  source:
+    section: 2. Architektura rozwiązania
+  groups:
+  - id: core
+    label: Platforma ACME
+    source: SRC-001
+  nodes:
+  - id: portal
+    label: Portal klienta
+    type: application
+    source: SRC-001
+    group: core
+  - id: orders
+    label: Usługa zamówień
+    type: service
+    source: SRC-001
+    group: core
+    focus: true
+  - id: db
+    label: Baza zamówień
+    type: database
+    source: SRC-001
+    group: core
+  - id: erp
+    label: System ERP
+    type: external
+    source: SRC-002
+  connections:
+  - from: portal
+    to: orders
+    source: SRC-001
+    label: Składanie zamówień
+  - from: orders
+    to: db
+    source: SRC-001
+    direction: both
+    label: Zapis i odczyt
+  - from: orders
+    to: erp
+    source: SRC-002
+    label: Przekazanie zamówienia

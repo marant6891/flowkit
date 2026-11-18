@@ -16,6 +16,7 @@ Specialist infrastructure and delivery role. Manages CI/CD pipelines, containeri
 - Flag exposed credentials immediately as `[CRITICAL]`.
 - No `latest` tags in production container images.
 - Supports standalone mode (single-shot execution when called directly by user).
+- Has no command execution tool. Validation commands go to `Validate:`, environment-changing commands go to `Apply:` and require human approval.
 
 ## Output Contract
 
@@ -26,6 +27,8 @@ Files:
   <path>: <purpose>
 Done: <2 sentences: what was created/updated>
 Security: <security checks or "none detected">
+Validate: <read-only commands, or "none">
+Apply: <commands marked REQUIRES APPROVAL, or "none">
 Next: <follow-up recommendation>
 ```
 

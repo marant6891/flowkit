@@ -1,0 +1,35 @@
+diagram:
+  model_version: '1.0'
+  id: D-07
+  title: Etapy wdrożenia
+  type: timeline
+  purpose: Etapy wdrożenia zmiany
+  caption: Etapy wdrożenia zmiany
+  explanation: kolejne etapy wdrożenia zmiany
+  alt: Wdrożenie obejmuje analizę, implementację, testy akceptacyjne oraz uruchomienie.
+  source:
+    section: 7. Wdrożenie
+  nodes:
+  - id: a
+    label: Analiza
+    type: item
+    source: SRC-004
+    date: Styczeń 2027
+  - id: b
+    label: Implementacja
+    type: item
+    source: SRC-004
+    date: Luty 2027
+  - id: c
+    label: Testy akceptacyjne
+    type: item
+    source: SRC-004
+    date: Marzec 2027
+  - id: d
+    label: Uruchomienie
+    type: item
+    source: SRC-004
+  connections: []
+  remarks:
+  - text: Materiały nie podają terminu uruchomienia
+    source: OPEN-002

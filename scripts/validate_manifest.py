@@ -40,21 +40,24 @@ def validate_plugin_manifest() -> None:
             found = released.group(1) if released else "none"
             err(f"plugin.json version ({version}) does not match latest CHANGELOG.md entry ({found})")
 
-    # Sprawdzenie istnienia ścieżek skills
-    for skill in data.get("skills", []):
-        path_str = skill.get("path")
-        if not path_str:
-            err(f"Skill entry missing 'path': {skill}")
-        elif not (ROOT / path_str).exists():
-            err(f"Declared skill path does not exist: {path_str}")
+    # Claude Code akceptuje tu ścieżkę albo listę ścieżek zaczynających się od "./".
+    for key, suffix in (("skills", ""), ("agents", ".md")):
+        entries = data.get(key, [])
+        entries = [entries] if isinstance(entries, str) else entries
+        if not isinstance(entries, list):
+            err(f"plugin.json '{key}' must be a path or a list of paths")
+            continue
+        for entry in entries:
+            if not isinstance(entry, str) or not entry.startswith("./"):
+                err(f"plugin.json '{key}' entry must be a path starting with './': {entry!r}")
+            elif not entry.endswith(suffix):
+                err(f"plugin.json '{key}' entry must end with '{suffix}': {entry}")
+            elif not (ROOT / entry).exists():
+                err(f"Declared {key} path does not exist: {entry}")
 
-    # Sprawdzenie istnienia ścieżek agents
-    for agent in data.get("agents", []):
-        path_str = agent.get("path")
-        if not path_str:
-            err(f"Agent entry missing 'path': {agent}")
-        elif not (ROOT / path_str).exists():
-            err(f"Declared agent path does not exist: {path_str}")
+    # Domyślne skanowanie skills/ nie może wykryć szablonu jako skilla.
+    if (ROOT / "skills" / "_template" / "SKILL.md").exists():
+        err("skills/_template must use SKILL.template.md, otherwise the plugin loads it as a skill")
 
 
 def validate_marketplace_manifest() -> None:

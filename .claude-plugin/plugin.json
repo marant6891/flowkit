@@ -1,7 +1,7 @@
 {
   "name": "flowkit",
   "displayName": "FlowKit - Analyst & DevOps Skills",
-  "version": "1.3.0",
+  "version": "1.5.0",
   "description": "Kolekcja profesjonalnych umiejętności (Agent Skills) i agentów dla analityków biznesowo-systemowych i inżynierów DevOps zgodna ze standardami Anthropic, Atlassian, Google SRE i PagerDuty. Zero halucynacji, ścisłe śledzenie źródeł.",
   "author": {
     "name": "Mariusz Antosiewicz",
@@ -27,56 +27,14 @@
     "agent",
     "orchestrator"
   ],
-  "skills": [
-    {
-      "name": "client-pt-prd-writer",
-      "path": "skills/client-pt-prd-writer"
-    },
-    {
-      "name": "client-meeting-recap",
-      "path": "skills/client-meeting-recap"
-    },
-    {
-      "name": "devops-incident-postmortem",
-      "path": "skills/devops-incident-postmortem"
-    }
-  ],
   "agents": [
-    {
-      "name": "agent-3x3",
-      "path": "agents/agent-3x3_agent.md",
-      "description": "Orkiestrator 3x3 — główny agent koordynujący subagenty"
-    },
-    {
-      "name": "agent-3x3-analyzer",
-      "path": "agents/agent-3x3-analyzer_agent.md",
-      "description": "Subagent: analiza kodu i struktury (read-only)"
-    },
-    {
-      "name": "agent-3x3-verifier",
-      "path": "agents/agent-3x3-verifier_agent.md",
-      "description": "Subagent: weryfikacja poprawności implementacji (read-only)"
-    },
-    {
-      "name": "agent-3x3-planner",
-      "path": "agents/agent-3x3-planner_agent.md",
-      "description": "Subagent: planowanie iteracji 3x3 (read-only)"
-    },
-    {
-      "name": "agent-3x3-implementer",
-      "path": "agents/agent-3x3-implementer_agent.md",
-      "description": "Subagent: realizacja atomowych kroków implementacyjnych"
-    },
-    {
-      "name": "agent-3x3-devops",
-      "path": "agents/agent-3x3-devops_agent.md",
-      "description": "Subagent: CI/CD, Docker, Kubernetes, IaC, cloud, środowiska"
-    },
-    {
-      "name": "agent-3x3-pm",
-      "path": "agents/agent-3x3-pm_agent.md",
-      "description": "Subagent: user stories, acceptance criteria, ADR (read-only)"
-    }
+    "./agents/adapters/claude-code/agent-3x3.md",
+    "./agents/adapters/claude-code/agent-3x3-analyzer.md",
+    "./agents/adapters/claude-code/agent-3x3-verifier.md",
+    "./agents/adapters/claude-code/agent-3x3-planner.md",
+    "./agents/adapters/claude-code/agent-3x3-implementer.md",
+    "./agents/adapters/claude-code/agent-3x3-devops.md",
+    "./agents/adapters/claude-code/agent-3x3-pm.md"
   ],
   "metadata": {
     "suggestedPrompts": [

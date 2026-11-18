@@ -27,7 +27,7 @@ When activating a skill, read the full `SKILL.md` and all files referenced insid
 
 The `agent-3x3` orchestrator coordinates subagents using a strict 3-step iteration loop:
 - Each iteration: ≤3 steps → summarize → ask user → repeat
-- Supported prefixes: `ANALYZE:` `VERIFY:` `PLAN:` `SPEC:` `DRY:` `LOG:` `DEVOPS:`
+- Supported prefixes: `ANALYZE:` `VERIFY:` `PLAN:` `SPEC:` `DRY:` `LOG:` `DEVOPS:` `SHIP:`
 - Subagents: Analyzer, Verifier, Planner, Implementer, DevOps, PM
 
 See [`agents/agent-3x3_agent.md`](../agents/agent-3x3_agent.md) for full protocol.
@@ -46,4 +46,4 @@ See [`DEVELOPMENT.md`](../DEVELOPMENT.md) for full branch strategy, conventional
 
 ## Contributing a New Skill
 
-Copy `skills/_template/`, fill in `SKILL.md` frontmatter, and add the skill to the catalog table in `README.md`. The CI pipeline validates frontmatter on every push and PR.
+Copy `skills/_template/`, rename `SKILL.template.md` to `SKILL.md`, fill in its frontmatter, and add the skill to the catalog table in `README.md`. The CI pipeline validates frontmatter on every push and PR.

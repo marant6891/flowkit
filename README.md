@@ -12,14 +12,14 @@ Repozytorium spełnia standard otwartych skilli AI oraz posiada manifest [`.clau
 
 | Skill | Wersja | Opis | Ścieżka |
 |---|---|---|---|
-| **client-pt-prd-writer** | `2.2` | Tworzy precyzyjną dokumentację techniczną (PT) i PRD wyłącznie na bazie materiałów źródłowych. Zawiera scenariusze akceptacyjne **Given-When-Then (Gherkin)**, **Definition of Done (DoD)**, wyłączenia **Non-Goals** oraz obsługę szablonów klienta (`.docx`, `.md`). Opcjonalny tryb **dokumentu końcowego bez dopisków** — czysty dokument w szablonie klienta. | [`skills/client-pt-prd-writer/`](skills/client-pt-prd-writer/) |
-| **client-meeting-recap** | `1.2` | Przekształca surowe transkrypcje (`.vtt`, `.docx`, `.txt`) w 2-częściowe podsumowanie: **Część A (Wewnętrzny Radar Ryzyk / Scope Creep dla zespołu, z cytatami jako dowodami)** oraz **Część B (Oficjalny mail do klienta z zadaniami DRI i klauzulą weryfikacji 48h)** — w osobnych plikach. | [`skills/client-meeting-recap/`](skills/client-meeting-recap/) |
+| **client-pt-prd-writer** | `2.4` | Tworzy precyzyjną dokumentację techniczną (PT) i PRD wyłącznie na bazie materiałów źródłowych. Zawiera scenariusze akceptacyjne **Given-When-Then (Gherkin)**, **Definition of Done (DoD)**, wyłączenia **Non-Goals** oraz obsługę szablonów klienta (`.docx`, `.md`). Opcjonalny tryb **dokumentu końcowego bez dopisków** — czysty dokument w szablonie klienta. **Diagramy oparte na źródłach** (architektura, procesy, sekwencje, model danych) osadzane w DOCX i Markdown oraz polskie nazwy statusów w tabelach. | [`skills/client-pt-prd-writer/`](skills/client-pt-prd-writer/) |
+| **client-meeting-recap** | `1.3` | Przekształca surowe transkrypcje (`.vtt`, `.docx`, `.txt`) w 2-częściowe podsumowanie: **Część A (Wewnętrzny Radar Ryzyk / Scope Creep dla zespołu, z cytatami jako dowodami)** oraz **Część B (Oficjalny mail do klienta z zadaniami DRI i klauzulą weryfikacji 48h)** — w osobnych plikach. | [`skills/client-meeting-recap/`](skills/client-meeting-recap/) |
 
 ### ⚙️ DevOps i Infrastruktura
 
 | Skill | Wersja | Opis | Ścieżka |
 |---|---|---|---|
-| **devops-incident-postmortem** | `1.3` | Generuje bezobwiniający raport postmortem zgodny ze standardami **Google SRE i PagerDuty**. Zawiera klasyfikację SEV-1/SEV-2, role (Incident Commander), wieloczynnikowy łańcuch przyczyn (**Trigger, Amplifier, Detection/Process Gap**, 5 Whys), rejestr Status Page oraz zadania PREVENT/DETECT/MITIGATE. | [`skills/devops-incident-postmortem/`](skills/devops-incident-postmortem/) |
+| **devops-incident-postmortem** | `1.4` | Generuje bezobwiniający raport postmortem zgodny ze standardami **Google SRE i PagerDuty**. Zawiera klasyfikację SEV-1/SEV-2, role (Incident Commander), wieloczynnikowy łańcuch przyczyn (**Trigger, Amplifier, Detection/Process Gap**, 5 Whys), rejestr Status Page oraz zadania PREVENT/DETECT/MITIGATE. | [`skills/devops-incident-postmortem/`](skills/devops-incident-postmortem/) |
 
 ### 🛠️ Szablony narzędziowe
 
@@ -33,9 +33,8 @@ Repozytorium spełnia standard otwartych skilli AI oraz posiada manifest [`.clau
 
 FlowKit realizuje dwuwarstwową architekturę agentów oddzielającą logikę domenową od specyfiki danego hosta:
 - **`agents/core/`** — platformowo neutralne kontrakty, reguły, formaty wyjściowe i stany procesowe (`DISCOVER`, `PLAN`, `EXECUTE`, `VERIFY`, `REPORT_PROGRESS`, `ASK_USER`, `WAIT_FOR_APPROVAL`).
-- **`agents/adapters/claude-code/`** — dedykowane adaptery Claude Code z oficjalnymi narzędziami (`Read`, `Grep`, `Glob`, `Edit`, `Bash`, `Agent`).
-- **`agents/adapters/vscode/`** — dedykowane agenci VS Code Copilot Custom Agents (`.agent.md`) z interaktywnymi promptami i handoffs.
-- **`agents/`** — zunifikowane pliki zapewniające pełną kompatybilność wsteczną.
+- **`agents/*_agent.md`** — pełne definicje zachowania, jedyne miejsce ich edycji.
+- **`agents/adapters/claude-code/`** i **`agents/adapters/vscode/`** — pliki instalowane u użytkownika, generowane poleceniem `python scripts/build_agents.py`. Walidator odrzuca adaptery niezgodne ze źródłem.
 
 ### Orkiestrator
 
@@ -65,6 +64,7 @@ FlowKit realizuje dwuwarstwową architekturę agentów oddzielającą logikę do
 | `DRY:` | planuje ≤3 kroków i czeka na potwierdzenie |
 | `LOG:` | dołącza każdą iterację do `AGENT_LOG.md` |
 | `DEVOPS:` | wywołuje agenta DevOps |
+| `SHIP:` | po weryfikacji i Twojej zgodzie przygotowuje gałąź, commit, push i PR |
 
 Prefiksy można łączyć od lewej do prawej: `PLAN: LOG: zadanie`, `SPEC: PLAN: zadanie`.
 
@@ -119,8 +119,8 @@ Agenty instaluje się do `~/.claude/agents/` (globalni) lub `.claude/agents/` (l
 # Windows — instalacja agentów dla Claude Code (domyślnie ~/.claude/agents)
 .\scripts\install.ps1 -AgentName all -Platform claude
 
-# Windows — instalacja dedykowanych agentów dla VS Code Copilot (.github/agents/*.agent.md)
-.\scripts\install.ps1 -AgentName all -Platform vscode
+# Windows — agenci VS Code Copilot trafiają do .github/agents bieżącego katalogu, więc uruchom z katalogu projektu
+& C:\sciezka\do\flowkit\scripts\install.ps1 -AgentName all -Platform vscode
 
 # Bezpieczna symulacja instalacji (dry-run)
 .\scripts\install.ps1 -AgentName all -DryRun
@@ -133,11 +133,17 @@ Agenty instaluje się do `~/.claude/agents/` (globalni) lub `.claude/agents/` (l
 # Linux / macOS — instalacja dla Claude Code
 ./scripts/install.sh agent all --platform claude
 
-# Linux / macOS — instalacja dla VS Code Copilot
-./scripts/install.sh agent all --platform vscode
+# Linux / macOS — agenci VS Code Copilot trafiają do .github/agents bieżącego katalogu projektu
+/sciezka/do/flowkit/scripts/install.sh agent all --platform vscode
 
 # Tryb symulacji (dry-run)
 ./scripts/install.sh agent all --dry-run
+```
+
+Orkiestrator uruchamiaj jako główny wątek sesji:
+
+```bash
+claude --agent agent-3x3
 ```
 
 #### Opcja B: Ręczna instalacja agentów
@@ -197,7 +203,7 @@ Szczegółowy przewodnik silnika znajduje się w [`skills/client-pt-prd-writer/r
 ## ➕ Jak dodać nowy skill do repozytorium?
 
 1. Skopiuj folder [`skills/_template/`](skills/_template/) do nowego katalogu `skills/<nowa-nazwa>/`.
-2. Wypełnij plik `SKILL.md` (upewnij się, że nagłówek YAML zawiera pola `name`, `version`, `tags` i `description`).
+2. Zmień nazwę `SKILL.template.md` na `SKILL.md` i wypełnij plik (nagłówek YAML musi zawierać pola `name`, `version`, `tags` i `description`).
 3. Dodaj wymagane `CHANGELOG.md`, `templates/` i `checklists/` (co najmniej jeden plik `.md` w każdym) oraz opcjonalne `examples/` i `references/`.
 4. Dopisz nowy skill do tabeli w sekcji [Katalog skilli](#-katalog-skilli-skills-catalog) w niniejszym pliku.
 5. Zgłoś zmianę przez Pull Request (lokalnie uruchom `python scripts/validate_skills.py`; ten sam walidator działa w CI).

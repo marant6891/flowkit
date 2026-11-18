@@ -18,8 +18,8 @@ Context: <1-2 sentences: business context>
 
 User stories:
 US-1: As a <role>, I want <goal>, so that <value>.
-  AC-1: <verifiable criterion>
-  AC-2: <verifiable criterion>
+  AC-1: Given <context>, when <action>, then <observable result>.
+  AC-2: Given <context>, when <action>, then <observable result>.
 
 Open questions: <genuine blockers, or "none">
 Dependencies: <dependencies, or "none">

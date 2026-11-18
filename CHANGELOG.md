@@ -8,6 +8,29 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 
 ---
 
+## [1.5.0] — 2026-11-18
+
+### Naprawiono
+- **Wtyczka Claude Code:** `plugin.json` przechodzi `claude plugin validate`, a szablon skilla nie jest ładowany jako skill.
+- **Instalatory:** `install.ps1` działa w Windows PowerShell 5.1, a instalacja dla VS Code trafia do bieżącego projektu.
+- **Agenci:** instalowane adaptery zawierają pełne definicje i są generowane przez `scripts/build_agents.py`; agent DevOps nie ma narzędzia do uruchamiania poleceń.
+- **Skille:** silniejsza kontrola diagramów, obsługa szablonów klienta, ochrona danych w recap i postmortem.
+
+### Dodano
+- Prefiks `SHIP:` (gałąź, commit, push i PR po weryfikacji i zgodzie użytkownika) oraz kierowanie dokumentów do skilli.
+- Scenariusze oceny `tests/evals/` i `scripts/grade_eval.py` do sprawdzania odpowiedzi modeli.
+
+---
+
+## [1.4.0] — 2026-11-18
+
+### Dodano
+- **Silnik diagramów w `client-pt-prd-writer` (2.3)**: 15 typów diagramów opartych wyłącznie na źródłach, eksport SVG/PNG/HTML, walidacja jakości oraz osadzanie w DOCX i Markdown.
+- **Polskie nazwy statusów, priorytetów i wymagalności** w tabelach dokumentów PT/PRD wraz z automatyczną kontrolą.
+- `tests/test_diagrams.py`: testy silnika diagramów i słownika statusów.
+
+---
+
 ## [1.3.0] — 2026-11-17
 
 ### Dodano

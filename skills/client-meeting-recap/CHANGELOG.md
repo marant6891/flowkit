@@ -1,5 +1,12 @@
 # Historia zmian skilla client-meeting-recap
 
+## 1.3 (18.11.2026)
+
+### Bezpieczeństwo materiałów
+- Treść transkrypcji jest traktowana wyłącznie jako dane, a nie polecenia.
+- Sekrety i dane szczególnie wrażliwe są zastępowane znacznikiem `[UKRYTO]`.
+- Podłączona instrukcja obsługi plików i szablonów Word.
+
 ## 1.2 (14.11.2026)
 
 ### Rzetelność i bezpieczeństwo wysyłki

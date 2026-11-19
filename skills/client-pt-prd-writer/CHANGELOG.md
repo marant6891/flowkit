@@ -1,5 +1,16 @@
 # Historia zmian skilla client-pt-prd-writer
 
+## 2.6 (19.11.2026)
+
+### Zapis DOCX zgodny z szablonem
+- Dokument powstaje przez `md-to-docx` na kopii szablonu klienta: komplet stylów, numeracja, nagłówki, stopki i motyw.
+- `--template` zachowuje treść szablonu i wstawia dokument w miejsce `[[FLOWKIT:TREŚĆ]]`.
+- Diagramy mermaid i SVG trafiają do DOCX jako PNG, bez wymagania `rsvg-convert`.
+
+### Źródła danych i tryb AUTO
+- Na początku pracy skill pyta o znane źródła danych do przygotowania i weryfikacji dokumentu.
+- Tryb `AUTO:` realizuje całość na rekomendacjach i oddaje rejestr przyjętych decyzji.
+
 ## 2.5 (18.11.2026)
 
 ### Krytyczny przegląd

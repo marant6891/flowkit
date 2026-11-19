@@ -1,6 +1,6 @@
 ---
 name: client-pt-prd-writer
-version: "2.5"
+version: "2.6"
 tags: [analyst, prd, pt, requirements, documentation, client, gherkin, dod, diagrams]
 description: >
   Tworzy profesjonalną dokumentację PT/PRD (projekt techniczny, specyfikacja
@@ -81,7 +81,11 @@ a nie kompletność wszystkich sekcji.
      tytułową, metryczkę i tabele szablonu; nie dodawaj sekcji, których szablon
      nie przewiduje – brakujące elementy obowiązkowe (np. Tematy do wyjaśnienia)
      dołącz jako ostatni rozdział lub załącznik, w stylu szablonu,
-   - wynik oddaj w formacie szablonu (szablon .docx → dokument .docx generowany z zachowaniem stylów przez `python-docx`, lub fallback do .md gdy brak bibliotek docx).
+   - wynik oddaj w formacie szablonu: szablon .docx/.dotx → dokument .docx z kompletem stylów i
+     formatowania szablonu. Pisz treść w Markdown, a potem uruchom `md-to-docx` z `--template` (szablon
+     z treścią, np. strona tytułowa) albo `--reference-doc` (same style), zgodnie z
+     [instrukcją DOCX](./references/docx-engine.md). Markdown oddajesz tylko, gdy `md-to-docx` zwróci
+     kod 3 (brak silnika), z dokładnym komunikatem i instrukcją instalacji.
 3. **Jeśli brak szablonu:** użyj [szablonu zapasowego](./templates/client-pt-prd-template.md)
    i oddaj dokument w formacie, o który prosi użytkownik.
 4. Gdy użytkownik dostarczy poprzedni dokument jako wzór – przejmij z niego
@@ -96,6 +100,19 @@ a nie kompletność wszystkich sekcji.
 Zbierz wszystko, co dostarczono: brief, ticket, e-mail, notatkę ze spotkania,
 istniejącą dokumentację, kod, konfigurację, modele danych, specyfikacje API,
 wymagania prawne, oczekiwania co do terminu i wdrożenia.
+
+**Zapytaj o znane źródła danych** — jednym blokiem, na początku pracy, zanim zaczniesz analizę:
+
+| ID | Pytanie |
+|---|---|
+| Q-001 | Jakie znane źródła mogę wykorzystać do przygotowania i weryfikacji dokumentu? (foldery z dokumentacją, repozytoria kodu, eksporty z Jira/Confluence, schematy baz danych, specyfikacje API, poprzednie wersje dokumentu) |
+| Q-002 | Które źródło jest nadrzędne, gdy informacje są sprzeczne? |
+| Q-003 | Czy są źródła, których nie wolno używać lub cytować (np. dane osobowe, materiały poufne)? |
+| Q-004 | Kto może potwierdzić niejasności (rola lub osoba)? |
+
+Pytania z Etapu 2 numeruj dalej. Wskazane źródła odczytaj (`read-document`, wyszukiwanie w repozytorium) i dopisz do rejestru źródeł.
+Gdy użytkownik nie zna źródeł albo pracujesz w trybie AUTO, pracuj na dostarczonych materiałach i zapisz
+brak źródeł weryfikujących jako `OPEN-NNN`.
 
 Utwórz **rejestr źródeł** (wewnętrzny, do oznaczania wpisów; w dokumencie
 umieść go w sekcji „Materiały źródłowe”):
@@ -276,6 +293,26 @@ użyj szablonu zapasowego z tymi samymi regułami.
 6. **Weryfikacja:** oprócz zwykłej checklisty wykonaj sekcję F
    [checklisty końcowej](./checklists/final-review-checklist.md), w tym
    wyszukiwanie pozostawionych znaczników.
+
+# Tryb AUTO — cała praca na rekomendacjach
+
+Włącz, gdy użytkownik użyje prefiksu `AUTO:` albo poprosi wprost o realizację całości bez pytań
+(„zrób całość”, „akceptuj rekomendacje”, „bez dopytywania”). Skill przechodzi Etapy 0–6 bez
+zatrzymywania się, a każde pytanie rozstrzyga swoją rekomendacją:
+
+1. Pytania z Etapów 1, 2 i 4 nie są zadawane — wypisz je w dokumencie i w odpowiedzi.
+2. Pytanie z „Propozycją domyślną” wynikającą z materiałów lub bezpieczną i odwracalną → przyjmij ją
+   jako `ASSUMPTION-NNN (AUTO)`. Pytanie bez takiej propozycji → `OPEN-NNN`. Nigdy nie zgaduj treści
+   merytorycznej: zasady 1, 3, 6 i 7 obowiązują bez zmian.
+3. Plan sekcji i plan diagramów z Etapu 4 realizuj w wersji rekomendowanej (diagram tam, gdzie spełnia
+   kryterium).
+4. Status dokumentu: „Roboczy”. W trybie końcowym bez dopisków luki rozstrzygaj według pkt 4 tego trybu:
+   (d) neutralne sformułowanie, a gdy element bez informacji nie ma sensu — (c) pominięcie.
+5. Zapis: jeśli jest szablon, `md-to-docx` z `--template` lub `--reference-doc`; potem Etap 6 w całości.
+6. Zatrzymaj się tylko, gdy: brak materiałów źródłowych, szablon wspomniany, ale niedostępny, polecenie
+   zostało odrzucone dwa razy, albo działanie wymaga zgody (usunięcie plików, wysyłka, publikacja).
+7. Pod dokumentem wypisz **rejestr decyzji AUTO**: każde pytanie, przyjętą rekomendację i jej
+   identyfikator, aby użytkownik mógł je potwierdzić lub odrzucić po fakcie.
 
 # Format odpowiedzi
 

@@ -69,7 +69,7 @@ Instructions below use neutral names: `read` = `Read` · `search` = `Grep`, `Glo
 EXEC_NOTE = """
 ## Local command execution
 
-Run every command only through the local executor: `python "<runtime>/flowkit_exec.py" --role ROLE -- <command> [args]`. Do not use pipes, redirects or command chaining. `<runtime>` is RUNTIME. Rejected commands are outside this agent's role: report them instead of working around the rule. Documents: `read-document <file> [--outline] [--lines FROM-TO]`.
+Run every command only through the local executor: `python "<runtime>/flowkit_exec.py" --role ROLE -- <command> [args]`. Do not use pipes, redirects or command chaining. `<runtime>` is RUNTIME. Rejected commands are outside this agent's role: report them instead of working around the rule. List of allowed commands: `help`. Documents: `read-document <file> [--outline] [--lines FROM-TO]`; Word output (roles with document writing): `md-to-docx <input.md> <output.docx> [--template <file> | --reference-doc <file>]`.
 """
 
 CLAUDE_RUNTIME = "`${CLAUDE_PLUGIN_ROOT}/runtime` in a plugin install, otherwise `~/.claude/flowkit/runtime`"
@@ -78,7 +78,7 @@ VSCODE_RUNTIME = "`.github/flowkit/runtime` in the workspace"
 VSCODE_ORCHESTRATOR_NOTE = """
 ## VS Code checkpoint (mandatory)
 
-Every `ASK_USER`, `WAIT_FOR_APPROVAL` and end-of-iteration checkpoint ends with a call to `#tool:vscode/askQuestions`. Offer the `Next:` items as up to 3 options, recommended first. Plain-text options do not count as a checkpoint. Subagents never ask the user; they return results to this agent.
+Every `ASK_USER`, `WAIT_FOR_APPROVAL` and end-of-iteration checkpoint ends with a call to `#tool:vscode/askQuestions`, except end-of-iteration checkpoints in `AUTO:` mode, which take option 1 without asking. Offer the `Next:` items as up to 3 options, recommended first. Plain-text options do not count as a checkpoint. Subagents never ask the user; they return results to this agent.
 """
 
 

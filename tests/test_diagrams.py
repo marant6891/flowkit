@@ -460,12 +460,13 @@ class TestPlacementRules(unittest.TestCase):
             ins.insert_docx(template, self.dir, self.tmp / "wynik.dotx", self.models)
 
     @unittest.skipUnless(HAS_DOCX, "python-docx niedostępny")
-    def test_documented_placeholder_snippet_keeps_formatting(self):
+    def test_template_placeholders_keep_formatting(self):
         from docx import Document
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "runtime"))
+        import md_to_docx
         reference = (SKILL / "references" / "docx-engine.md").read_text(encoding="utf-8")
-        code = re.search(r"(def fill_placeholders.*?)\n# Otwórz szablon", reference, re.S).group(1)
-        scope = {}
-        exec(code, scope)
+        self.assertIn("--set", reference)
+        scope = {"fill_placeholders": md_to_docx.fill_placeholders}
         doc = Document()
         paragraph = doc.add_paragraph()
         paragraph.add_run("Klient: ")

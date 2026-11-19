@@ -5,7 +5,8 @@ Business and systems analysis on local materials: requirements, processes, impac
 ## Rules
 
 - No source means no content; gaps are marked `DO POTWIERDZENIA` with `OPEN-NNN`.
-- Large documents are read in parts through `read-document`.
+- Known data sources for preparation and verification are requested once before analysis (skipped in `AUTO:`).
+- Large documents are read in parts through `read-document`; Word results are written with `md-to-docx`, using the client template when provided.
 - Source materials are never modified.
 - PT/PRD, meeting recap and postmortem work is delegated to FlowKit skills.
 

@@ -1,6 +1,7 @@
 """Testy lokalnej warstwy bezpieczeństwa FlowKit.
 Uruchom: python -m unittest tests/test_runtime.py
 """
+import importlib.util
 import json
 import re
 import subprocess
@@ -171,6 +172,108 @@ class TestLocalDocuments(unittest.TestCase):
         path.write_text("A=1", encoding="utf-8")
         with self.assertRaises(ValueError):
             fx.document_lines(path)
+
+
+HAS_DOCX = importlib.util.find_spec("docx") is not None
+MERMAID_SAMPLE = """```mermaid
+flowchart LR
+  A --> B
+```
+"""
+DOCX_SAMPLE = """# Zakres
+
+Tekst **ważny**.
+
+| ID | Status |
+|---|---|
+| FR-001 | Wymagane |
+
+- punkt
+"""
+
+
+class TestDocxWriting(unittest.TestCase):
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.dir = Path(self.tmp.name)
+
+    def test_help_and_docx_policy(self):
+        for role in fx.ROLE_COMMANDS:
+            self.assertIsNone(fx.check(role, ["help"]), role)
+        for role in ("orchestrator", "analyst", "implementer"):
+            self.assertIsNone(fx.check(role, ["md-to-docx", "a.md", "a.docx", "--template", "t.dotx"]), role)
+        for role in ("analyzer", "verifier", "diagnostics"):
+            self.assertIsNotNone(fx.check(role, ["md-to-docx", "a.md", "a.docx"]), role)
+        for command in (["md-to-docx", "a.md", "a.md"], ["md-to-docx", "a.md"], ["md-to-docx", "a.md", "b.docx", "c.docx"],
+                        ["md-to-docx", "a.md", "b.docx", "--output-file", "x"]):
+            self.assertIsNotNone(fx.check("analyst", command), command)
+        self.assertIn("md-to-docx", fx.check("orchestrator", ["pandoc", "a.md", "-o", "a.docx"]))
+
+    def test_help_lists_role_commands(self):
+        result = subprocess.run([sys.executable, EXEC, "--role", "analyst", "--", "help"], capture_output=True,
+                                text=True, encoding="utf-8", check=False)
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("md-to-docx", result.stdout)
+        self.assertIn("read-document", result.stdout)
+
+    def test_guard_allows_docx_conversion(self):
+        command = f'python "{EXEC}" --role analyst -- md-to-docx dok.md dok.docx --reference-doc szablon.dotx'
+        payload = {"agent_type": "agent-3x3-analyst", "tool_name": "Bash", "tool_input": {"command": command}}
+        result = subprocess.run([sys.executable, str(ROOT / "runtime" / "guard_bash.py")], input=json.dumps(payload),
+                                capture_output=True, text=True, encoding="utf-8", check=False)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_remote_images_are_not_fetched(self):
+        import md_to_docx as md
+        report = md.Report()
+        text = md.resolve_images("![logo](https://example.com/a.png)", self.dir, self.dir, report)
+        self.assertEqual(text, "logo")
+        self.assertTrue(report.warnings)
+
+    def test_mermaid_without_renderer_stays_as_code(self):
+        import md_to_docx as md
+        original = md.mermaid_commands
+        md.mermaid_commands = lambda: []
+        try:
+            report = md.Report()
+            text = md.replace_mermaid(MERMAID_SAMPLE, self.dir, report)
+        finally:
+            md.mermaid_commands = original
+        self.assertIn("```mermaid", text)
+        self.assertTrue(report.warnings)
+
+    @unittest.skipUnless(HAS_DOCX, "wymaga python-docx")
+    def test_document_keeps_template_styles_header_and_content(self):
+        from docx import Document
+        template = Document()
+        template.styles["Heading 1"].font.size = 400000
+        template.add_paragraph("Strona tytułowa", style="Title")
+        table = template.add_table(rows=1, cols=1)
+        table.style = template.styles["Light Grid Accent 1"]
+        template.sections[0].footer.paragraphs[0].text = "Stopka klienta"
+        template.add_paragraph("[[FLOWKIT:TREŚĆ]]")
+        template.add_paragraph("Zakończenie szablonu")
+        template.save(self.dir / "szablon.docx")
+        (self.dir / "dok.md").write_text(DOCX_SAMPLE,
+                                          encoding="utf-8")
+        for option, output in (("--template", "a.docx"), ("--reference-doc", "b.docx")):
+            result = subprocess.run([sys.executable, EXEC, "--role", "analyst", "--", "md-to-docx", str(self.dir / "dok.md"),
+                                     str(self.dir / output), option, str(self.dir / "szablon.docx")],
+                                    capture_output=True, text=True, encoding="utf-8", check=False)
+            self.assertEqual(result.returncode, 0, result.stdout)
+            doc = Document(self.dir / output)
+            self.assertEqual(doc.sections[0].footer.paragraphs[0].text, "Stopka klienta")
+            self.assertEqual(len(doc.styles), len(template.styles))
+            self.assertIn("Light Grid Accent 1", [t.style.name for t in doc.tables])
+            styles = [(p.style.name, p.text) for p in doc.paragraphs]
+            self.assertIn(("Heading 1", "Zakres"), styles)
+            self.assertIn(("List Bullet", "punkt"), styles)
+        texts = [p.text for p in Document(self.dir / "a.docx").paragraphs]
+        self.assertLess(texts.index("Strona tytułowa"), texts.index("Zakres"))
+        self.assertLess(texts.index("Zakres"), texts.index("Zakończenie szablonu"))
+        self.assertNotIn("[[FLOWKIT:TREŚĆ]]", texts)
 
 
 class TestLocalOnlySolution(unittest.TestCase):

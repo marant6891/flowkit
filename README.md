@@ -12,7 +12,7 @@ Repozytorium spełnia standard otwartych skilli AI oraz posiada manifest [`.clau
 
 | Skill | Wersja | Opis | Ścieżka |
 |---|---|---|---|
-| **client-pt-prd-writer** | `2.5` | Tworzy precyzyjną dokumentację techniczną (PT) i PRD wyłącznie na bazie materiałów źródłowych. Zawiera scenariusze akceptacyjne **Given-When-Then (Gherkin)**, **Definition of Done (DoD)**, wyłączenia **Non-Goals** oraz obsługę szablonów klienta (`.docx`, `.md`). Opcjonalny tryb **dokumentu końcowego bez dopisków** — czysty dokument w szablonie klienta. **Diagramy oparte na źródłach** (architektura, procesy, sekwencje, model danych) osadzane w DOCX i Markdown oraz polskie nazwy statusów w tabelach. | [`skills/client-pt-prd-writer/`](skills/client-pt-prd-writer/) |
+| **client-pt-prd-writer** | `2.6` | Tworzy precyzyjną dokumentację techniczną (PT) i PRD wyłącznie na bazie materiałów źródłowych. Zawiera scenariusze akceptacyjne **Given-When-Then (Gherkin)**, **Definition of Done (DoD)**, wyłączenia **Non-Goals** oraz obsługę szablonów klienta (`.docx`, `.md`). Opcjonalny tryb **dokumentu końcowego bez dopisków** — czysty dokument w szablonie klienta. **Diagramy oparte na źródłach** (architektura, procesy, sekwencje, model danych) osadzane w DOCX i Markdown oraz polskie nazwy statusów w tabelach. | [`skills/client-pt-prd-writer/`](skills/client-pt-prd-writer/) |
 | **client-meeting-recap** | `1.3` | Przekształca surowe transkrypcje (`.vtt`, `.docx`, `.txt`) w 2-częściowe podsumowanie: **Część A (Wewnętrzny Radar Ryzyk / Scope Creep dla zespołu, z cytatami jako dowodami)** oraz **Część B (Oficjalny mail do klienta z zadaniami DRI i klauzulą weryfikacji 48h)** — w osobnych plikach. | [`skills/client-meeting-recap/`](skills/client-meeting-recap/) |
 
 ### 🗄️ Dane i SQL
@@ -46,7 +46,7 @@ FlowKit realizuje dwuwarstwową architekturę agentów oddzielającą logikę do
 
 | Agent | Plik | Opis |
 |---|---|---|
-| **agent-3x3** | [`agent-3x3_agent.md`](agents/agent-3x3_agent.md) | Główny orkiestrator. Iteracyjny development: max 3 kroki na iterację, wymuszone podsumowanie (`REPORT_PROGRESS`) i potwierdzenie użytkownika (`ASK_USER`). Obsługuje prefiksy `ANALYZE:` `VERIFY:` `PLAN:` `SPEC:` `DRY:` `LOG:` `DEVOPS:`. Koordynuje subagenty. |
+| **agent-3x3** | [`agent-3x3_agent.md`](agents/agent-3x3_agent.md) | Główny orkiestrator. Iteracyjny development: max 3 kroki na iterację, wymuszone podsumowanie (`REPORT_PROGRESS`) i potwierdzenie użytkownika (`ASK_USER`). Obsługuje prefiksy `ANALYZE:` `VERIFY:` `PLAN:` `SPEC:` `DRY:` `LOG:` `DEVOPS:` `DIAG:` `BA:` `SQL:` `SHIP:` `AUTO:`. Koordynuje subagenty. |
 
 ### Subagenty (wywoływane przez orkiestratora)
 
@@ -78,8 +78,9 @@ Prefiksy są opcjonalne. Bez prefiksu `agent-3x3` sam rozpoznaje rodzaj zadania,
 | `BA:` | uruchamia analityka biznesowo-systemowego |
 | `SQL:` | przygotowuje bezpieczne zapytanie, zestawienie lub skrypt poprawy danych |
 | `SHIP:` | po weryfikacji i Twojej zgodzie przygotowuje gałąź, commit, push i PR |
+| `AUTO:` | realizuje całe zadanie na rekomendacjach: na każdym checkpoincie przyjmuje opcję 1, pytania rozstrzyga domyślną propozycją (`ASSUMPTION-NNN (AUTO)`), zatrzymuje się tylko przy krokach `[HIGH]`, usuwaniu, dostarczeniu i publikacji; na końcu oddaje listę przyjętych decyzji |
 
-Prefiksy można łączyć od lewej do prawej: `PLAN: LOG: zadanie`, `SPEC: PLAN: zadanie`.
+Prefiksy można łączyć od lewej do prawej: `PLAN: LOG: zadanie`, `SPEC: PLAN: zadanie`, `AUTO: BA: zadanie`.
 
 ---
 
@@ -88,6 +89,8 @@ Prefiksy można łączyć od lewej do prawej: `PLAN: LOG: zadanie`, `SPEC: PLAN:
 - **Bez MCP i narzędzi webowych:** agenci mają jawne listy narzędzi i pracują na plikach oraz poleceniach lokalnych.
 - **Kontrolowane polecenia:** agenci uruchamiają polecenia tylko przez `runtime/flowkit_exec.py`, bez powłoki i według listy dozwolonej dla roli.
 - **Twarda blokada w Claude Code:** hook `runtime/guard_bash.py` odrzuca każde inne polecenie agenta FlowKit. Zwykłe sesje nie są objęte tym hookiem.
+- **Lista poleceń roli:** `python runtime/flowkit_exec.py --role <rola> -- help`.
+- **Dokumenty Word:** `read-document` czyta `.docx`/`.dotx`/`.xlsx`/`.pdf`, a `md-to-docx` zapisuje DOCX z Markdown na kopii szablonu klienta (`--template` lub `--reference-doc`), z kompletem jego stylów, nagłówkami i stopkami. Diagramy mermaid i SVG są osadzane jako PNG. Szczegóły: [docx-engine.md](skills/client-pt-prd-writer/references/docx-engine.md).
 - **Ochrona danych:** wyniki poleceń są skracane, sekrety ukrywane, a pliki takie jak `.env` i klucze prywatne niedostępne.
 - **VS Code:** Copilot nie korzysta z tego hooka, dlatego zostaw włączone potwierdzanie poleceń w terminalu.
 - **Zasady projektu:** skopiuj [`docs/flowkit-project.template.md`](docs/flowkit-project.template.md) do projektu jako `flowkit-project.md`.

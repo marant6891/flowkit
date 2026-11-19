@@ -6,6 +6,16 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 
 ## [Unreleased]
 
+### Dodano
+- **Zapis DOCX `md-to-docx`:** polecenie executora zapisuje Word z Markdown na kopii szablonu klienta (`--template` z treścią szablonu i znacznikiem `[[FLOWKIT:TREŚĆ]]` albo `--reference-doc` z samymi stylami). Dokument ma komplet stylów, numerację, nagłówki, stopki i styl tabel szablonu. Bloki mermaid są renderowane lokalnym mermaid-cli, a SVG zamieniane na PNG (Playwright, CairoSVG, rsvg-convert), więc Pandoc nie wymaga `rsvg-convert`.
+- **`help` w executorze:** `flowkit_exec.py --role <rola> -- help` wypisuje polecenia dozwolone dla roli; odrzucenie wskazuje, jak zapisać DOCX.
+- **Tryb `AUTO:`:** orkiestrator i skill PT/PRD realizują całe zadanie na rekomendacjach i oddają rejestr przyjętych decyzji.
+- **Pytanie o źródła danych:** praca nad dokumentem zaczyna się od pytania o znane źródła do przygotowania i weryfikacji.
+
+### Naprawiono
+- Agenci nie mogli zapisać DOCX: `pandoc` i skrypty Python były poza listą dozwolonych poleceń.
+- `detect-docx-libs` pokazuje też Pandoc, mermaid-cli, Playwright, CairoSVG i rsvg-convert.
+
 ---
 
 ## [1.7.0] — 2026-11-18

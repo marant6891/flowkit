@@ -1,6 +1,7 @@
 """Lokalne, kontrolowane uruchamianie poleceń agentów FlowKit.
 
 Użycie: python flowkit_exec.py --role <rola> -- <polecenie> [argumenty]
+Lista poleceń dozwolonych dla roli: python flowkit_exec.py --role <rola> -- help
 
 Polecenie działa bez powłoki, wyłącznie z listy dozwolonej dla roli. Wynik jest skracany,
 a sekrety ukrywane. Skrypt nie korzysta z sieci ani z zewnętrznych usług.
@@ -25,6 +26,8 @@ MAX_DOCUMENT_BYTES = 50_000_000
 MAX_UNZIPPED_BYTES = 200_000_000
 DEFAULT_TIMEOUT = 120
 TEST_TIMEOUT = 900
+DOCUMENT_TIMEOUT = 600
+RUNTIME_DIR = Path(__file__).resolve().parent
 
 GIT_READ = ("git status", "git diff", "git log", "git show", "git rev-parse", "git ls-files", "git blame",
             "git check-ignore", "git branch --list", "git branch --show-current")
@@ -41,15 +44,24 @@ DIAGNOSTICS = (
     "shellcheck", "tflint", "kubeconform", "systemctl status", "journalctl", "df", "free", "uptime",
 )
 DELIVERY = ("git switch -c", "git add", "git commit -m", "git push -u origin", "gh pr create")
+HELP = ("help",)
 DOCUMENTS = ("read-document", "detect-docx-libs")
+DOCUMENT_WRITE = ("md-to-docx",)
+BUILTINS = {
+    "help": "help — lista poleceń dozwolonych dla roli",
+    "read-document": "read-document <plik> [--outline] [--lines OD-DO] — odczyt .docx/.dotx/.xlsx/.pdf/.md/.txt",
+    "detect-docx-libs": "detect-docx-libs — biblioteki i narzędzia do pracy z DOCX i diagramami",
+    "md-to-docx": "md-to-docx <wejście.md> <wynik.docx> [--reference-doc szablon] [--template szablon] "
+                  "[--engine auto|pandoc|python-docx] [--set POLE=WARTOŚĆ] [--keep-images] — zapis DOCX z Markdown, diagramy mermaid/SVG jako PNG",
+}
 
 ROLE_COMMANDS = {
-    "orchestrator": GIT_READ + SEARCH + DELIVERY + DOCUMENTS,
-    "analyzer": GIT_READ + SEARCH + STATIC,
-    "verifier": GIT_READ + SEARCH + STATIC + TESTS,
-    "implementer": STATIC + TESTS + DOCUMENTS,
-    "diagnostics": GIT_READ + SEARCH + DIAGNOSTICS + DOCUMENTS,
-    "analyst": GIT_READ + SEARCH + DOCUMENTS,
+    "orchestrator": HELP + GIT_READ + SEARCH + DELIVERY + DOCUMENTS + DOCUMENT_WRITE,
+    "analyzer": HELP + GIT_READ + SEARCH + STATIC,
+    "verifier": HELP + GIT_READ + SEARCH + STATIC + TESTS,
+    "implementer": HELP + STATIC + TESTS + DOCUMENTS + DOCUMENT_WRITE,
+    "diagnostics": HELP + GIT_READ + SEARCH + DIAGNOSTICS + DOCUMENTS,
+    "analyst": HELP + GIT_READ + SEARCH + DOCUMENTS + DOCUMENT_WRITE,
 }
 SKILL_SCRIPT_ROLES = {"orchestrator", "analyst"}
 SKILL_SCRIPTS = {
@@ -129,7 +141,10 @@ def check(role: str, raw_argv: list[str]) -> str | None:
     if role in SKILL_SCRIPT_ROLES and is_skill_script(argv):
         return None
     if not any(matches(argv, prefix) for prefix in ROLE_COMMANDS[role]):
-        return f"polecenie niedozwolone dla roli {role}: {' '.join(argv[:3])}"
+        hint = ""
+        if argv[0] in ("pandoc", "pypandoc", "mmdc", "npx", "rsvg-convert", *PYTHON_NAMES) and "md-to-docx" in ROLE_COMMANDS[role]:
+            hint = " (zapis DOCX: md-to-docx <wejście.md> <wynik.docx> [--reference-doc szablon])"
+        return f"polecenie niedozwolone dla roli {role}: {' '.join(argv[:3])}{hint}"
     if argv[0] == "kubectl":
         if any("secret" in token.lower() for token in argv[1:]):
             return "odczyt obiektów Secret jest zabroniony"
@@ -139,6 +154,21 @@ def check(role: str, raw_argv: list[str]) -> str | None:
         return "opcja git zapisująca plik lub uruchamiająca program jest zabroniona"
     if argv[0] in ("git", "gh"):
         return delivery_problem(argv)
+    if argv[0] == "md-to-docx":
+        return md_to_docx_problem(argv[1:])
+    return None
+
+
+def md_to_docx_problem(args: list[str]) -> str | None:
+    """Wynik musi być nowym plikiem .docx; źródła i szablony pozostają nietknięte."""
+    positional = [a for i, a in enumerate(args) if not a.startswith("-")
+                  and (i == 0 or args[i - 1] not in ("--reference-doc", "--template", "--engine", "--set"))]
+    if len(positional) != 2:
+        return "md-to-docx wymaga: <wejście.md> <wynik.docx>"
+    if not positional[1].lower().endswith(".docx"):
+        return "md-to-docx zapisuje wyłącznie plik .docx"
+    if Path(positional[1]).resolve() == Path(positional[0]).resolve():
+        return "md-to-docx nie może nadpisać pliku źródłowego"
     return None
 
 
@@ -297,13 +327,47 @@ def read_document(args: list[str]) -> int:
 
 def detect_docx_libs() -> int:
     for label, module in (("python-docx", "docx"), ("mammoth", "mammoth"), ("docx2txt", "docx2txt"),
-                          ("pypandoc", "pypandoc"), ("pypdf", "pypdf")):
+                          ("pypandoc", "pypandoc"), ("pypdf", "pypdf"), ("playwright", "playwright"),
+                          ("cairosvg", "cairosvg")):
         print(f"{label}: {'AVAILABLE' if importlib.util.find_spec(module) else 'MISSING'}")
+    for label, tool in (("pandoc", "pandoc"), ("mermaid-cli (mmdc)", "mmdc"), ("npx", "npx"), ("rsvg-convert", "rsvg-convert")):
+        print(f"{label}: {'AVAILABLE' if shutil.which(tool) else 'MISSING'}")
+    print("Zapis DOCX: md-to-docx (Pandoc, a bez niego python-docx). Odczyt: read-document.")
     return 0
 
 
-def run(argv: list[str]) -> int:
+def show_help(role: str) -> int:
+    print(f"Rola: {role}. Uruchamiaj: flowkit_exec.py --role {role} -- <polecenie> [argumenty]")
+    print("Polecenia wbudowane:")
+    for prefix in ROLE_COMMANDS[role]:
+        if prefix in BUILTINS:
+            print(f"  {BUILTINS[prefix]}")
+    print("Dozwolone polecenia (prefiksy):")
+    print("  " + " · ".join(p for p in ROLE_COMMANDS[role] if p not in BUILTINS))
+    if role in SKILL_SCRIPT_ROLES:
+        for skill, scripts in sorted(SKILL_SCRIPTS.items()):
+            print(f"  python <katalog skilla>/{skill}/scripts/<{'|'.join(sorted(scripts))}>")
+    print("Bez powłoki, potoków, przekierowań i łączenia poleceń. Odrzucone polecenie zgłoś użytkownikowi.")
+    return 0
+
+
+def md_to_docx(args: list[str]) -> int:
+    try:
+        result = subprocess.run([sys.executable, str(RUNTIME_DIR / "md_to_docx.py"), *args], stdout=subprocess.PIPE,
+                                stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, timeout=DOCUMENT_TIMEOUT, check=False)
+    except subprocess.TimeoutExpired:
+        print(f"PRZEKROCZONO CZAS: {DOCUMENT_TIMEOUT} s")
+        return 124
+    print(limit_output(redact(result.stdout.decode("utf-8", "replace"))))
+    return result.returncode
+
+
+def run(argv: list[str], role: str = "orchestrator") -> int:
     name = normalized(argv)
+    if name[0] == "help":
+        return show_help(role)
+    if name[0] == "md-to-docx":
+        return md_to_docx(argv[1:])
     if name[0] == "read-document":
         return read_document(argv[1:])
     if name[0] == "detect-docx-libs":
@@ -327,15 +391,20 @@ def run(argv: list[str]) -> int:
 def main(args: list[str]) -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if len(args) == 3 and args[0] == "--role" and args[2] == "--" and args[1] in ROLE_COMMANDS:
+        return show_help(args[1])
     if len(args) < 4 or args[0] != "--role" or args[2] != "--":
-        print("Użycie: flowkit_exec.py --role <rola> -- <polecenie> [argumenty]")
+        print("Użycie: flowkit_exec.py --role <rola> -- <polecenie> [argumenty]. "
+              "Lista poleceń: flowkit_exec.py --role <rola> -- help")
         return 2
     role, argv = args[1], args[3:]
+    if normalized(argv)[:1] in (["--help"], ["-h"]):
+        argv = ["help"]
     problem = check(role, argv)
     if problem:
-        print(f"ODRZUCONO: {problem}")
+        print(f"ODRZUCONO: {problem}. Lista dozwolonych poleceń: flowkit_exec.py --role {role} -- help")
         return 2
-    return run(argv)
+    return run(argv, role)
 
 
 if __name__ == "__main__":

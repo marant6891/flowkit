@@ -28,7 +28,7 @@ When activating a skill, read the full `SKILL.md` and all files referenced insid
 
 The `agent-3x3` orchestrator coordinates subagents using a strict 3-step iteration loop:
 - Each iteration: ≤3 steps → summarize → ask user → repeat
-- Supported prefixes: `ANALYZE:` `VERIFY:` `PLAN:` `SPEC:` `DRY:` `LOG:` `DEVOPS:` `DIAG:` `BA:` `SQL:` `SHIP:`. Prefixes are optional: without one the orchestrator selects the action from the request
+- Supported prefixes: `ANALYZE:` `VERIFY:` `PLAN:` `SPEC:` `DRY:` `LOG:` `DEVOPS:` `DIAG:` `BA:` `SQL:` `SHIP:` `AUTO:` (whole task on recommendations, no checkpoint stops except high-risk actions). Prefixes are optional: without one the orchestrator selects the action from the request
 - Subagents: Analyzer, Verifier, Planner, Implementer, DevOps, PM
 
 See [`agents/agent-3x3_agent.md`](../agents/agent-3x3_agent.md) for full protocol.

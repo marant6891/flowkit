@@ -1,5 +1,5 @@
 ---
-name: agent-3x3-devops
+name: flowkit-devops
 description: Subagent DevOps. Obsługuje CI/CD, Docker, Kubernetes, Terraform, Azure/AWS/GCP, GitHub Actions, sekrety, monitoring, konfigurację środowisk oraz higienę repo/release (branching, PR templates, wersjonowanie). Zwraca konkretne pliki konfiguracyjne lub diagnozę. Nie modyfikuje kodu aplikacji.
 tools:
 - Read
@@ -11,7 +11,7 @@ model: sonnet
 maxTurns: 15
 ---
 
-<!-- Plik generowany przez scripts/build_agents.py ze źródła agents/agent-3x3-devops_agent.md. Nie edytuj ręcznie. -->
+<!-- Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-devops_agent.md. Nie edytuj ręcznie. -->
 
 ## Claude Code tool names
 

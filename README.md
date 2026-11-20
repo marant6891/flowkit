@@ -42,11 +42,13 @@ claude plugin marketplace add marant6891/flowkit
 claude plugin install flowkit@flowkit
 ```
 
-Uruchom orkiestrator jako główny wątek sesji w katalogu projektu:
+Uruchom głównego agenta — orkiestrator — w katalogu projektu. W instalacji przez wtyczkę jego nazwa ma prefiks wtyczki:
 
 ```bash
-claude --agent agent-3x3
+claude --agent flowkit:flowkit-orchestrator
 ```
+
+Aby każda sesja w projekcie startowała od orkiestratora, ustaw go jako domyślnego agenta (patrz [Główny agent](#główny-agent)).
 
 Przykładowe zadania:
 
@@ -109,20 +111,28 @@ Nowy skill zaczyna się od wzorca [`skills/_template/`](skills/_template/) — p
 
 ## Agenci
 
-Orkiestrator `agent-3x3` koordynuje pracę w iteracjach (najwyżej 3 kroki, podsumowanie, decyzja użytkownika) i deleguje zadania do subagentów.
+### Główny agent
+
+**`flowkit-orchestrator`** to jedyny agent, z którym się rozmawia. Rozpoznaje zadanie, wybiera skill, pracuje w pętli 3x3 (najwyżej 3 kroki, podsumowanie, decyzja użytkownika) i deleguje pracę do 9 subagentów. Subagentów nie wybiera się ręcznie.
+
+| Platforma | Jak jest widoczny |
+|---|---|
+| Claude Code | `claude --agent flowkit-orchestrator` (wtyczka: `flowkit:flowkit-orchestrator`). Domyślny agent projektu: `install.ps1 -SetDefaultAgent` / `install.sh --set-default-agent` zapisuje `"agent": "flowkit-orchestrator"` w `.claude/settings.json` bieżącego projektu; w instalacji przez wtyczkę wpisz tam `flowkit:flowkit-orchestrator`. Lista `/agents` pokazuje także subagentów — Claude Code nie pozwala ich ukryć. |
+| VS Code Copilot | Na liście wyboru agentów jest tylko `flowkit-orchestrator`. Subagenci mają `user-invocable: false`: są ukryci, a orkiestrator może ich wywołać (lista w polu `agents`). |
+
+### Subagenci
 
 | Agent | Uprawnienia | Zadanie |
 |---|---|---|
-| **agent-3x3** | odczyt, edycja, testy, dostarczenie po zgodzie | Orkiestrator: dobór trybu i skilla, plan, delegacja, weryfikacja, gałąź/commit/PR po zgodzie |
-| **agent-3x3-analyst** | odczyt, edycja, dokumenty | Wymagania, proces, analiza wpływu, backlog, przypadki testowe i UAT na dokumentach Word, Excel, PDF i tekstowych |
-| **agent-3x3-analyzer** | tylko odczyt | Analiza kodu i zależności z rozróżnieniem faktów i hipotez |
-| **agent-3x3-planner** | tylko odczyt | Plan iteracji z etykietami ryzyka i szacunkiem pracy |
-| **agent-3x3-pm** | tylko odczyt | User stories, kryteria akceptacji, ADR |
-| **agent-3x3-implementer** | edycja, testy | Jeden atomowy krok zmiany z samokontrolą diffa |
-| **agent-3x3-verifier** | tylko odczyt, testy | Weryfikacja w 9 wymiarach; bez uruchomionych testów `[NOT VERIFIED]` |
-| **agent-3x3-devops** | edycja, bez wykonywania poleceń | CI/CD, Docker, Kubernetes, IaC, chmura; polecenia zmieniające środowisko tylko jako propozycja `REQUIRES APPROVAL` |
-| **agent-3x3-diagnostics** | tylko odczyt | Logi, stan klastra i kontenerów, runbooki |
-| **agent-3x3-validator** | tylko odczyt, walidatory | Statyczna walidacja Terraform, Dockerfile, compose, Helm, Kubernetes YAML, CI, skryptów i JSON; bez wdrażania i dostępu do klastra |
+| **flowkit-analyst** | odczyt, edycja, dokumenty | Wymagania, proces, analiza wpływu, backlog, przypadki testowe i UAT na dokumentach Word, Excel, PDF i tekstowych |
+| **flowkit-code-analyzer** | tylko odczyt | Analiza kodu i zależności z rozróżnieniem faktów i hipotez |
+| **flowkit-planner** | tylko odczyt | Plan iteracji z etykietami ryzyka i szacunkiem pracy |
+| **flowkit-product-owner** | tylko odczyt | User stories, kryteria akceptacji, ADR |
+| **flowkit-implementer** | edycja, testy | Jeden atomowy krok zmiany z samokontrolą diffa |
+| **flowkit-verifier** | tylko odczyt, testy | Weryfikacja w 9 wymiarach; bez uruchomionych testów `[NOT VERIFIED]` |
+| **flowkit-devops** | edycja, bez wykonywania poleceń | CI/CD, Docker, Kubernetes, IaC, chmura; polecenia zmieniające środowisko tylko jako propozycja `REQUIRES APPROVAL` |
+| **flowkit-diagnostics** | tylko odczyt | Logi, stan klastra i kontenerów, runbooki |
+| **flowkit-validator** | tylko odczyt, walidatory | Statyczna walidacja Terraform, Dockerfile, compose, Helm, Kubernetes YAML, CI, skryptów i JSON; bez wdrażania i dostępu do klastra |
 
 Definicje źródłowe są w [`agents/*_agent.md`](agents/), kontrakty niezależne od platformy w [`agents/core/`](agents/core/), a pliki instalowane u użytkownika w [`agents/adapters/`](agents/adapters/) (generowane przez `python scripts/build_agents.py`).
 
@@ -263,7 +273,7 @@ Patrz [Szybki start](#szybki-start). Wtyczka instaluje skille, agentów, runtime
 ./scripts/install.sh skill flowkit-client-pt-prd-writer
 ```
 
-Opcje: `-DryRun` / `--dry-run` (symulacja), `-Force` / `--force` (nadpisanie bez pytania), `-Uninstall` / `--uninstall`, `-TargetPath` (instalacja skilla w projekcie, np. `./.claude/skills`).
+Opcje: `-DryRun` / `--dry-run` (symulacja), `-Force` / `--force` (nadpisanie bez pytania), `-Uninstall` / `--uninstall`, `-TargetPath` / `--target` (instalacja skilla w projekcie, np. `./.claude/skills`), `-SetDefaultAgent` / `--set-default-agent` (orkiestrator domyślnym agentem bieżącego projektu; uruchom w katalogu projektu).
 
 ### VS Code Copilot
 
@@ -288,8 +298,24 @@ Prompty skilli dla Copilot Chat są w [`.github/prompts/`](.github/prompts/) (np
 
 1. Zainstaluj ponownie agentów i runtime (`-AgentName all`) oraz potrzebne skille — runtime zawiera nowe zabezpieczenia i polecenia.
 2. **Usuń stare katalogi skilli bez prefiksu** `flowkit-` (np. `~/.claude/skills/client-pt-prd-writer`, `.github/skills/client-meeting-recap`), inaczej skille będą widoczne podwójnie.
-3. Agenci czytają teraz tylko pliki z katalogu projektu. Materiały z innych miejsc skopiuj do projektu albo ustaw `FLOWKIT_EXTRA_PATHS`.
-4. Polecenia, które agenci mają wykonywać sami (np. budowanie projektu), dopisz do pliku zgód.
+3. **Usuń starych agentów `agent-3x3*`** (`~/.claude/agents/agent-3x3*.md`, `.github/agents/agent-3x3*.agent.md`). Nowe nazwy:
+
+   | Wersja 1.7 | Wersja 1.8 |
+   |---|---|
+   | `agent-3x3` | `flowkit-orchestrator` |
+   | `agent-3x3-analyst` | `flowkit-analyst` |
+   | `agent-3x3-analyzer` | `flowkit-code-analyzer` |
+   | `agent-3x3-planner` | `flowkit-planner` |
+   | `agent-3x3-pm` | `flowkit-product-owner` |
+   | `agent-3x3-implementer` | `flowkit-implementer` |
+   | `agent-3x3-verifier` | `flowkit-verifier` |
+   | `agent-3x3-devops` | `flowkit-devops` |
+   | `agent-3x3-diagnostics` | `flowkit-diagnostics` |
+   | `agent-3x3-validator` | `flowkit-validator` |
+
+   Polecenie startowe to teraz `claude --agent flowkit-orchestrator`. Do czasu usunięcia starzy agenci są nadal chronieni przez hook nowego runtime (zgodność wsteczna tylko w wersji 1.8).
+4. Agenci czytają teraz tylko pliki z katalogu projektu. Materiały z innych miejsc skopiuj do projektu albo ustaw `FLOWKIT_EXTRA_PATHS`.
+5. Polecenia, które agenci mają wykonywać sami (np. budowanie projektu), dopisz do pliku zgód.
 
 Pełna lista zmian: [CHANGELOG.md](CHANGELOG.md).
 
@@ -306,6 +332,7 @@ Pełna lista zmian: [CHANGELOG.md](CHANGELOG.md).
 | `KONTROLA: FAIL` (kod 4) | DOCX zapisany, ale jego struktura nie zgadza się ze źródłem | sprawdź ostrzeżenia (brakujące obrazy, nagłówki spoza stylów szablonu) przed oddaniem dokumentu |
 | diagram mermaid jako blok kodu | brak lokalnego mermaid-cli | `npm install -g @mermaid-js/mermaid-cli` |
 | `FlowKit zablokował zmianę pliku` | agent próbował zmienić plik zgód lub runtime | te pliki zmienia tylko użytkownik |
+| w VS Code na liście agentów są `agent-3x3*` | starzy agenci z wersji 1.7 | usuń `.github/agents/agent-3x3*.agent.md` (patrz [Aktualizacja](#aktualizacja-z-wersji-17)) |
 
 ---
 

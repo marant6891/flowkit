@@ -1,5 +1,5 @@
 ---
-name: agent-3x3-analyzer
+name: flowkit-code-analyzer
 description: Subagent read-only. Analizuje kod, zależności i strukturę. Zwraca findings [CRITICAL]/[WARNING]/[INFO] z poziomem pewności. Nie modyfikuje plików.
 user-invocable: false
 tools: ['read', 'search', 'execute']

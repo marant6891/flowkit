@@ -4,7 +4,7 @@
 .PARAMETER SkillName
     Nazwa skilla do zainstalowania (np. flowkit-client-pt-prd-writer).
 .PARAMETER AgentName
-    Nazwa agenta do zainstalowania (np. agent-3x3 lub 'all').
+    Nazwa agenta do zainstalowania (np. flowkit-orchestrator lub 'all').
 .PARAMETER Platform
     Docelowa platforma: 'claude' (domyślnie, ~/.claude/) lub 'vscode' (.github/ w bieżącym katalogu projektu).
 .PARAMETER TargetPath
@@ -17,12 +17,17 @@
     Wymusza nadpisanie istniejących plików bez pytania.
 .PARAMETER Uninstall
     Usuwa wskazany skill lub agenta z katalogu docelowego.
+.PARAMETER SetDefaultAgent
+    Ustawia flowkit-orchestrator jako domyślnego agenta Claude Code w bieżącym projekcie
+    (.claude/settings.json, klucz "agent"). Pozostałe ustawienia pliku zostają bez zmian.
 .EXAMPLE
     .\scripts\install.ps1 -SkillName flowkit-client-pt-prd-writer -DryRun
 .EXAMPLE
     .\scripts\install.ps1 -AgentName all -Platform claude -Force
 .EXAMPLE
     .\scripts\install.ps1 -AgentName all -Platform vscode -AgentTargetPath ./.github/agents
+.EXAMPLE
+    .\scripts\install.ps1 -AgentName all -Platform claude -SetDefaultAgent
 #>
 [CmdletBinding()]
 param(
@@ -34,8 +39,11 @@ param(
     [string]$AgentTargetPath,
     [switch]$DryRun,
     [switch]$Force,
-    [switch]$Uninstall
+    [switch]$Uninstall,
+    [switch]$SetDefaultAgent
 )
+
+$DefaultAgent = "flowkit-orchestrator"
 
 $RepoRoot = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $SkillsDir = Join-Path $RepoRoot "skills"
@@ -67,19 +75,19 @@ if (-not $AgentTargetPath) {
 # Whitelist dostępnych zasobów (zabezpieczenie przed path traversal)
 $AvailableSkills = Get-ChildItem -Path $SkillsDir -Directory | Where-Object { $_.Name -notlike "_*" } | Select-Object -ExpandProperty Name
 $AvailableAgents = @(
-    "agent-3x3",
-    "agent-3x3-analyzer",
-    "agent-3x3-verifier",
-    "agent-3x3-planner",
-    "agent-3x3-implementer",
-    "agent-3x3-devops",
-    "agent-3x3-pm",
-    "agent-3x3-diagnostics",
-    "agent-3x3-analyst",
-    "agent-3x3-validator"
+    "flowkit-orchestrator",
+    "flowkit-code-analyzer",
+    "flowkit-verifier",
+    "flowkit-planner",
+    "flowkit-implementer",
+    "flowkit-devops",
+    "flowkit-product-owner",
+    "flowkit-diagnostics",
+    "flowkit-analyst",
+    "flowkit-validator"
 )
 
-if (-not $SkillName -and -not $AgentName) {
+if (-not $SkillName -and -not $AgentName -and -not $SetDefaultAgent) {
     Write-Host ""
     Write-Host "=== FlowKit Safe Installer (Platform: $Platform) ===" -ForegroundColor Cyan
     Write-Host ""
@@ -228,5 +236,31 @@ if ($AgentName) {
         Write-Host "  ✓ Zainstalowano lokalną warstwę bezpieczeństwa: $RuntimeDir" -ForegroundColor Green
     } elseif ($AgentName -eq "all" -and (Test-Path $RuntimeDir)) {
         Remove-Item -Path $RuntimeDir -Recurse -Force
+    }
+}
+
+# --- DOMYŚLNY AGENT CLAUDE CODE ---
+if ($SetDefaultAgent) {
+    $SettingsDir = Join-Path (Get-Location).Path ".claude"
+    $SettingsFile = Join-Path $SettingsDir "settings.json"
+    Write-Host ""
+    Write-Host "[DEFAULT AGENT] $DefaultAgent -> $SettingsFile" -ForegroundColor Cyan
+    if ($DryRun) {
+        Write-Host "  [DRY-RUN] Ustawiono by `"agent`": `"$DefaultAgent`"" -ForegroundColor Gray
+    } else {
+        $Settings = [ordered]@{}
+        if (Test-Path $SettingsFile) {
+            try {
+                $Existing = Get-Content -Raw -Path $SettingsFile | ConvertFrom-Json
+                foreach ($p in $Existing.PSObject.Properties) { $Settings[$p.Name] = $p.Value }
+            } catch {
+                Write-Error "Plik $SettingsFile nie jest poprawnym JSON. Popraw go ręcznie i uruchom ponownie."
+                exit 1
+            }
+        }
+        $Settings["agent"] = $DefaultAgent
+        New-Item -ItemType Directory -Force -Path $SettingsDir | Out-Null
+        $Settings | ConvertTo-Json -Depth 20 | Set-Content -Path $SettingsFile -Encoding UTF8
+        Write-Host "  ✓ Sesje Claude Code w tym projekcie startują od $DefaultAgent (wtyczka: flowkit:$DefaultAgent)" -ForegroundColor Green
     }
 }

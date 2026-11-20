@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # FlowKit Safe Installer — skille i agenty
-# Obsługuje flagi: --dry-run, --force, --platform claude|vscode, --uninstall
+# Obsługuje flagi: --dry-run, --force, --platform claude|vscode, --uninstall, --set-default-agent
 #
 # Przykłady:
 #   ./scripts/install.sh skill flowkit-client-pt-prd-writer --dry-run
 #   ./scripts/install.sh agent all --platform claude --force
-#   ./scripts/install.sh agent agent-3x3 --platform vscode
+#   ./scripts/install.sh agent flowkit-orchestrator --platform vscode
+#   ./scripts/install.sh agent all --set-default-agent   # orkiestrator domyślnym agentem projektu
 
 set -e
 
@@ -21,6 +22,8 @@ DRY_RUN=false
 FORCE=false
 UNINSTALL=false
 PLATFORM="claude"
+SET_DEFAULT_AGENT=false
+DEFAULT_AGENT="flowkit-orchestrator"
 
 # Parsowanie argumentów
 while [[ $# -gt 0 ]]; do
@@ -45,6 +48,10 @@ while [[ $# -gt 0 ]]; do
             UNINSTALL=true
             shift
             ;;
+        --set-default-agent)
+            SET_DEFAULT_AGENT=true
+            shift
+            ;;
         --platform)
             PLATFORM="$2"
             shift 2
@@ -54,7 +61,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         -h|--help)
-            echo "Użycie: $0 [skill|agent] [nazwa|all] [--platform claude|vscode] [--dry-run] [--force] [--uninstall]"
+            echo "Użycie: $0 [skill|agent] [nazwa|all] [--platform claude|vscode] [--dry-run] [--force] [--uninstall] [--set-default-agent]"
             exit 0
             ;;
         *)
@@ -67,9 +74,9 @@ while [[ $# -gt 0 ]]; do
 done
 
 AVAILABLE_SKILLS=("flowkit-client-pt-prd-writer" "flowkit-client-meeting-recap" "flowkit-devops-incident-postmortem" "flowkit-sql-data-assistant" "flowkit-devops-sre-review")
-AVAILABLE_AGENTS=("agent-3x3" "agent-3x3-analyzer" "agent-3x3-verifier" "agent-3x3-planner" "agent-3x3-implementer" "agent-3x3-devops" "agent-3x3-pm" "agent-3x3-diagnostics" "agent-3x3-analyst" "agent-3x3-validator")
+AVAILABLE_AGENTS=("flowkit-orchestrator" "flowkit-code-analyzer" "flowkit-verifier" "flowkit-planner" "flowkit-implementer" "flowkit-devops" "flowkit-product-owner" "flowkit-diagnostics" "flowkit-analyst" "flowkit-validator")
 
-if [ -z "$MODE" ]; then
+if [ -z "$MODE" ] && [ "$SET_DEFAULT_AGENT" = false ]; then
     echo ""
     echo "=== FlowKit Safe Installer (Platform: $PLATFORM) ==="
     echo ""
@@ -80,7 +87,7 @@ if [ -z "$MODE" ]; then
     for a in "${AVAILABLE_AGENTS[@]}"; do echo "  - $a"; done
     echo "  (użyj 'all' aby wybrać wszystkich agentów)"
     echo ""
-    echo "Użycie: $0 skill <nazwa> | $0 agent <nazwa|all> [--dry-run] [--force]"
+    echo "Użycie: $0 skill <nazwa> | $0 agent <nazwa|all> [--dry-run] [--force] [--set-default-agent]"
     exit 0
 fi
 
@@ -230,5 +237,37 @@ elif [ "$MODE" = "agent" ]; then
         cp -r "$REPO_ROOT/runtime/"* "$RUNTIME_DIR/"
         rm -rf "$RUNTIME_DIR/__pycache__"
         echo "  ✓ Zainstalowano lokalną warstwę bezpieczeństwa: $RUNTIME_DIR"
+    fi
+fi
+
+# --- Domyślny agent Claude Code w bieżącym projekcie ---
+if [ "$SET_DEFAULT_AGENT" = true ]; then
+    SETTINGS_FILE="$(pwd)/.claude/settings.json"
+    echo ""
+    echo "[DEFAULT AGENT] $DEFAULT_AGENT -> $SETTINGS_FILE"
+    if [ "$DRY_RUN" = true ]; then
+        echo "  [DRY-RUN] Ustawiono by \"agent\": \"$DEFAULT_AGENT\""
+    else
+        PY=""
+        for candidate in python3 python; do
+            # Sprawdzamy, czy interpreter działa (w Windows python3 bywa tylko aliasem do Sklepu).
+            if command -v "$candidate" >/dev/null 2>&1 && "$candidate" -c "" >/dev/null 2>&1; then
+                PY="$candidate"; break
+            fi
+        done
+        if [ -z "$PY" ]; then echo "Błąd: --set-default-agent wymaga Pythona." >&2; exit 1; fi
+        mkdir -p "$(dirname "$SETTINGS_FILE")"
+        "$PY" - "$SETTINGS_FILE" "$DEFAULT_AGENT" <<'PYEOF'
+import json, sys
+from pathlib import Path
+path, agent = Path(sys.argv[1]), sys.argv[2]
+try:
+    data = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+except ValueError:
+    sys.exit(f"Plik {path} nie jest poprawnym JSON. Popraw go ręcznie i uruchom ponownie.")
+data["agent"] = agent
+path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+PYEOF
+        echo "  ✓ Sesje Claude Code w tym projekcie startują od $DEFAULT_AGENT (wtyczka: flowkit:$DEFAULT_AGENT)"
     fi
 fi

@@ -12,7 +12,7 @@ This repository provides reusable **Agent Skills** and **Agents** for Business/S
 - `templates/` — fallback output templates when the user has no custom template.
 - `CHANGELOG.md` — version history of the skill.
 
-**Agents** are located under `agents/`. Each `*_agent.md` file is a Claude Code agent definition with YAML frontmatter. The main orchestrator is `agent-3x3_agent.md`.
+**Agents** are located under `agents/`. Each `*_agent.md` file is a Claude Code agent definition with YAML frontmatter. The main orchestrator is `flowkit-orchestrator_agent.md`.
 
 ## When to Activate a Skill
 
@@ -25,14 +25,14 @@ Activate a skill when the user requests an output that matches the skill's `desc
 
 When activating a skill, read the full `SKILL.md` and all files referenced inside it before generating output.
 
-## Agent 3x3 — Orchestrator
+## Main agent — flowkit-orchestrator
 
-The `agent-3x3` orchestrator coordinates subagents using a strict 3-step iteration loop:
+The `flowkit-orchestrator` agent is the single entry point. It coordinates subagents using a strict 3-step iteration loop:
 - Each iteration: ≤3 steps → summarize → ask user → repeat
 - Supported prefixes: `ANALYZE:` `VERIFY:` `PLAN:` `SPEC:` `DRY:` `LOG:` `DEVOPS:` `DIAG:` `BA:` `SQL:` `SHIP:` `AUTO:` `FAST:` `STRICT:` (whole task on recommendations, no checkpoint stops except high-risk actions). Prefixes are optional: without one the orchestrator selects the action from the request
-- Subagents: Analyzer, Verifier, Planner, Implementer, DevOps, PM
+- Subagents (hidden from the agent picker, called by the orchestrator): `flowkit-code-analyzer`, `flowkit-verifier`, `flowkit-planner`, `flowkit-implementer`, `flowkit-devops`, `flowkit-product-owner`, `flowkit-diagnostics`, `flowkit-analyst`, `flowkit-validator`
 
-See [`agents/agent-3x3_agent.md`](../agents/agent-3x3_agent.md) for full protocol.
+See [`agents/flowkit-orchestrator_agent.md`](../agents/flowkit-orchestrator_agent.md) for full protocol.
 
 ## Core Rules (All Skills & AI Agents)
 

@@ -18,7 +18,7 @@ Purpose: let subagents skip re-reading/re-analyzing what an earlier subagent in 
 ---
 title: "<short task title>"
 date: <YYYY-MM-DD>
-tags: [agent-context, agent-3x3]
+tags: [agent-context, flowkit-orchestrator]
 task: "<one-line task description>"
 status: in-progress
 related: []

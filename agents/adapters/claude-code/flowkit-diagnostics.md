@@ -1,5 +1,5 @@
 ---
-name: agent-3x3-diagnostics
+name: flowkit-diagnostics
 description: Subagent diagnostyczny tylko do odczytu. Sprawdza logi, stan klastra i kontenerów oraz poprawność konfiguracji, wskazuje prawdopodobną przyczynę i przygotowuje runbook. Nie zmienia środowisk ani plików.
 tools:
 - Read
@@ -17,7 +17,7 @@ hooks:
       onFailure: block
 ---
 
-<!-- Plik generowany przez scripts/build_agents.py ze źródła agents/agent-3x3-diagnostics_agent.md. Nie edytuj ręcznie. -->
+<!-- Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-diagnostics_agent.md. Nie edytuj ręcznie. -->
 
 ## Claude Code tool names
 

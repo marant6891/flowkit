@@ -28,16 +28,16 @@
     "orchestrator"
   ],
   "agents": [
-    "./agents/adapters/claude-code/agent-3x3.md",
-    "./agents/adapters/claude-code/agent-3x3-analyzer.md",
-    "./agents/adapters/claude-code/agent-3x3-verifier.md",
-    "./agents/adapters/claude-code/agent-3x3-planner.md",
-    "./agents/adapters/claude-code/agent-3x3-implementer.md",
-    "./agents/adapters/claude-code/agent-3x3-devops.md",
-    "./agents/adapters/claude-code/agent-3x3-pm.md",
-    "./agents/adapters/claude-code/agent-3x3-diagnostics.md",
-    "./agents/adapters/claude-code/agent-3x3-analyst.md",
-    "./agents/adapters/claude-code/agent-3x3-validator.md"
+    "./agents/adapters/claude-code/flowkit-orchestrator.md",
+    "./agents/adapters/claude-code/flowkit-code-analyzer.md",
+    "./agents/adapters/claude-code/flowkit-verifier.md",
+    "./agents/adapters/claude-code/flowkit-planner.md",
+    "./agents/adapters/claude-code/flowkit-implementer.md",
+    "./agents/adapters/claude-code/flowkit-devops.md",
+    "./agents/adapters/claude-code/flowkit-product-owner.md",
+    "./agents/adapters/claude-code/flowkit-diagnostics.md",
+    "./agents/adapters/claude-code/flowkit-analyst.md",
+    "./agents/adapters/claude-code/flowkit-validator.md"
   ],
   "metadata": {
     "suggestedPrompts": [

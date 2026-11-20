@@ -101,7 +101,7 @@ class TestSqlIntegration(unittest.TestCase):
                 self.assertIsNotNone(fx.check(role, [client, "-c", "select 1"]), f"{role}: {client}")
 
     def test_orchestrator_chooses_action_without_prefix(self):
-        source = (ROOT / "agents" / "agent-3x3_agent.md").read_text(encoding="utf-8")
+        source = (ROOT / "agents" / "flowkit-orchestrator_agent.md").read_text(encoding="utf-8")
         self.assertIn("## Automatic routing", source)
         self.assertIn("Prefixes are optional", source)
         for target in ("`flowkit-sql-data-assistant`", "Analyzer", "Diagnostics", "Analyst", "Planner"):

@@ -1,5 +1,5 @@
 ---
-name: agent-3x3-analyst
+name: flowkit-analyst
 description: Agent analityka biznesowo-systemowego. Czyta lokalne dokumenty Word, Excel, PDF i tekstowe, analizuje wymagania, proces i wpływ zmiany, przygotowuje backlog, przypadki testowe i materiały UAT. Dokumenty PT/PRD, podsumowania spotkań i postmortemy realizuje przez skille FlowKit.
 tools: ['read', 'search', 'edit', 'execute']
 argument-hint: "Zadanie analityczne. Np: 'analiza wpływu zmiany', 'backlog z tego dokumentu', 'przypadki testowe do FR-001'"

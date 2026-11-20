@@ -24,6 +24,9 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 - **Pytanie o źródła danych:** praca nad dokumentem zaczyna się od pytania o znane źródła do przygotowania i weryfikacji.
 
 ### Zmieniono
+- **Nazwy agentów z prefiksem `flowkit-`:** `agent-3x3` → `flowkit-orchestrator`, `agent-3x3-analyzer` → `flowkit-code-analyzer`, `agent-3x3-pm` → `flowkit-product-owner`, pozostali `agent-3x3-<rola>` → `flowkit-<rola>`. Hook rozpoznaje dawne nazwy do kolejnego wydania.
+- **Główny agent widoczny jako jedyny:** w VS Code subagenci mają `user-invocable: false` (ukryci na liście wyboru, dostępni dla orkiestratora przez pole `agents`); opis orkiestratora zaczyna się od „Główny agent FlowKit — zacznij tutaj”. Instalatory mają opcję `-SetDefaultAgent` / `--set-default-agent` (domyślny agent projektu w Claude Code).
+- Executor rozwija wzorce plików (np. `diagrams/D-*.yaml`) w obrębie katalogu roboczego — wcześniej kroki diagramów skilla PT/PRD dostawały wzorzec dosłownie i kończyły się błędem.
 - **Nazwy skilli z prefiksem `flowkit-`:** `flowkit-client-pt-prd-writer`, `flowkit-client-meeting-recap`, `flowkit-devops-incident-postmortem`, `flowkit-sql-data-assistant`, `flowkit-devops-sre-review` (katalogi, prompty VS Code, routing agentów, instalatory). Po aktualizacji usuń stare katalogi skilli bez prefiksu z `~/.claude/skills/` lub `.github/skills/`.
 - Analityk oznacza rodzaj stwierdzeń (fakt, obserwacja, interpretacja, założenie, decyzja, rekomendacja, pytanie) i raportuje luki pokrycia wymagań testami.
 - `client-pt-prd-writer` 2.9: kontrola pokrycia w wariancie pełnym, oznaczanie interpretacji.

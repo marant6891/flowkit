@@ -1,14 +1,15 @@
 ---
-name: agent-3x3-diagnostics
+name: flowkit-diagnostics
 description: Subagent diagnostyczny tylko do odczytu. Sprawdza logi, stan klastra i kontenerów oraz poprawność konfiguracji, wskazuje prawdopodobną przyczynę i przygotowuje runbook. Nie zmienia środowisk ani plików.
 tools:
 - read
 - search
 - execute
 argument-hint: 'Objaw lub zakres. Np: ''pod payments restartuje się'', ''zweryfikuj manifesty k8s/'''
+user-invocable: false
 ---
 
-<!-- Plik generowany przez scripts/build_agents.py ze źródła agents/agent-3x3-diagnostics_agent.md. Nie edytuj ręcznie. -->
+<!-- Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-diagnostics_agent.md. Nie edytuj ręcznie. -->
 
 ## Local command execution
 

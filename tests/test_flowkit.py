@@ -39,20 +39,20 @@ class TestFlowKitContracts(unittest.TestCase):
             self.assertIn("description", data, f"{f} must have 'description'")
 
     def test_orchestrator_has_no_yaml_syntax_error(self):
-        f = ROOT / "agents" / "agent-3x3_agent.md"
+        f = ROOT / "agents" / "flowkit-orchestrator_agent.md"
         content = f.read_text(encoding="utf-8")
         parts = content.split("---", 2)
         data = yaml.safe_load(parts[1])
-        self.assertEqual(data["name"], "agent-3x3")
+        self.assertEqual(data["name"], "flowkit-orchestrator")
         self.assertIn("description", data)
 
     def test_verifier_includes_not_verified_status(self):
-        verifier_file = ROOT / "agents" / "agent-3x3-verifier_agent.md"
+        verifier_file = ROOT / "agents" / "flowkit-verifier_agent.md"
         content = verifier_file.read_text(encoding="utf-8")
         self.assertIn("[NOT VERIFIED]", content, "Verifier must support NOT VERIFIED status")
 
     def test_analyzer_includes_scanned_and_not_checked(self):
-        analyzer_file = ROOT / "agents" / "agent-3x3-analyzer_agent.md"
+        analyzer_file = ROOT / "agents" / "flowkit-code-analyzer_agent.md"
         content = analyzer_file.read_text(encoding="utf-8")
         self.assertIn("Scanned:", content)
         self.assertIn("Not checked:", content)
@@ -91,25 +91,25 @@ class TestFlowKitContracts(unittest.TestCase):
     def test_agent_validator_detects_unknown_tool(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = self._agents_copy(tmp)
-            path = root / "agents" / "adapters" / "claude-code" / "agent-3x3-analyzer.md"
+            path = root / "agents" / "adapters" / "claude-code" / "flowkit-code-analyzer.md"
             path.write_text(path.read_text(encoding="utf-8").replace("- Read", "- NieMa"), encoding="utf-8")
             self.assertTrue(any("Unknown tool" in e for e in validate_agents.validate(root)))
 
     def test_agent_validator_detects_missing_adapter(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = self._agents_copy(tmp)
-            (root / "agents" / "adapters" / "vscode" / "agent-3x3-pm.agent.md").unlink()
+            (root / "agents" / "adapters" / "vscode" / "flowkit-product-owner.agent.md").unlink()
             self.assertTrue(any("Missing vscode adapter" in e for e in validate_agents.validate(root)))
 
     def test_agent_validator_detects_stale_adapter(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = self._agents_copy(tmp)
-            path = root / "agents" / "adapters" / "claude-code" / "agent-3x3-pm.md"
+            path = root / "agents" / "adapters" / "claude-code" / "flowkit-product-owner.md"
             path.write_text(path.read_text(encoding="utf-8") + "\nRęczna zmiana\n", encoding="utf-8")
             self.assertTrue(any("out of sync" in e for e in validate_agents.validate(root)))
 
     def test_installed_agents_keep_full_behaviour(self):
-        orchestrator = (ROOT / "agents" / "adapters" / "claude-code" / "agent-3x3.md").read_text(encoding="utf-8")
+        orchestrator = (ROOT / "agents" / "adapters" / "claude-code" / "flowkit-orchestrator.md").read_text(encoding="utf-8")
         for section in ("Correction loop", "Reconciliation", "Task profiles", "Risk labels", "Delivery", "FlowKit skills"):
             self.assertIn(section, orchestrator)
 
@@ -117,14 +117,24 @@ class TestFlowKitContracts(unittest.TestCase):
         def tools(name):
             text = (ROOT / "agents" / "adapters" / "claude-code" / f"{name}.md").read_text(encoding="utf-8")
             return yaml.safe_load(text.split("---", 2)[1])["tools"]
-        self.assertNotIn("Bash", tools("agent-3x3-devops"))
-        for name in ("agent-3x3", "agent-3x3-implementer", "agent-3x3-devops"):
+        self.assertNotIn("Bash", tools("flowkit-devops"))
+        for name in ("flowkit-orchestrator", "flowkit-implementer", "flowkit-devops"):
             self.assertIn("Write", tools(name), name)
-        for name in ("agent-3x3-analyzer", "agent-3x3-verifier", "agent-3x3-planner", "agent-3x3-pm"):
+        for name in ("flowkit-code-analyzer", "flowkit-verifier", "flowkit-planner", "flowkit-product-owner"):
             self.assertFalse({"Edit", "Write"} & set(tools(name)), name)
 
+    def test_only_orchestrator_is_visible_in_vscode_picker(self):
+        for path in (ROOT / "agents" / "adapters" / "vscode").glob("*.agent.md"):
+            data = yaml.safe_load(path.read_text(encoding="utf-8").split("---", 2)[1])
+            if data["name"] == "flowkit-orchestrator":
+                self.assertNotIn("user-invocable", data)
+                self.assertEqual(len(data["agents"]), 9)
+                self.assertTrue(data["description"].startswith("Główny agent FlowKit"))
+            else:
+                self.assertIs(data["user-invocable"], False, path.name)
+
     def test_vscode_orchestrator_opens_question_window(self):
-        text = (ROOT / "agents" / "adapters" / "vscode" / "agent-3x3.agent.md").read_text(encoding="utf-8")
+        text = (ROOT / "agents" / "adapters" / "vscode" / "flowkit-orchestrator.agent.md").read_text(encoding="utf-8")
         tools = yaml.safe_load(text.split("---", 2)[1])["tools"]
         self.assertIn("vscode/askQuestions", tools)
         self.assertNotIn("vscode", tools)
@@ -132,7 +142,7 @@ class TestFlowKitContracts(unittest.TestCase):
         self.assertNotIn("vscode_askQuestions", text)
 
     def test_verifier_can_run_common_test_stacks(self):
-        verifier = (ROOT / "agents" / "agent-3x3-verifier_agent.md").read_text(encoding="utf-8")
+        verifier = (ROOT / "agents" / "flowkit-verifier_agent.md").read_text(encoding="utf-8")
         for command in ("python -m unittest", "dotnet test", "mvn -q test", "gradle test"):
             self.assertIn(command, verifier)
 

@@ -16,13 +16,24 @@ from flowkit_exec import allow_file, check  # noqa: E402
 
 EXECUTOR = Path(__file__).resolve().parent / "flowkit_exec.py"
 ROLES = {
-    "agent-3x3": "orchestrator",
-    "agent-3x3-analyzer": "analyzer",
-    "agent-3x3-verifier": "verifier",
-    "agent-3x3-implementer": "implementer",
-    "agent-3x3-diagnostics": "diagnostics",
-    "agent-3x3-analyst": "analyst",
-    "agent-3x3-validator": "validator",
+    "flowkit-orchestrator": "orchestrator",
+    "flowkit-code-analyzer": "analyzer",
+    "flowkit-verifier": "verifier",
+    "flowkit-implementer": "implementer",
+    "flowkit-diagnostics": "diagnostics",
+    "flowkit-analyst": "analyst",
+    "flowkit-validator": "validator",
+}
+# Agenci FlowKit bez roli wykonawczej: polecenia są dla nich zablokowane.
+NO_EXEC = {"flowkit-planner", "flowkit-product-owner", "flowkit-devops"}
+# Nazwy sprzed wersji 1.8.0 (agent-3x3*). Agenci zainstalowani wcześniej nadal są chronieni
+# przez nowy runtime. Do usunięcia w kolejnym wydaniu.
+LEGACY = {
+    "agent-3x3": "flowkit-orchestrator", "agent-3x3-analyzer": "flowkit-code-analyzer",
+    "agent-3x3-verifier": "flowkit-verifier", "agent-3x3-implementer": "flowkit-implementer",
+    "agent-3x3-diagnostics": "flowkit-diagnostics", "agent-3x3-analyst": "flowkit-analyst",
+    "agent-3x3-validator": "flowkit-validator", "agent-3x3-planner": "flowkit-planner",
+    "agent-3x3-pm": "flowkit-product-owner", "agent-3x3-devops": "flowkit-devops",
 }
 PYTHON = {"python", "python3", "py", "python.exe", "python3.exe", "py.exe"}
 EDIT_TOOLS = {"Edit", "Write", "MultiEdit", "NotebookEdit"}
@@ -100,7 +111,8 @@ def main() -> int:
         print("FlowKit zablokował polecenie: nieczytelne dane hooka.", file=sys.stderr)
         return 2
     name = str(data.get("agent_type") or "").rsplit(":", 1)[-1]
-    if not name.startswith("agent-3x3"):
+    name = LEGACY.get(name, name)
+    if name not in ROLES and name not in NO_EXEC:
         return 0
     if data.get("tool_name") in EDIT_TOOLS:
         problem = protected_edit(data.get("tool_input") or {})

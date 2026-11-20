@@ -96,16 +96,16 @@ class TestGuardHook(unittest.TestCase):
         self.assertEqual(self.run_guard("Explore", "rm -rf build").returncode, 0)
 
     def test_direct_commands_are_blocked_with_guidance(self):
-        result = self.run_guard("agent-3x3-diagnostics", "kubectl get pods")
+        result = self.run_guard("flowkit-diagnostics", "kubectl get pods")
         self.assertEqual(result.returncode, 2)
         self.assertIn("flowkit_exec.py", result.stderr)
 
     def test_plugin_scoped_agent_name_is_recognised(self):
-        self.assertEqual(self.run_guard("flowkit:agent-3x3-verifier", "rm -rf build").returncode, 2)
+        self.assertEqual(self.run_guard("flowkit:flowkit-verifier", "rm -rf build").returncode, 2)
 
     def test_executor_with_allowed_command_passes(self):
         command = f'python "{EXEC}" --role diagnostics -- kubectl get pods'
-        self.assertEqual(self.run_guard("flowkit:agent-3x3-diagnostics", command).returncode, 0)
+        self.assertEqual(self.run_guard("flowkit:flowkit-diagnostics", command).returncode, 0)
 
     def test_bypass_attempts_are_blocked(self):
         attempts = [
@@ -120,10 +120,18 @@ class TestGuardHook(unittest.TestCase):
             'FOO=1 python x.py',
         ]
         for command in attempts:
-            self.assertEqual(self.run_guard("agent-3x3-diagnostics", command).returncode, 2, command)
+            self.assertEqual(self.run_guard("flowkit-diagnostics", command).returncode, 2, command)
+
+    def test_legacy_agent_names_stay_guarded(self):
+        self.assertEqual(self.run_guard("agent-3x3-verifier", "rm -rf build").returncode, 2)
+        self.assertEqual(self.run_guard("flowkit:agent-3x3", "rm -rf build").returncode, 2)
+        self.assertEqual(self.run_guard("agent-3x3-pm", "ls").returncode, 2)
+
+    def test_foreign_agents_are_not_affected(self):
+        self.assertEqual(self.run_guard("flowkit-my-own-agent", "rm -rf build").returncode, 0)
 
     def test_agents_without_execution_role_are_blocked(self):
-        self.assertEqual(self.run_guard("agent-3x3-devops", "ls").returncode, 2)
+        self.assertEqual(self.run_guard("flowkit-devops", "ls").returncode, 2)
 
     def test_invalid_hook_input_fails_closed(self):
         result = subprocess.run([sys.executable, str(ROOT / "runtime" / "guard_bash.py")], input="nie-json",
@@ -243,7 +251,7 @@ class TestDocxWriting(unittest.TestCase):
 
     def test_guard_allows_docx_conversion(self):
         command = f'python "{EXEC}" --role analyst -- md-to-docx dok.md dok.docx --reference-doc szablon.dotx'
-        payload = {"agent_type": "agent-3x3-analyst", "tool_name": "Bash", "tool_input": {"command": command}}
+        payload = {"agent_type": "flowkit-analyst", "tool_name": "Bash", "tool_input": {"command": command}}
         result = subprocess.run([sys.executable, str(ROOT / "runtime" / "guard_bash.py")], input=json.dumps(payload),
                                 capture_output=True, text=True, encoding="utf-8", check=False)
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -349,6 +357,16 @@ class TestWorkspaceBoundary(unittest.TestCase):
                            ("orchestrator", ["gh", "pr", "create", "--title", "feat: a/b"]),
                            ("diagnostics", ["kubectl", "get", "deployment/app", "-n", "prod", "-o", "yaml"])):
             self.assertIsNone(fx.check(role, argv), argv)
+
+    def test_globs_are_expanded_inside_the_workspace_only(self):
+        Path("diagrams").mkdir()
+        for name in ("D-01-a.yaml", "D-02-b.yaml"):
+            (Path("diagrams") / name).write_text("x", encoding="utf-8")
+        self.assertEqual(fx.expand_globs(["python", "s.py", "diagrams/D-*.yaml", "--out", "x*"]),
+                         ["python", "s.py", str(Path("diagrams/D-01-a.yaml")), str(Path("diagrams/D-02-b.yaml")),
+                          "--out", "x*"])
+        outside = str(self.outside_dir / "*.txt")
+        self.assertEqual(fx.expand_globs(["rg", "x", outside]), ["rg", "x", outside])
 
     def test_extra_paths_are_configured_by_the_user(self):
         os.environ[fx.EXTRA_PATHS_ENV] = str(self.outside_dir)
@@ -493,11 +511,11 @@ class TestValidatorAndConsent(unittest.TestCase):
                               env={**os.environ, fx.ALLOW_FILE_ENV: str(self.allow)})
 
     def test_agents_cannot_edit_consent_file_or_runtime(self):
-        for agent in ("agent-3x3", "agent-3x3-devops", "flowkit:agent-3x3-implementer"):
+        for agent in ("flowkit-orchestrator", "flowkit-devops", "flowkit:flowkit-implementer"):
             for path in (str(self.allow), str(ROOT / "runtime" / "flowkit_exec.py")):
                 result = self.run_guard({"agent_type": agent, "tool_name": "Write", "tool_input": {"file_path": path}})
                 self.assertEqual(result.returncode, 2, (agent, path))
-        allowed = self.run_guard({"agent_type": "agent-3x3-devops", "tool_name": "Edit",
+        allowed = self.run_guard({"agent_type": "flowkit-devops", "tool_name": "Edit",
                                   "tool_input": {"file_path": str(self.dir / "k8s.yaml")}})
         self.assertEqual(allowed.returncode, 0)
         user = self.run_guard({"tool_name": "Write", "tool_input": {"file_path": str(self.allow)}})
@@ -548,8 +566,10 @@ class TestLocalOnlySolution(unittest.TestCase):
             self.assertIsNone(pattern.search(path.read_text(encoding="utf-8")), path.name)
 
     def test_claude_subagents_have_model_and_turn_limits(self):
-        for path in (ROOT / "agents" / "adapters" / "claude-code").glob("agent-3x3-*.md"):
+        for path in (ROOT / "agents" / "adapters" / "claude-code").glob("flowkit-*.md"):
             data = yaml.safe_load(path.read_text(encoding="utf-8").split("---", 2)[1])
+            if data["name"] == "flowkit-orchestrator":
+                continue
             self.assertEqual(data["model"], "sonnet", path.name)
             self.assertGreater(data["maxTurns"], 0, path.name)
 
@@ -565,7 +585,7 @@ class TestLocalOnlySolution(unittest.TestCase):
         self.assertIn("guard_bash.py", hooks["hooks"][0]["command"])
 
     def test_orchestrator_procedures_exist(self):
-        source = (ROOT / "agents" / "agent-3x3_agent.md").read_text(encoding="utf-8")
+        source = (ROOT / "agents" / "flowkit-orchestrator_agent.md").read_text(encoding="utf-8")
         names = set(re.findall(r"`([a-z-]+\.md)`", source)) - {"flowkit-project.md"}
         self.assertEqual(len(names), 6)
         for name in names:

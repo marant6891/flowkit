@@ -19,18 +19,18 @@ VSCODE_TOOLS = {"vscode/askQuestions", "execute", "read", "agent", "edit", "sear
 
 # Minimalna treść kontraktów z agents/core, która musi trafić do instalowanych adapterów.
 CORE_TERMS = {
-    "agent-3x3": ["REPORT_PROGRESS", "ASK_USER", "WAIT_FOR_APPROVAL", "Correction loop", "Reconciliation",
+    "flowkit-orchestrator": ["REPORT_PROGRESS", "ASK_USER", "WAIT_FOR_APPROVAL", "Correction loop", "Reconciliation",
                   "Task profiles", "Risk labels", "Error handling", "SHIP:", "Automatic routing", "SQL:"],
-    "agent-3x3-analyzer": ["Scanned:", "Not checked:", "Confidence:", "Assumptions:"],
-    "agent-3x3-verifier": ["Logic", "Contracts", "Tests", "Dependencies", "Security", "Performance",
+    "flowkit-code-analyzer": ["Scanned:", "Not checked:", "Confidence:", "Assumptions:"],
+    "flowkit-verifier": ["Logic", "Contracts", "Tests", "Dependencies", "Security", "Performance",
                            "Consistency", "Docs", "Requirements", "[NOT VERIFIED]"],
-    "agent-3x3-planner": ["Iter 1:", "Effort:", "Risks:"],
-    "agent-3x3-implementer": ["Self-check", "DONE", "PARTIAL", "BLOCKED"],
-    "agent-3x3-devops": ["Validate:", "Apply:", "REQUIRES APPROVAL"],
-    "agent-3x3-pm": ["US-1", "AC-1", "Given", "ADR-N"],
-    "agent-3x3-diagnostics": ["DIAGNOSTICS:", "Probable cause:", "REQUIRES APPROVAL"],
-    "agent-3x3-analyst": ["ANALYST:", "read-document", "Critical review"],
-    "agent-3x3-validator": ["VALIDATOR:", "NOT_RUN", "Overall:", "Not validated:"],
+    "flowkit-planner": ["Iter 1:", "Effort:", "Risks:"],
+    "flowkit-implementer": ["Self-check", "DONE", "PARTIAL", "BLOCKED"],
+    "flowkit-devops": ["Validate:", "Apply:", "REQUIRES APPROVAL"],
+    "flowkit-product-owner": ["US-1", "AC-1", "Given", "ADR-N"],
+    "flowkit-diagnostics": ["DIAGNOSTICS:", "Probable cause:", "REQUIRES APPROVAL"],
+    "flowkit-analyst": ["ANALYST:", "read-document", "Critical review"],
+    "flowkit-validator": ["VALIDATOR:", "NOT_RUN", "Overall:", "Not validated:"],
 }
 
 
@@ -74,10 +74,10 @@ def check_definition(path: Path, name: str, allowed: set[str], errors: list[str]
             errors.append(f"[{path.name}] Missing required contract term: {term}")
     if "vscode_askQuestions" in body:
         errors.append(f"[{path.name}] Use the tool name vscode/askQuestions")
-    if name == "agent-3x3" and allowed is VSCODE_TOOLS:
+    if name == "flowkit-orchestrator" and allowed is VSCODE_TOOLS:
         if "vscode/askQuestions" not in tools or "#tool:vscode/askQuestions" not in body:
             errors.append(f"[{path.name}] VS Code orchestrator must call vscode/askQuestions at checkpoints")
-    if name == "agent-3x3-devops" and {"Bash", "execute"} & set(tools):
+    if name == "flowkit-devops" and {"Bash", "execute"} & set(tools):
         errors.append(f"[{path.name}] DevOps agent must not have a command execution tool")
 
 
@@ -95,7 +95,7 @@ def validate(root: Path = ROOT) -> list[str]:
                 errors.append(f"[{path.name}] Missing {platform} adapter")
                 continue
             check_definition(path, name, allowed, errors)
-        core_name = re.sub(r"^agent-3x3-?", "", name) or "orchestrator"
+        core_name = re.sub(r"^flowkit-", "", name)
         if not (root / "agents" / "core" / f"{core_name}.md").exists():
             errors.append(f"[{core_name}.md] Missing core contract")
     if not errors:

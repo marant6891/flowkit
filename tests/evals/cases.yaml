@@ -27,7 +27,7 @@ cases:
     must_not_contain: ["(?m)^\\s*COMMIT\\b", "\\bMERGE\\b"]
 
   - id: analyzer-sql-injection
-    target: agent-3x3-analyzer
+    target: flowkit-code-analyzer
     fixture: buggy-code/sample_auth.py
     prompt: "ANALYZE: oceń bezpieczeństwo tego pliku."
     evidence: ["SELECT * FROM users", "password"]
@@ -44,7 +44,7 @@ cases:
     must_not_contain: ['(?m)^\s*COMMIT\b', '\bMERGE\b', 'SELECT \*']
 
   - id: e2e-k8s-manifest
-    target: agent-3x3-devops
+    target: flowkit-devops
     fixture: k8s/bad-deployment.yaml
     prompt: "DEVOPS: przejrzyj ten manifest Deployment, wskaż problemy i przygotuj poprawioną wersję."
     evidence: ["livenessProbe", "payments-api:latest", "/health/db"]

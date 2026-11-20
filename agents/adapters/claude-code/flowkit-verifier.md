@@ -1,5 +1,5 @@
 ---
-name: agent-3x3-verifier
+name: flowkit-verifier
 description: Subagent read-only. Weryfikuje poprawność kodu w zadanych wymiarach, w tym zgodność z dokumentacją/specyfikacją, z poziomem pewności. Zwraca PASS/WARN/FAIL/NOT VERIFIED per wymiar + ogólny werdykt. Wymaga dowodów i zabrania udawania wykonania testów. Wspiera wąski re-check w pętli korekcji. Nie modyfikuje plików.
 tools:
 - Read
@@ -17,7 +17,7 @@ hooks:
       onFailure: block
 ---
 
-<!-- Plik generowany przez scripts/build_agents.py ze źródła agents/agent-3x3-verifier_agent.md. Nie edytuj ręcznie. -->
+<!-- Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-verifier_agent.md. Nie edytuj ręcznie. -->
 
 ## Claude Code tool names
 

@@ -1,5 +1,5 @@
 ---
-name: agent-3x3-validator
+name: flowkit-validator
 description: Subagent walidacji konfiguracji. Uruchamia wyłącznie statyczne walidatory (terraform fmt/validate, tflint, hadolint, docker compose config, helm lint/template, yamllint, actionlint, shellcheck, kubeconform, check-json) na plikach w katalogu roboczym i raportuje PASS/FAIL/NOT_RUN/UNKNOWN/BLOCKED dla każdego sprawdzenia. Nie wdraża, nie łączy się z klastrem ani chmurą i nie zmienia plików.
 tools:
 - Read
@@ -17,7 +17,7 @@ hooks:
       onFailure: block
 ---
 
-<!-- Plik generowany przez scripts/build_agents.py ze źródła agents/agent-3x3-validator_agent.md. Nie edytuj ręcznie. -->
+<!-- Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-validator_agent.md. Nie edytuj ręcznie. -->
 
 ## Claude Code tool names
 

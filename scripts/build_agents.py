@@ -14,46 +14,46 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 
 AGENTS = (
-    "agent-3x3", "agent-3x3-analyzer", "agent-3x3-verifier", "agent-3x3-planner",
-    "agent-3x3-implementer", "agent-3x3-devops", "agent-3x3-pm", "agent-3x3-diagnostics", "agent-3x3-analyst",
-    "agent-3x3-validator",
+    "flowkit-orchestrator", "flowkit-code-analyzer", "flowkit-verifier", "flowkit-planner",
+    "flowkit-implementer", "flowkit-devops", "flowkit-product-owner", "flowkit-diagnostics", "flowkit-analyst",
+    "flowkit-validator",
 )
 
 # Listy narzędzi są jawne: agenci działają lokalnie, bez narzędzi webowych i bez MCP.
 CLAUDE_TOOLS = {
-    "agent-3x3": ["Read", "Grep", "Glob", "Edit", "Write", "Bash", "Agent", "Skill"],
-    "agent-3x3-analyzer": ["Read", "Grep", "Glob", "Bash"],
-    "agent-3x3-verifier": ["Read", "Grep", "Glob", "Bash"],
-    "agent-3x3-planner": ["Read", "Grep", "Glob"],
-    "agent-3x3-implementer": ["Read", "Edit", "Write", "Grep", "Glob", "Bash"],
-    "agent-3x3-devops": ["Read", "Edit", "Write", "Grep", "Glob"],
-    "agent-3x3-pm": ["Read", "Grep", "Glob"],
-    "agent-3x3-diagnostics": ["Read", "Grep", "Glob", "Bash"],
-    "agent-3x3-analyst": ["Read", "Grep", "Glob", "Edit", "Write", "Bash", "Skill"],
-    "agent-3x3-validator": ["Read", "Grep", "Glob", "Bash"],
+    "flowkit-orchestrator": ["Read", "Grep", "Glob", "Edit", "Write", "Bash", "Agent", "Skill"],
+    "flowkit-code-analyzer": ["Read", "Grep", "Glob", "Bash"],
+    "flowkit-verifier": ["Read", "Grep", "Glob", "Bash"],
+    "flowkit-planner": ["Read", "Grep", "Glob"],
+    "flowkit-implementer": ["Read", "Edit", "Write", "Grep", "Glob", "Bash"],
+    "flowkit-devops": ["Read", "Edit", "Write", "Grep", "Glob"],
+    "flowkit-product-owner": ["Read", "Grep", "Glob"],
+    "flowkit-diagnostics": ["Read", "Grep", "Glob", "Bash"],
+    "flowkit-analyst": ["Read", "Grep", "Glob", "Edit", "Write", "Bash", "Skill"],
+    "flowkit-validator": ["Read", "Grep", "Glob", "Bash"],
 }
 
 # Orkiestrator dziedziczy model sesji; subagenci mają jawny model i limit kroków.
 CLAUDE_LIMITS = {
-    "agent-3x3-analyzer": ("sonnet", 15),
-    "agent-3x3-verifier": ("sonnet", 20),
-    "agent-3x3-planner": ("sonnet", 12),
-    "agent-3x3-implementer": ("sonnet", 25),
-    "agent-3x3-devops": ("sonnet", 15),
-    "agent-3x3-pm": ("sonnet", 10),
-    "agent-3x3-diagnostics": ("sonnet", 15),
-    "agent-3x3-analyst": ("sonnet", 40),
-    "agent-3x3-validator": ("sonnet", 15),
+    "flowkit-code-analyzer": ("sonnet", 15),
+    "flowkit-verifier": ("sonnet", 20),
+    "flowkit-planner": ("sonnet", 12),
+    "flowkit-implementer": ("sonnet", 25),
+    "flowkit-devops": ("sonnet", 15),
+    "flowkit-product-owner": ("sonnet", 10),
+    "flowkit-diagnostics": ("sonnet", 15),
+    "flowkit-analyst": ("sonnet", 40),
+    "flowkit-validator": ("sonnet", 15),
 }
 
 EXEC_ROLES = {
-    "agent-3x3": "orchestrator",
-    "agent-3x3-analyzer": "analyzer",
-    "agent-3x3-verifier": "verifier",
-    "agent-3x3-implementer": "implementer",
-    "agent-3x3-diagnostics": "diagnostics",
-    "agent-3x3-analyst": "analyst",
-    "agent-3x3-validator": "validator",
+    "flowkit-orchestrator": "orchestrator",
+    "flowkit-code-analyzer": "analyzer",
+    "flowkit-verifier": "verifier",
+    "flowkit-implementer": "implementer",
+    "flowkit-diagnostics": "diagnostics",
+    "flowkit-analyst": "analyst",
+    "flowkit-validator": "validator",
 }
 
 GUARD_HOOK = {"PreToolUse": [{"matcher": "Bash|Edit|Write|MultiEdit|NotebookEdit", "hooks": [{
@@ -62,6 +62,7 @@ GUARD_HOOK = {"PreToolUse": [{"matcher": "Bash|Edit|Write|MultiEdit|NotebookEdit
     "onFailure": "block",
 }]}]}
 
+ORCHESTRATOR = "flowkit-orchestrator"
 GENERATED = "<!-- Plik generowany przez scripts/build_agents.py ze źródła agents/SOURCE. Nie edytuj ręcznie. -->\n"
 
 CLAUDE_NOTE = """
@@ -112,8 +113,13 @@ def render(name: str, platform: str, root: Path = ROOT) -> str:
         if name in EXEC_ROLES:
             data["hooks"] = GUARD_HOOK
         return front_matter(data) + note + CLAUDE_NOTE + exec_note(name, CLAUDE_RUNTIME) + "\n" + body
-    if name == "agent-3x3":
+    if name == ORCHESTRATOR:
         note += VSCODE_ORCHESTRATOR_NOTE
+        # Lista subagentów, których orkiestrator może użyć (VS Code, tryb Local).
+        meta = {**meta, "agents": [agent for agent in AGENTS if agent != ORCHESTRATOR]}
+    else:
+        # Subagenci nie pojawiają się na liście wyboru agentów; orkiestrator nadal może ich wywołać.
+        meta = {**meta, "user-invocable": False}
     return front_matter(meta) + note + exec_note(name, VSCODE_RUNTIME) + "\n" + body
 
 
@@ -145,7 +151,9 @@ def main() -> int:
         return 1 if stale else 0
     for name in AGENTS:
         for platform in ("claude", "vscode"):
-            target(name, platform).write_text(render(name, platform), encoding="utf-8", newline="\n")
+            path = target(name, platform)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(render(name, platform), encoding="utf-8", newline="\n")
     print(f"Wygenerowano adaptery: {len(AGENTS) * 2}")
     return 0
 

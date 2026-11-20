@@ -557,7 +557,30 @@ def md_to_docx(args: list[str]) -> int:
     return result.returncode
 
 
+GLOB_CHARS = re.compile(r"[*?\[]")
+
+
+def expand_globs(argv: list[str]) -> list[str]:
+    """Rozwija wzorce (np. diagrams/D-*.yaml) jak powłoka, ale tylko w katalogu roboczym i FLOWKIT_EXTRA_PATHS.
+
+    Executor działa bez powłoki, więc bez tego skrypty dostałyby wzorzec dosłownie. Wzorzec bez dopasowań
+    zostaje bez zmian (jak w bash), a dopasowania spoza dozwolonych katalogów są pomijane.
+    """
+    import glob
+
+    roots = allowed_roots()
+    expanded = [argv[0]]
+    for token in argv[1:]:
+        if token.startswith("-") or "://" in token or not GLOB_CHARS.search(token):
+            expanded.append(token)
+            continue
+        matches = sorted(m for m in glob.glob(token) if within_allowed(Path(m), roots))
+        expanded.extend(matches or [token])
+    return expanded
+
+
 def run(argv: list[str], role: str = "orchestrator") -> int:
+    argv = expand_globs(argv)
     name = normalized(argv)
     if name[0] == "help":
         return show_help(role)

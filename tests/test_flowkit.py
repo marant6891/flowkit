@@ -62,7 +62,7 @@ class TestFlowKitContracts(unittest.TestCase):
         self.assertTrue(manifest_file.exists())
         manifest = json.loads(manifest_file.read_text(encoding="utf-8"))
 
-        self.assertEqual(len(manifest["agents"]), 9)
+        self.assertEqual(len(manifest["agents"]), 10)
         for a in manifest["agents"]:
             self.assertTrue(a.startswith("./agents/adapters/claude-code/"), a)
             self.assertTrue((ROOT / a).exists(), f"Agent path must exist: {a}")
@@ -151,10 +151,10 @@ class TestFlowKitContracts(unittest.TestCase):
         self.assertTrue(grade_eval.grade(case, "ANALYZER: auth — clean"))
 
     def test_docx_engine_reference_exists(self):
-        ref1 = ROOT / "skills" / "client-pt-prd-writer" / "references" / "docx-engine.md"
-        ref2 = ROOT / "skills" / "client-meeting-recap" / "references" / "docx-engine.md"
-        self.assertTrue(ref1.exists(), "docx-engine.md must exist in client-pt-prd-writer")
-        self.assertTrue(ref2.exists(), "docx-engine.md must exist in client-meeting-recap")
+        ref1 = ROOT / "skills" / "flowkit-client-pt-prd-writer" / "references" / "docx-engine.md"
+        ref2 = ROOT / "skills" / "flowkit-client-meeting-recap" / "references" / "docx-engine.md"
+        self.assertTrue(ref1.exists(), "docx-engine.md must exist in flowkit-client-pt-prd-writer")
+        self.assertTrue(ref2.exists(), "docx-engine.md must exist in flowkit-client-meeting-recap")
         content = ref1.read_text(encoding="utf-8")
         self.assertIn("python-docx", content)
 

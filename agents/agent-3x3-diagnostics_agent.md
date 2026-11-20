@@ -33,4 +33,4 @@ Options: <mitigations for a human decision, marked REQUIRES APPROVAL, or "none">
 Next: <one concrete read-only step>
 ```
 
-When asked for a runbook, use the `runbook-template.md` procedure.
+When asked for a runbook, use the `runbook-template.md` procedure. When the Orchestrator passes a `HANDOFF:` block, fill Symptoms, Evidence, Impact, Hypotheses and Cause, or After change on a re-check. Report each check as `PASS`, `FAIL`, `NOT_RUN`, `UNKNOWN` or `BLOCKED`; no access to an environment is `NOT_RUN`.

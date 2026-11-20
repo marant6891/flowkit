@@ -1,8 +1,8 @@
 {
   "name": "flowkit",
   "displayName": "FlowKit - Analyst & DevOps Skills",
-  "version": "1.7.0",
-  "description": "Kolekcja profesjonalnych umiejętności (Agent Skills) i agentów dla analityków biznesowo-systemowych i inżynierów DevOps zgodna ze standardami Anthropic, Atlassian, Google SRE i PagerDuty. Zero halucynacji, ścisłe śledzenie źródeł.",
+  "version": "1.8.0",
+  "description": "Skille i agenci AI dla analityków biznesowo-systemowych i inżynierów DevOps: dokumenty PT/PRD w szablonie klienta, podsumowania spotkań, postmortemy, przeglądy SRE, bezpieczny SQL i walidacja konfiguracji. Treść tylko ze źródeł, praca lokalna przez kontrolowany executor.",
   "author": {
     "name": "Mariusz Antosiewicz",
     "url": "https://github.com/marant6891"
@@ -36,15 +36,16 @@
     "./agents/adapters/claude-code/agent-3x3-devops.md",
     "./agents/adapters/claude-code/agent-3x3-pm.md",
     "./agents/adapters/claude-code/agent-3x3-diagnostics.md",
-    "./agents/adapters/claude-code/agent-3x3-analyst.md"
+    "./agents/adapters/claude-code/agent-3x3-analyst.md",
+    "./agents/adapters/claude-code/agent-3x3-validator.md"
   ],
   "metadata": {
     "suggestedPrompts": [
-      "Napisz projekt techniczny (PT) z kryteriami Given-When-Then i Definition of Done",
-      "Przygotuj podsumowanie e-mail dla klienta z Wewnętrznym Radarem Ryzyk z transkrypcji VTT",
-      "Przygotuj raport postmortem SRE (SEV-1/SEV-2) z osią czasu, łańcuchem przyczyn i zadaniami ACT",
-      "PLAN: przeanalizuj i zaplanuj implementację nowej funkcjonalności",
-      "DEVOPS: przygotuj pipeline CI/CD dla tego projektu"
+      "Przygotuj dokument PT na podstawie materiałów z folderu w szablonie klienta",
+      "Podsumuj spotkanie z pliku VTT i przygotuj mail do klienta",
+      "Przygotuj raport postmortem z logów incydentu",
+      "Zrób przegląd SRE usługi na podstawie manifestów i reguł alertów",
+      "DEVOPS: przygotuj pipeline CI/CD i zwaliduj go"
     ]
   }
 }

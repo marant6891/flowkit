@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parent.parent
 AGENTS = (
     "agent-3x3", "agent-3x3-analyzer", "agent-3x3-verifier", "agent-3x3-planner",
     "agent-3x3-implementer", "agent-3x3-devops", "agent-3x3-pm", "agent-3x3-diagnostics", "agent-3x3-analyst",
+    "agent-3x3-validator",
 )
 
 # Listy narzędzi są jawne: agenci działają lokalnie, bez narzędzi webowych i bez MCP.
@@ -29,6 +30,7 @@ CLAUDE_TOOLS = {
     "agent-3x3-pm": ["Read", "Grep", "Glob"],
     "agent-3x3-diagnostics": ["Read", "Grep", "Glob", "Bash"],
     "agent-3x3-analyst": ["Read", "Grep", "Glob", "Edit", "Write", "Bash", "Skill"],
+    "agent-3x3-validator": ["Read", "Grep", "Glob", "Bash"],
 }
 
 # Orkiestrator dziedziczy model sesji; subagenci mają jawny model i limit kroków.
@@ -41,6 +43,7 @@ CLAUDE_LIMITS = {
     "agent-3x3-pm": ("sonnet", 10),
     "agent-3x3-diagnostics": ("sonnet", 15),
     "agent-3x3-analyst": ("sonnet", 40),
+    "agent-3x3-validator": ("sonnet", 15),
 }
 
 EXEC_ROLES = {
@@ -50,9 +53,10 @@ EXEC_ROLES = {
     "agent-3x3-implementer": "implementer",
     "agent-3x3-diagnostics": "diagnostics",
     "agent-3x3-analyst": "analyst",
+    "agent-3x3-validator": "validator",
 }
 
-GUARD_HOOK = {"PreToolUse": [{"matcher": "Bash", "hooks": [{
+GUARD_HOOK = {"PreToolUse": [{"matcher": "Bash|Edit|Write|MultiEdit|NotebookEdit", "hooks": [{
     "type": "command",
     "command": 'python "$HOME/.claude/flowkit/runtime/guard_bash.py"',
     "onFailure": "block",
@@ -69,7 +73,7 @@ Instructions below use neutral names: `read` = `Read` · `search` = `Grep`, `Glo
 EXEC_NOTE = """
 ## Local command execution
 
-Run every command only through the local executor: `python "<runtime>/flowkit_exec.py" --role ROLE -- <command> [args]`. Do not use pipes, redirects or command chaining. `<runtime>` is RUNTIME. Rejected commands are outside this agent's role: report them instead of working around the rule. List of allowed commands: `help`. Documents: `read-document <file> [--outline] [--lines FROM-TO]`; Word output (roles with document writing): `md-to-docx <input.md> <output.docx> [--template <file> | --reference-doc <file>]`.
+Run every command only through the local executor: `python "<runtime>/flowkit_exec.py" --role ROLE -- <command> [args]`. Do not use pipes, redirects or command chaining. `<runtime>` is RUNTIME. Rejected commands are outside this agent's role: report them instead of working around the rule. List of allowed commands: `help`. Commands the user explicitly allowed in their allow file (shown by `help`) are permitted for this agent: run them yourself through the executor instead of asking the user to run them. When a command is rejected and the user wants it run, tell them the exact line to add to the allow file; never edit that file yourself. Paths must stay inside the workspace (the folder the agent was started in); for materials elsewhere, ask the user to copy them into the project or add the folder to the `FLOWKIT_EXTRA_PATHS` environment variable. Documents: `read-document <file> [--outline] [--lines FROM-TO]`; Word output (roles with document writing): `md-to-docx <input.md> <output.docx> [--template <file> | --reference-doc <file>]`.
 """
 
 CLAUDE_RUNTIME = "`${CLAUDE_PLUGIN_ROOT}/runtime` in a plugin install, otherwise `~/.claude/flowkit/runtime`"

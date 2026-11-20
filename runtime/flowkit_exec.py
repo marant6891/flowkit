@@ -10,6 +10,7 @@ Kody wyjścia: kod polecenia, 2 = polecenie odrzucone, 3 = brak wymaganej biblio
 from __future__ import annotations
 
 import importlib.util
+import os
 import re
 import shutil
 import subprocess
@@ -41,37 +42,50 @@ DIAGNOSTICS = (
     "kubectl explain", "kubectl events", "kubectl apply --dry-run=client", "helm list", "helm status", "helm history",
     "helm lint", "docker ps", "docker logs", "docker images", "docker version", "docker stats --no-stream",
     "terraform validate", "terraform version", "terraform fmt -check", "hadolint", "yamllint", "actionlint",
-    "shellcheck", "tflint", "kubeconform", "systemctl status", "journalctl", "df", "free", "uptime",
+    "shellcheck", "tflint", "kubeconform", "docker compose config -q", "docker compose config --quiet",
+    "systemctl status", "journalctl", "df", "free", "uptime",
+)
+# Walidacja statyczna plików konfiguracyjnych: bez dostępu do klastra, chmury i rejestrów obrazów.
+VALIDATION = (
+    "terraform fmt -check", "terraform validate", "tflint", "hadolint", "docker compose config -q",
+    "docker compose config --quiet", "helm lint", "helm template", "yamllint", "actionlint", "shellcheck",
+    "kubeconform", "check-json",
 )
 DELIVERY = ("git switch -c", "git add", "git commit -m", "git push -u origin", "gh pr create")
 HELP = ("help",)
 DOCUMENTS = ("read-document", "detect-docx-libs")
 DOCUMENT_WRITE = ("md-to-docx",)
+STATUS_FOOTER = "[kod wyjścia: {code}]"
 BUILTINS = {
     "help": "help — lista poleceń dozwolonych dla roli",
     "read-document": "read-document <plik> [--outline] [--lines OD-DO] — odczyt .docx/.dotx/.xlsx/.pdf/.md/.txt",
     "detect-docx-libs": "detect-docx-libs — biblioteki i narzędzia do pracy z DOCX i diagramami",
+    "check-json": "check-json <plik.json> [...] — sprawdza poprawność składni JSON (PASS/FAIL dla każdego pliku)",
     "md-to-docx": "md-to-docx <wejście.md> <wynik.docx> [--reference-doc szablon] [--template szablon] "
-                  "[--engine auto|pandoc|python-docx] [--set POLE=WARTOŚĆ] [--keep-images] — zapis DOCX z Markdown, diagramy mermaid/SVG jako PNG",
+                  "[--engine auto|pandoc|python-docx] [--set POLE=WARTOŚĆ] [--keep-images] [--pdf] — zapis DOCX z Markdown, "
+                  "diagramy mermaid/SVG jako PNG, kontrola wyniku i opcjonalny podgląd PDF",
 }
 
 ROLE_COMMANDS = {
-    "orchestrator": HELP + GIT_READ + SEARCH + DELIVERY + DOCUMENTS + DOCUMENT_WRITE,
+    # Orkiestrator uruchamia testy i kontrole statyczne w ścieżce szybkiej („make the change, run its check”).
+    "orchestrator": HELP + GIT_READ + SEARCH + STATIC + TESTS + DELIVERY + DOCUMENTS + DOCUMENT_WRITE,
     "analyzer": HELP + GIT_READ + SEARCH + STATIC,
     "verifier": HELP + GIT_READ + SEARCH + STATIC + TESTS,
     "implementer": HELP + STATIC + TESTS + DOCUMENTS + DOCUMENT_WRITE,
     "diagnostics": HELP + GIT_READ + SEARCH + DIAGNOSTICS + DOCUMENTS,
     "analyst": HELP + GIT_READ + SEARCH + DOCUMENTS + DOCUMENT_WRITE,
+    "validator": HELP + GIT_READ + SEARCH + VALIDATION,
 }
 SKILL_SCRIPT_ROLES = {"orchestrator", "analyst"}
 SKILL_SCRIPTS = {
-    "client-pt-prd-writer": {"generate_diagram.py", "export_diagram.py", "validate_diagram.py", "insert_diagrams.py",
+    "flowkit-client-pt-prd-writer": {"generate_diagram.py", "export_diagram.py", "validate_diagram.py", "insert_diagrams.py",
                              "check_status_labels.py"},
-    "sql-data-assistant": {"check_sql.py"},
+    "flowkit-sql-data-assistant": {"check_sql.py"},
 }
 
 FORBIDDEN_FLAGS = {"--fix", "--write", "--output-file", "-exec", "-execdir", "-ok", "-okdir", "-delete", "-fprint", "-fprintf",
-                   "-fls", "--pre", "--token", "--as", "--as-group", "--password"}
+                   "-fls", "--pre", "--token", "--as", "--as-group", "--password", "--dependency-update",
+                   "--kube-context", "--kubeconfig"}
 SENSITIVE_PATH = re.compile(
     r"(^|[\\/])(\.env(\.(?!example$)[^\\/]+)?|id_rsa|id_ed25519|credentials(\.[^\\/]+)?|secrets?\.[^\\/]+"
     r"|[^\\/]+\.(pem|key|pfx|p12))$", re.IGNORECASE)
@@ -124,6 +138,135 @@ def delivery_problem(argv: list[str]) -> str | None:
     return None
 
 
+# --- Granica katalogu roboczego ------------------------------------------------
+# Agent widzi tylko katalog, w którym go uruchomiono, i katalogi dopisane przez użytkownika w zmiennej
+# FLOWKIT_EXTRA_PATHS (lista rozdzielona ';' w Windows lub ':' w Linux/macOS). Hook odrzuca przypisania
+# zmiennych w poleceniu agenta, więc listę zmienia tylko użytkownik.
+EXTRA_PATHS_ENV = "FLOWKIT_EXTRA_PATHS"
+
+
+def allowed_roots() -> list[Path]:
+    roots = [Path.cwd().resolve()]
+    for item in os.environ.get(EXTRA_PATHS_ENV, "").split(os.pathsep):
+        if item.strip():
+            roots.append(Path(item.strip()).expanduser().resolve())
+    return roots
+
+
+def within_allowed(path: Path, roots: list[Path] | None = None) -> bool:
+    """Ścieżka po rozwinięciu `..`, `~` i dowiązań symbolicznych musi leżeć w dozwolonym katalogu."""
+    try:
+        target = path.expanduser().resolve()
+    except (OSError, RuntimeError, ValueError):
+        return False
+    return any(target == root or root in target.parents for root in roots or allowed_roots())
+
+
+def path_candidates(argv: list[str], skip: set[int]) -> list[str]:
+    """Argumenty, które wyglądają na ścieżki: separator, `.`/`~` na początku, litera dysku albo istniejący plik."""
+    found = []
+    for index, token in enumerate(argv[1:], 1):
+        if index in skip or "://" in token:
+            continue
+        value = token.split("=", 1)[1] if token.startswith("-") and "=" in token else token
+        if value.startswith("-") or not value:
+            continue
+        drive = re.match(r"^[A-Za-z]:[\\/]", value)
+        if ":" in value and not drive:
+            continue  # rewizje git (HEAD:plik), typy kubectl, pola klucz:wartość
+        if drive or "/" in value or "\\" in value or value.startswith((".", "~")) or Path(value).exists():
+            found.append(value)
+    return found
+
+
+def path_problem(argv: list[str], skip: set[int]) -> str | None:
+    roots = allowed_roots()
+    for value in path_candidates(argv, skip):
+        if not within_allowed(Path(value), roots):
+            return (f"ścieżka poza katalogiem roboczym: {value}. Skopiuj plik do projektu albo poproś użytkownika "
+                    f"o dopisanie katalogu do zmiennej {EXTRA_PATHS_ENV}")
+    return None
+
+
+# --- Zgody użytkownika ------------------------------------------------------------
+# Polecenia spoza listy roli, które użytkownik świadomie pozwolił wykonywać. Plik leży poza projektem
+# (domyślnie ~/.flowkit/allow.json, inna ścieżka: zmienna FLOWKIT_ALLOW_FILE), a hook blokuje jego edycję
+# przez agentów. Zgoda nie wyłącza twardych zabezpieczeń: powłok, wrażliwych plików, granicy katalogu
+# roboczego, odczytu obiektów Secret ani ochrony gałęzi głównej.
+ALLOW_FILE_ENV = "FLOWKIT_ALLOW_FILE"
+INLINE_CODE = {("python", "-c"), ("python3", "-c"), ("py", "-c"), ("node", "-e"), ("node", "--eval"), ("node", "-p"),
+               ("perl", "-e"), ("ruby", "-e"), ("php", "-r"), ("deno", "eval"), ("bun", "-e")}
+INTERPRETERS = {"python", "python3", "py", "node", "perl", "ruby", "php", "deno", "bun", "java", "npx"}
+
+
+def allow_file() -> Path:
+    configured = os.environ.get(ALLOW_FILE_ENV, "").strip()
+    return Path(configured).expanduser() if configured else Path.home() / ".flowkit" / "allow.json"
+
+
+def allow_entry_problem(entry: str) -> str | None:
+    words = normalized(entry.split())
+    if not words:
+        return "pusty wpis"
+    if words[0] in SHELLS_AND_RUNNERS:
+        return f"{words[0]} uruchamia dowolne polecenia"
+    if words[0] in INTERPRETERS and len(words) < 2:
+        return f"sam {words[0]} pozwoliłby uruchomić dowolny kod; podaj skrypt lub moduł"
+    if tuple(words[:2]) in INLINE_CODE:
+        return "kod podany w wierszu poleceń jest niedozwolony"
+    if any(ch in entry for ch in ";&|<>`$\n"):
+        return "znaki powłoki są niedozwolone"
+    return None
+
+
+def user_allowed(role: str) -> tuple[list[str], list[str]]:
+    """Zwraca (dozwolone prefiksy dla roli, odrzucone wpisy z powodem). Błędny plik = brak zgód."""
+    import json
+
+    path = allow_file()
+    try:
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
+    except FileNotFoundError:
+        return [], []
+    except (OSError, ValueError) as error:
+        return [], [f"{path}: {error}"]
+    commands = data.get("commands") if isinstance(data, dict) else None
+    if not isinstance(commands, dict):
+        return [], [f"{path}: brak obiektu \"commands\""]
+    allowed, ignored = [], []
+    for key in ("*", role):
+        entries = commands.get(key) or []
+        for entry in entries if isinstance(entries, list) else []:
+            problem = allow_entry_problem(str(entry))
+            if problem:
+                ignored.append(f"{entry}: {problem}")
+            else:
+                allowed.append(" ".join(normalized(str(entry).split())))
+    return allowed, ignored
+
+
+def allow_hint(role: str, argv: list[str]) -> str:
+    prefix = " ".join(argv[:2]) if len(argv) > 1 and not argv[1].startswith("-") else argv[0]
+    if allow_entry_problem(prefix):
+        return ""
+    return (f" Jeśli chcesz, aby agent wykonywał to polecenie, dopisz \"{prefix}\" do listy \"{role}\" "
+            f"w pliku zgód {allow_file()}")
+
+
+DOCX_TOOLS = ("pandoc", "pypandoc", "mmdc", "rsvg-convert")
+
+
+def rejection_hint(role: str, argv: list[str]) -> str:
+    """Podpowiedź dopasowana do odrzuconego polecenia."""
+    joined = " ".join(argv).lower()
+    if "md-to-docx" in ROLE_COMMANDS[role] and (argv[0] in DOCX_TOOLS or "docx" in joined or "pandoc" in joined):
+        return " (zapis DOCX: md-to-docx <wejście.md> <wynik.docx> [--template szablon])"
+    others = [r for r, prefixes in ROLE_COMMANDS.items() if r != role and any(matches(argv, p) for p in prefixes)]
+    if others:
+        return f" (polecenie należy do ról: {', '.join(others)} — przekaż krok właściwemu agentowi)"
+    return ""
+
+
 def check(role: str, raw_argv: list[str]) -> str | None:
     """Zwraca powód odrzucenia albo None, gdy polecenie jest dozwolone."""
     if role not in ROLE_COMMANDS:
@@ -138,17 +281,22 @@ def check(role: str, raw_argv: list[str]) -> str | None:
             return f"zabroniona opcja: {token}"
         if SENSITIVE_PATH.search(token):
             return f"dostęp do pliku wrażliwego jest zabroniony: {token}"
-    if role in SKILL_SCRIPT_ROLES and is_skill_script(argv):
+    skill_script = role in SKILL_SCRIPT_ROLES and is_skill_script(argv)
+    problem = path_problem(argv, {1} if skill_script else set())
+    if problem:
+        return problem
+    if skill_script:
         return None
+    user_rule = None
     if not any(matches(argv, prefix) for prefix in ROLE_COMMANDS[role]):
-        hint = ""
-        if argv[0] in ("pandoc", "pypandoc", "mmdc", "npx", "rsvg-convert", *PYTHON_NAMES) and "md-to-docx" in ROLE_COMMANDS[role]:
-            hint = " (zapis DOCX: md-to-docx <wejście.md> <wynik.docx> [--reference-doc szablon])"
-        return f"polecenie niedozwolone dla roli {role}: {' '.join(argv[:3])}{hint}"
+        user_rule = next((p for p in user_allowed(role)[0] if matches(argv, p)), None)
+        if user_rule is None:
+            return (f"polecenie niedozwolone dla roli {role}: {' '.join(argv[:3])}{rejection_hint(role, argv)}."
+                    f"{allow_hint(role, argv)}")
     if argv[0] == "kubectl":
         if any("secret" in token.lower() for token in argv[1:]):
             return "odczyt obiektów Secret jest zabroniony"
-        if argv[1] == "apply" and sum(t.startswith("--dry-run") for t in argv) != 1:
+        if user_rule is None and len(argv) > 1 and argv[1] == "apply" and sum(t.startswith("--dry-run") for t in argv) != 1:
             return "kubectl apply wymaga dokładnie jednej opcji --dry-run=client"
     if argv[0] == "git" and any(t.startswith(("--output", "--ext-diff", "--exec")) for t in argv):
         return "opcja git zapisująca plik lub uruchamiająca program jest zabroniona"
@@ -286,9 +434,29 @@ def document_lines(path: Path) -> list[str]:
         return excel_lines(path)
     if suffix == ".pdf":
         return pdf_lines(path)
-    if suffix in TEXT_SUFFIXES:
-        return path.read_text(encoding="utf-8", errors="replace").splitlines()
-    raise ValueError(f"nieobsługiwany format: {suffix}")
+    if suffix in TEXT_SUFFIXES or is_text_file(path):
+        return read_text_lines(path)
+    raise ValueError(f"nieobsługiwany format: {suffix or 'brak rozszerzenia'} (plik binarny; obsługiwane: "
+                     ".docx, .dotx, .xlsx, .xlsm, .pdf i pliki tekstowe, w tym kod źródłowy)")
+
+
+def is_text_file(path: Path) -> bool:
+    """Kod źródłowy i inne pliki tekstowe rozpoznawane po treści: brak bajtów zerowych w początku pliku."""
+    with path.open("rb") as handle:
+        head = handle.read(8192)
+    if head.startswith((b"\xff\xfe", b"\xfe\xff")):
+        return True  # UTF-16 z BOM (np. pliki z Visual Studio)
+    return b"\0" not in head
+
+
+def read_text_lines(path: Path) -> list[str]:
+    data = path.read_bytes()
+    if data.startswith((b"\xff\xfe", b"\xfe\xff")):
+        return data.decode("utf-16", errors="replace").splitlines()
+    try:
+        return data.decode("utf-8-sig").splitlines()
+    except UnicodeDecodeError:
+        return data.decode("cp1250", errors="replace").splitlines()  # starsze polskie pliki Windows
 
 
 def read_document(args: list[str]) -> int:
@@ -336,6 +504,28 @@ def detect_docx_libs() -> int:
     return 0
 
 
+def check_json(paths: list[str]) -> int:
+    """check-json: składnia plików JSON, bez wykonywania ich treści."""
+    import json
+
+    if not paths:
+        print("Użycie: check-json <plik.json> [...]")
+        return 2
+    failed = 0
+    for name in paths:
+        path = Path(name)
+        try:
+            if path.stat().st_size > MAX_DOCUMENT_BYTES:
+                raise ValueError("plik jest zbyt duży")
+            json.loads(path.read_text(encoding="utf-8-sig"))
+            print(f"PASS {name}")
+        except (OSError, ValueError, UnicodeDecodeError) as error:
+            failed += 1
+            print(f"FAIL {name}: {redact(str(error))[:MAX_LINE_CHARS]}")
+    print(STATUS_FOOTER.format(code=1 if failed else 0))
+    return 1 if failed else 0
+
+
 def show_help(role: str) -> int:
     print(f"Rola: {role}. Uruchamiaj: flowkit_exec.py --role {role} -- <polecenie> [argumenty]")
     print("Polecenia wbudowane:")
@@ -347,6 +537,11 @@ def show_help(role: str) -> int:
     if role in SKILL_SCRIPT_ROLES:
         for skill, scripts in sorted(SKILL_SCRIPTS.items()):
             print(f"  python <katalog skilla>/{skill}/scripts/<{'|'.join(sorted(scripts))}>")
+    allowed, ignored = user_allowed(role)
+    print(f"Zgody użytkownika ({allow_file()}):")
+    print("  " + (" · ".join(allowed) if allowed else "brak") + " — te polecenia wykonuj sam, nie odsyłaj ich do czatu")
+    for item in ignored:
+        print(f"  pominięto: {item}")
     print("Bez powłoki, potoków, przekierowań i łączenia poleceń. Odrzucone polecenie zgłoś użytkownikowi.")
     return 0
 
@@ -372,19 +567,23 @@ def run(argv: list[str], role: str = "orchestrator") -> int:
         return read_document(argv[1:])
     if name[0] == "detect-docx-libs":
         return detect_docx_libs()
+    if name[0] == "check-json":
+        return check_json(argv[1:])
     argv = with_limits(argv)
     executable = sys.executable if name[0] in PYTHON_NAMES else shutil.which(argv[0])
     if executable is None:
-        print(f"BRAK NARZĘDZIA: {argv[0]}")
+        print(f"BRAK NARZĘDZIA: {argv[0]} (status: NOT_RUN)")
         return 127
-    timeout = TEST_TIMEOUT if any(matches(name, prefix) for prefix in TESTS) else DEFAULT_TIMEOUT
+    long_running = TESTS + tuple(user_allowed(role)[0])  # testy i zgody użytkownika (np. budowanie)
+    timeout = TEST_TIMEOUT if any(matches(name, prefix) for prefix in long_running) else DEFAULT_TIMEOUT
     try:
         result = subprocess.run([executable, *argv[1:]], stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                 stdin=subprocess.DEVNULL, timeout=timeout, check=False)
     except subprocess.TimeoutExpired:
-        print(f"PRZEKROCZONO CZAS: {timeout} s")
+        print(f"PRZEKROCZONO CZAS: {timeout} s (status: UNKNOWN)")
         return 124
     print(limit_output(redact(result.stdout.decode("utf-8", "replace"))))
+    print(STATUS_FOOTER.format(code=result.returncode))
     return result.returncode
 
 

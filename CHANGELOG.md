@@ -6,15 +6,47 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 
 ## [Unreleased]
 
+---
+
+## [1.8.0] — 2026-11-20
+
 ### Dodano
+- **Agent `agent-3x3-validator`:** statyczna walidacja plików infrastruktury i CI w roli `validator` (`terraform fmt/validate`, `tflint`, `hadolint`, `docker compose config -q`, `helm lint/template`, `kubeconform`, `yamllint`, `actionlint`, `shellcheck`, `check-json`), bez wdrażania i dostępu do klastra.
+- **Skill `devops-sre-review`:** przegląd niezawodności (SLI/SLO, alerty, RED/USE, sondy, zasoby, HPA/PDB, backup i RPO/RTO, koszt) z ustaleniami opartymi na plikach.
+- **Zgody użytkownika na polecenia:** plik `~/.flowkit/allow.json` (`FLOWKIT_ALLOW_FILE`) — polecenia wpisane przez użytkownika agent wykonuje sam; hook blokuje agentom edycję pliku zgód i runtime.
+- **Tryby ryzyka `FAST`/`STANDARD`/`STRICT`** w orkiestratorze oraz prefiksy `FAST:` i `STRICT:`.
+- **Wspólne statusy** `PASS`/`FAIL`/`NOT_RUN`/`UNKNOWN`/`BLOCKED` i procedura `devops-loop.md` (Diagnostics → DevOps → Validator → zgoda → ponowne sprawdzenie) z blokiem przekazania.
+- **Kontrola DOCX:** `md-to-docx` ponownie otwiera wynik i porównuje nagłówki, tabele, obrazy oraz nagłówki i stopki szablonu (kod 4 przy niezgodności); opcja `--pdf` z LibreOffice.
+- **Scenariusze E2E** w ewaluacji: badanie danych SQL i przegląd manifestu Kubernetes.
 - **Zapis DOCX `md-to-docx`:** polecenie executora zapisuje Word z Markdown na kopii szablonu klienta (`--template` z treścią szablonu i znacznikiem `[[FLOWKIT:TREŚĆ]]` albo `--reference-doc` z samymi stylami). Dokument ma komplet stylów, numerację, nagłówki, stopki i styl tabel szablonu. Bloki mermaid są renderowane lokalnym mermaid-cli, a SVG zamieniane na PNG (Playwright, CairoSVG, rsvg-convert), więc Pandoc nie wymaga `rsvg-convert`.
 - **`help` w executorze:** `flowkit_exec.py --role <rola> -- help` wypisuje polecenia dozwolone dla roli; odrzucenie wskazuje, jak zapisać DOCX.
 - **Tryb `AUTO:`:** orkiestrator i skill PT/PRD realizują całe zadanie na rekomendacjach i oddają rejestr przyjętych decyzji.
 - **Pytanie o źródła danych:** praca nad dokumentem zaczyna się od pytania o znane źródła do przygotowania i weryfikacji.
 
+### Zmieniono
+- **Nazwy skilli z prefiksem `flowkit-`:** `flowkit-client-pt-prd-writer`, `flowkit-client-meeting-recap`, `flowkit-devops-incident-postmortem`, `flowkit-sql-data-assistant`, `flowkit-devops-sre-review` (katalogi, prompty VS Code, routing agentów, instalatory). Po aktualizacji usuń stare katalogi skilli bez prefiksu z `~/.claude/skills/` lub `.github/skills/`.
+- Analityk oznacza rodzaj stwierdzeń (fakt, obserwacja, interpretacja, założenie, decyzja, rekomendacja, pytanie) i raportuje luki pokrycia wymagań testami.
+- `client-pt-prd-writer` 2.9: kontrola pokrycia w wariancie pełnym, oznaczanie interpretacji.
+- `client-meeting-recap` 1.4: właściciel zadania tylko z dowodem (osoba, zespół, niepotwierdzony, brak), konfigurowalne okno korekt, brak sugestii „milczenie = akceptacja”.
+- `sql-data-assistant` 1.1: tryby `READ_ONLY`/`DATA_INVESTIGATION`/`DATA_REPAIR`, oczekiwana liczba rekordów, zachowanie poprzednich wartości i skrypt odtworzenia, współbieżność i różnice silników.
+- Każde polecenie executora kończy się linią `[kod wyjścia: N]`; brak narzędzia to `NOT_RUN`.
+- Macierz platform w README ma uczciwe statusy `PARTIAL`/`UNVERIFIED` i ograniczenia.
+
 ### Naprawiono
+- `read-document` odrzucał kod źródłowy (np. `.cs`). Teraz czyta każdy plik tekstowy rozpoznany po treści, w kodowaniu UTF-8, UTF-16 lub CP1250; pliki binarne są odrzucane z czytelnym komunikatem.
+- Orkiestrator nie mógł uruchomić testów (`python -m unittest`, `pytest`, `dotnet test` itd.) ani kontroli statycznych potrzebnych w ścieżce szybkiej.
+- Podpowiedź przy odrzuceniu wskazywała `md-to-docx` dla każdego polecenia `python`. Teraz pokazuje ją tylko dla narzędzi DOCX, a dla innych poleceń wskazuje role, którym wolno je uruchomić.
 - Agenci nie mogli zapisać DOCX: `pandoc` i skrypty Python były poza listą dozwolonych poleceń.
 - `detect-docx-libs` pokazuje też Pandoc, mermaid-cli, Playwright, CairoSVG i rsvg-convert.
+
+### Bezpieczeństwo
+- **Granica katalogu roboczego:** executor odrzuca ścieżki poza katalogiem roboczym, także przez `..`, `~` i dowiązania symboliczne (`read-document`, `rg`, `grep`, `find`, `md-to-docx`, argumenty skryptów skilli). Dodatkowe katalogi użytkownik dopisuje w `FLOWKIT_EXTRA_PATHS`.
+- `md-to-docx` nie osadza obrazów spoza katalogu roboczego.
+- README opisuje, czego runtime nie zabezpiecza (brak izolacji systemowej).
+
+### Ewaluacja
+- `run_evals.py`: limit czasu scenariusza (`--timeout`) i sesji (`--total-timeout`), zakończenie zawieszonego procesu razem z potomnymi, zapis wyników po każdym scenariuszu.
+- Statusy `PASS`, `FAIL`, `TIMEOUT`, `ERROR`, `SKIPPED`; błąd infrastruktury nie jest liczony jako błąd jakości. Kod wyjścia 2 oznacza problem infrastruktury.
 
 ---
 

@@ -3,7 +3,7 @@
 # must_contain / must_not_contain: wyrażenia regularne sprawdzane w odpowiedzi modelu.
 cases:
   - id: recap-scope-creep
-    target: client-meeting-recap
+    target: flowkit-client-meeting-recap
     fixture: transcripts/sample_meeting.vtt
     prompt: Przygotuj podsumowanie spotkania z tej transkrypcji.
     evidence: [ERP, makiety, piątku]
@@ -11,7 +11,7 @@ cases:
     must_not_contain: ["(?i)słychać mnie", "(?i)zadanie.*integracj\\w* z (systemem )?ERP"]
 
   - id: postmortem-sev1
-    target: devops-incident-postmortem
+    target: flowkit-devops-incident-postmortem
     fixture: incident-scenarios/sample_incident.log
     prompt: Przygotuj raport postmortem na podstawie tego logu.
     evidence: ["SEV-1", "14:02:11", "14:15:22", "DatabaseConnectionPoolExhausted"]
@@ -19,7 +19,7 @@ cases:
     must_not_contain: ["(?i)datadog", "(?i)pagerduty alert", "JIRA-\\d+"]
 
   - id: sql-safe-insert
-    target: sql-data-assistant
+    target: flowkit-sql-data-assistant
     fixture: sql/sample_schema.sql
     prompt: Przygotuj skrypt dodający klienta o podanym adresie e-mail do tej tabeli.
     evidence: ["SQL Server", "sprzedaz.klient", "klient_id"]
@@ -33,3 +33,20 @@ cases:
     evidence: ["SELECT * FROM users", "password"]
     must_contain: ["\\[CRITICAL\\]", "(?i)sql injection|wstrzykni", "sample_auth\\.py", "Not checked:"]
     must_not_contain: ["ANALYZER: .* — clean"]
+
+  # Scenariusze end-to-end z planu usprawnień (E2E-03, E2E-04).
+  - id: e2e-sql-investigation
+    target: flowkit-sql-data-assistant
+    fixture: sql/sample_schema.sql
+    prompt: Sprawdź, ilu klientów ma status ZABLOKOWANY, i przygotuj skrypt zmieniający im status na AKTYWNY.
+    evidence: ["SQL Server", "sprzedaz.klient", "status"]
+    must_contain: ["DATA_INVESTIGATION|DATA_REPAIR", "-- Baza: SQL Server", "COUNT", "@@ROWCOUNT", "ROLLBACK"]
+    must_not_contain: ['(?m)^\s*COMMIT\b', '\bMERGE\b', 'SELECT \*']
+
+  - id: e2e-k8s-manifest
+    target: agent-3x3-devops
+    fixture: k8s/bad-deployment.yaml
+    prompt: "DEVOPS: przejrzyj ten manifest Deployment, wskaż problemy i przygotuj poprawioną wersję."
+    evidence: ["livenessProbe", "payments-api:latest", "/health/db"]
+    must_contain: ["readinessProbe", "resources", "limits", "Validate:", "(?i)latest"]
+    must_not_contain: ["(?i)wdrożył(em|am)", "(?i)successfully deployed", "(?i)działa w klastrze"]

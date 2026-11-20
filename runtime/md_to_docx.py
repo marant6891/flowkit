@@ -10,13 +10,19 @@ Opcje:
                          Wymusza silnik python-docx.
   --engine auto|pandoc|python-docx   domyślnie auto: Pandoc, a gdy go brak – python-docx
   --keep-images          zachowaj wyrenderowane diagramy obok wyniku (<wynik>_diagrams/)
+  --set POLE=WARTOŚĆ     wypełnia pole szablonu (powtarzalne)
+  --pdf                  podgląd PDF przez LibreOffice (soffice); bez niego status NOT_RUN
+
+Po zapisie wynik jest ponownie otwierany i porównywany ze źródłem (nagłówki, tabele, obrazy,
+nagłówki i stopki stron szablonu).
 
 Bloki ```mermaid są renderowane do PNG lokalnym mermaid-cli (`mmdc` w PATH albo
 `npx --no -p @mermaid-js/mermaid-cli`, bez pobierania pakietów). Obrazy SVG są zamieniane
 na PNG: gotowy plik .png obok .svg → Playwright → CairoSVG → rsvg-convert. Obrazy z adresów
 http(s) nie są pobierane – zostaje tekst alternatywny.
 
-Kody wyjścia: 0 = sukces (ostrzeżenia na wyjściu), 1 = błąd danych, 3 = brak silnika DOCX.
+Kody wyjścia: 0 = sukces (ostrzeżenia na wyjściu), 1 = błąd danych, 3 = brak silnika DOCX,
+4 = dokument zapisany, ale kontrola struktury nie przeszła.
 """
 from __future__ import annotations
 
@@ -30,6 +36,9 @@ import sys
 import tempfile
 import zipfile
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from flowkit_exec import EXTRA_PATHS_ENV, allowed_roots, within_allowed  # noqa: E402
 
 CONTENT_MARKER = "[[FLOWKIT:TREŚĆ]]"
 MERMAID_BLOCK = re.compile(r"^```+\s*mermaid[^\n]*\n(.*?)^```+[ \t]*$", re.DOTALL | re.MULTILINE)
@@ -158,6 +167,7 @@ def svg_to_png(svg: Path, png: Path) -> str | None:
 
 def resolve_images(text: str, base_dir: Path, images_dir: Path, report: Report) -> str:
     converted: dict[Path, Path] = {}
+    roots = [*allowed_roots(), images_dir.resolve()]  # katalog roboczy, FLOWKIT_EXTRA_PATHS i wyrenderowane diagramy
 
     def replace(match: re.Match) -> str:
         alt, target, title = match.group(1), match.group(2), match.group(3) or ""
@@ -167,6 +177,9 @@ def resolve_images(text: str, base_dir: Path, images_dir: Path, report: Report) 
         path = Path(target)
         path = path if path.is_absolute() else (base_dir / path)
         path = path.resolve()
+        if not within_allowed(path, roots):
+            report.warn(f"obraz poza katalogiem roboczym nie jest osadzany: {target} (zmienna {EXTRA_PATHS_ENV})")
+            return alt or "[obraz]"
         if not path.exists():
             report.warn(f"brak pliku obrazu: {target}")
             return match.group(0)
@@ -544,6 +557,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--template", type=Path)
     parser.add_argument("--engine", choices=("auto", "pandoc", "python-docx"), default="auto")
     parser.add_argument("--keep-images", action="store_true")
+    parser.add_argument("--pdf", action="store_true", help="podgląd PDF przez LibreOffice, gdy jest dostępny")
     parser.add_argument("--set", action="append", default=[], metavar="POLE=WARTOŚĆ",
                         help="wypełnia pole szablonu, np. --set \"[TYTUŁ]=Analiza zmian\" (powtarzalne)")
     return parser.parse_args(argv)
@@ -605,6 +619,91 @@ def choose_engine(args: argparse.Namespace) -> tuple[str | None, str | None]:
     return None, None
 
 
+W_NS = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+HEADING_STYLE = re.compile(r"(?:heading|nag\w*?)\s*(\d)", re.I)
+
+
+def markdown_structure(text: str) -> dict[str, int]:
+    """Liczba nagłówków, tabel i obrazów w Markdown (poza blokami kodu)."""
+    counts = {"nagłówki": 0, "tabele": 0, "obrazy": 0}
+    lines, fenced = text.replace("\r\n", "\n").split("\n"), False
+    for i, line in enumerate(lines):
+        if line.strip().startswith("```"):
+            fenced = not fenced
+            continue
+        if fenced:
+            continue
+        if HEADING.match(line):
+            counts["nagłówki"] += 1
+        if "|" in line and i + 1 < len(lines) and TABLE_RULE.match(lines[i + 1]):
+            counts["tabele"] += 1
+        counts["obrazy"] += sum(1 for m in IMAGE.finditer(line) if not m.group(2).lower().endswith(".svg"))
+    return counts
+
+
+def docx_structure(path: Path) -> tuple[dict[str, int], int]:
+    """Liczba nagłówków, tabel i obrazów w DOCX oraz liczba części nagłówków i stopek stron."""
+    import xml.etree.ElementTree as ET
+
+    with zipfile.ZipFile(path) as archive:
+        body = ET.fromstring(archive.read("word/document.xml"))
+        parts = sum(1 for n in archive.namelist() if re.match(r"word/(header|footer)\d*\.xml$", n))
+    headings = 0
+    for paragraph in body.iter(f"{W_NS}p"):
+        style = paragraph.find(f"{W_NS}pPr/{W_NS}pStyle")
+        if style is not None and HEADING_STYLE.search(style.get(f"{W_NS}val", "")):
+            headings += 1
+    counts = {"nagłówki": headings, "tabele": sum(1 for _ in body.iter(f"{W_NS}tbl")),
+              "obrazy": sum(1 for _ in body.iter(f"{W_NS}drawing"))}
+    return counts, parts
+
+
+def verify_output(text: str, output: Path, template: Path | None, report: Report) -> bool:
+    """Ponowne otwarcie wyniku i porównanie struktury z Markdown oraz z szablonem (nagłówki i stopki stron)."""
+    try:
+        found, parts = docx_structure(output)
+    except Exception as error:  # uszkodzony plik wynikowy
+        report.warn(f"kontrola DOCX: nie można ponownie otworzyć wyniku: {error}")
+        return False
+    expected = markdown_structure(text)
+    base = {"nagłówki": 0, "tabele": 0, "obrazy": 0}
+    template_parts = 0
+    if template is not None:
+        base, template_parts = docx_structure(template)
+    ok = True
+    details = []
+    for key, value in expected.items():
+        # W trybie --template wynik zawiera też elementy szablonu; przy --reference-doc treść szablonu jest usuwana.
+        minimum = value + (base[key] if template is not None and key != "nagłówki" else 0)
+        status = "PASS" if found[key] >= minimum else "FAIL"
+        ok = ok and status == "PASS"
+        details.append(f"{key} {found[key]}/{minimum} {status}")
+    if template_parts and parts < template_parts:
+        ok = False
+        details.append(f"nagłówki/stopki stron {parts}/{template_parts} FAIL")
+    report.note(f"Kontrola DOCX: {'; '.join(details)} — {'PASS' if ok else 'FAIL'}")
+    return ok
+
+
+def export_pdf(output: Path, report: Report) -> None:
+    office = shutil.which("soffice") or shutil.which("libreoffice")
+    if office is None:
+        report.note("Podgląd PDF: NOT_RUN (brak LibreOffice: soffice). Sprawdź dokument wizualnie w Word.")
+        return
+    try:
+        result = subprocess.run([office, "--headless", "--convert-to", "pdf", "--outdir", str(output.parent), str(output)],
+                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
+                                timeout=RENDER_TIMEOUT, check=False)
+    except subprocess.TimeoutExpired:
+        report.warn("podgląd PDF: przekroczono czas (UNKNOWN)")
+        return
+    pdf = output.with_suffix(".pdf")
+    if result.returncode == 0 and pdf.exists():
+        report.note(f"Podgląd PDF: PASS — {pdf}")
+    else:
+        report.warn(f"podgląd PDF: FAIL — {result.stdout.decode('utf-8', 'replace').strip()[-300:]}")
+
+
 def main(argv: list[str]) -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -641,12 +740,18 @@ def main(argv: list[str]) -> int:
             keep = output.with_name(output.stem + "_diagrams")
             shutil.copytree(images_dir, keep, dirs_exist_ok=True, ignore=shutil.ignore_patterns("*.mmd"))
             report.note(f"Diagramy zachowane w: {keep}")
+        verified = verify_output(text, output, template, report)
+        if args.pdf:
+            export_pdf(output, report)
     except Exception as error:  # każdy błąd konwersji kończy się czytelnym komunikatem, bez śladu stosu
         print(f"BŁĄD: {error}")
         return 1
     finally:
         shutil.rmtree(work_dir, ignore_errors=True)
     print(f"ZAPISANO: {output} (ostrzeżeń: {len(report.warnings)})")
+    if not verified:
+        print("KONTROLA: FAIL — dokument zapisany, ale jego struktura nie zgadza się ze źródłem; sprawdź go przed oddaniem.")
+        return 4
     return 0
 
 

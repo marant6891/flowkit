@@ -1,4 +1,4 @@
-"""Testy skilla sql-data-assistant i automatycznego doboru działania orkiestratora.
+"""Testy skilla flowkit-sql-data-assistant i automatycznego doboru działania orkiestratora.
 Uruchom: python -m unittest tests/test_sql.py
 """
 import re
@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SKILL = ROOT / "skills" / "sql-data-assistant"
+SKILL = ROOT / "skills" / "flowkit-sql-data-assistant"
 sys.path.insert(0, str(SKILL / "scripts"))
 sys.path.insert(0, str(ROOT / "runtime"))
 
@@ -92,7 +92,7 @@ class TestSafetyChecker(unittest.TestCase):
 class TestSqlIntegration(unittest.TestCase):
 
     def test_agents_can_check_but_never_connect_to_database(self):
-        script = "C:/x/sql-data-assistant/scripts/check_sql.py"
+        script = "C:/x/flowkit-sql-data-assistant/scripts/check_sql.py"
         self.assertIsNone(fx.check("orchestrator", ["python", script, "a.sql"]))
         self.assertIsNone(fx.check("analyst", ["python", script, "a.sql"]))
         self.assertIsNotNone(fx.check("verifier", ["python", script, "a.sql"]))
@@ -104,14 +104,14 @@ class TestSqlIntegration(unittest.TestCase):
         source = (ROOT / "agents" / "agent-3x3_agent.md").read_text(encoding="utf-8")
         self.assertIn("## Automatic routing", source)
         self.assertIn("Prefixes are optional", source)
-        for target in ("`sql-data-assistant`", "Analyzer", "Diagnostics", "Analyst", "Planner"):
+        for target in ("`flowkit-sql-data-assistant`", "Analyzer", "Diagnostics", "Analyst", "Planner"):
             self.assertIn(target, source)
         self.assertNotIn("Unknown profile → ask before starting", source)
 
     def test_skill_is_available_on_all_channels(self):
-        self.assertIn("sql-data-assistant", (ROOT / "scripts" / "install.sh").read_text(encoding="utf-8"))
-        self.assertIn("**sql-data-assistant**", (ROOT / "README.md").read_text(encoding="utf-8"))
-        self.assertIn("sql-data-assistant", (ROOT / ".github" / "copilot-instructions.md").read_text(encoding="utf-8"))
+        self.assertIn("flowkit-sql-data-assistant", (ROOT / "scripts" / "install.sh").read_text(encoding="utf-8"))
+        self.assertIn("**flowkit-sql-data-assistant**", (ROOT / "README.md").read_text(encoding="utf-8"))
+        self.assertIn("flowkit-sql-data-assistant", (ROOT / ".github" / "copilot-instructions.md").read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

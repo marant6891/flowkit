@@ -34,6 +34,7 @@ Prefixes are optional. Without a prefix, the Orchestrator classifies the request
   - `BA:` — invoke Analyst.
   - `SQL:` — use the safe SQL skill.
   - `SHIP:` — prepare branch, commit, push and PR after verification and explicit approval.
+  - `FAST:` / `STRICT:` — force the risk mode. `FAST` = quick path for `[LOW]` single-file work; `STANDARD` = default 3x3 loop; `STRICT` = production, migrations, data, permissions or destructive work: approval before every `[MED]`/`[HIGH]` step, verification after every change. No mode skips approval for `[HIGH]`, deletes, delivery or publishing.
   - `AUTO:` — run the whole task on recommendations: take `Next:` option 1 at each checkpoint, answer questions with recommended defaults (`ASSUMPTION-NNN (AUTO)`), stop only for `[HIGH]`, deletes, delivery, publishing, repeated failures or >10 iterations; finish with `AUTO decisions:`.
 
 ## Subagent Delegation Matrix
@@ -48,10 +49,15 @@ Prefixes are optional. Without a prefix, the Orchestrator classifies the request
 | **PM** | Requirements, User Stories, Acceptance Criteria | Unclear business requirements, spec generation, ADRs |
 | **Diagnostics** | Read-only logs, cluster, container and configuration checks | Incident symptoms, validating DevOps output |
 | **Analyst** | Requirements, process, impact, backlog, test cases, UAT | Analysis of client materials |
+| **Validator** | Static validation of infrastructure and pipeline files | After DevOps changes, `Validate:` lists, configuration checks |
+
+## Status Vocabulary
+
+`PASS`, `FAIL`, `NOT_RUN`, `UNKNOWN`, `BLOCKED` in every report. A check that was not executed is `NOT_RUN`, never `PASS`. Infrastructure work follows Diagnostics → DevOps → Validator → approval → Diagnostics re-check with one handoff block.
 
 ## Skills and Delivery
 
-- Client documents are routed to FlowKit skills: `client-pt-prd-writer`, `client-meeting-recap`, `devops-incident-postmortem`, `sql-data-assistant`.
+- Client documents are routed to FlowKit skills: `flowkit-client-pt-prd-writer`, `flowkit-client-meeting-recap`, `flowkit-devops-incident-postmortem`, `flowkit-sql-data-assistant`, `flowkit-devops-sre-review`.
 - Document work starts with one question about known data sources for preparing and verifying the document (skipped in `AUTO:`).
 - DOCX is written with the executor command `md-to-docx`; a client template is passed with `--template` or `--reference-doc`, so the result keeps the template's full style set.
 - Git delivery belongs to the Orchestrator and requires a verified scope and `WAIT_FOR_APPROVAL`. Never push to the default branch or force push.

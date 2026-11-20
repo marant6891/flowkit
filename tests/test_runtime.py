@@ -37,8 +37,8 @@ class TestCommandPolicy(unittest.TestCase):
             "analyzer": ["rg TODO src", "tsc --noEmit", "git log -5"],
             "implementer": ["pytest -x tests/test_a.py", "eslint src/a.js"],
             "orchestrator": ["python -m unittest tests/test_a.py", "pytest -q", "dotnet test", "tsc --noEmit", "git status", "git add src/a.py", "git commit -m opis", "git push -u origin feat/a",
-                             "gh pr create --fill", "python C:/x/client-pt-prd-writer/scripts/generate_diagram.py m.yaml"],
-            "analyst": ["read-document brief.docx --outline", "python /x/client-pt-prd-writer/scripts/check_status_labels.py d.md"],
+                             "gh pr create --fill", "python C:/x/flowkit-client-pt-prd-writer/scripts/generate_diagram.py m.yaml"],
+            "analyst": ["read-document brief.docx --outline", "python /x/flowkit-client-pt-prd-writer/scripts/check_status_labels.py d.md"],
         }
         for role, commands in allowed.items():
             for command in commands:
@@ -268,6 +268,17 @@ class TestDocxWriting(unittest.TestCase):
         self.assertTrue(report.warnings)
 
     @unittest.skipUnless(HAS_DOCX, "wymaga python-docx")
+    def test_docx_check_detects_lost_structure(self):
+        import md_to_docx as md
+        from docx import Document
+        doc = Document()
+        doc.add_paragraph("Bez nagłówków")
+        doc.save(self.dir / "pusty.docx")
+        report = md.Report()
+        self.assertFalse(md.verify_output("# A\n\n## B\n", self.dir / "pusty.docx", None, report))
+        self.assertTrue(any("FAIL" in note for note in report.notes))
+
+    @unittest.skipUnless(HAS_DOCX, "wymaga python-docx")
     def test_document_keeps_template_styles_header_and_content(self):
         from docx import Document
         template = Document()
@@ -286,6 +297,8 @@ class TestDocxWriting(unittest.TestCase):
                                      str(self.dir / output), option, str(self.dir / "szablon.docx")],
                                     capture_output=True, text=True, encoding="utf-8", check=False, cwd=self.dir)
             self.assertEqual(result.returncode, 0, result.stdout)
+            self.assertIn("Kontrola DOCX", result.stdout)
+            self.assertIn("— PASS", result.stdout)
             doc = Document(self.dir / output)
             self.assertEqual(doc.sections[0].footer.paragraphs[0].text, "Stopka klienta")
             self.assertEqual(len(doc.styles), len(template.styles))
@@ -349,7 +362,7 @@ class TestWorkspaceBoundary(unittest.TestCase):
         self.assertIsNotNone(fx.check("analyst", ["read-document", "link/tajne.txt"]))
 
     def test_skill_script_path_is_allowed_but_its_arguments_are_checked(self):
-        script = "C:/x/client-pt-prd-writer/scripts/check_status_labels.py"
+        script = "C:/x/flowkit-client-pt-prd-writer/scripts/check_status_labels.py"
         self.assertIsNone(fx.check("analyst", ["python", script, "dok.md"]))
         self.assertIsNotNone(fx.check("analyst", ["python", script, str(self.outside_dir / "tajne.txt")]))
 
@@ -373,7 +386,7 @@ class TestEvalRunnerLimits(unittest.TestCase):
         self.assertIn("1 s", error)
 
     def test_infrastructure_errors_are_not_quality_failures(self):
-        item = {"skill": "client-meeting-recap", "prompt": "x", "expected": True}
+        item = {"skill": "flowkit-client-meeting-recap", "prompt": "x", "expected": True}
         usage = {"input_tokens": 0, "output_tokens": 0}
         timeout = run_evals.evaluate(item, {"status": "TIMEOUT", "error": "przekroczono", "usage": usage})
         failed = run_evals.evaluate(item, {"status": "OK", "error": "", "usage": usage, "skills": [], "answer": ""})
@@ -405,6 +418,109 @@ class TestEvalRunnerLimits(unittest.TestCase):
         self.assertEqual(calls, ["p"])
         self.assertEqual([r["status"] for r in rows], ["PASS", "SKIPPED"])
         self.assertEqual(saved, rows)
+
+
+class TestValidatorAndConsent(unittest.TestCase):
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.dir = Path(self.tmp.name)
+        self.allow = self.dir / "allow.json"
+        os.environ[fx.ALLOW_FILE_ENV] = str(self.allow)
+        self.addCleanup(os.environ.pop, fx.ALLOW_FILE_ENV, None)
+
+    def test_validator_runs_only_static_checks(self):
+        for command in ("terraform fmt -check", "terraform validate", "hadolint Dockerfile", "docker compose config -q",
+                        "helm lint charts/api", "helm template api charts/api", "kubeconform k8s/a.yaml",
+                        "yamllint k8s", "actionlint", "shellcheck run.sh", "check-json a.json"):
+            self.assertIsNone(fx.check("validator", command.split()), command)
+        for command in ("terraform apply", "terraform init", "helm install api charts/api", "kubectl apply -f a.yaml",
+                        "docker push api", "docker compose up", "helm template api charts/api --dependency-update",
+                        "kubectl get pods --kubeconfig x", "git commit -m x", "pytest -q"):
+            self.assertIsNotNone(fx.check("validator", command.split()), command)
+
+    def test_check_json_reports_each_file(self):
+        good, bad = self.dir / "a.json", self.dir / "b.json"
+        good.write_text('{"a": 1}', encoding="utf-8")
+        bad.write_text("{a:", encoding="utf-8")
+        result = subprocess.run([sys.executable, EXEC, "--role", "validator", "--", "check-json", "a.json", "b.json"],
+                                capture_output=True, text=True, encoding="utf-8", check=False, cwd=self.dir)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("PASS a.json", result.stdout)
+        self.assertIn("FAIL b.json", result.stdout)
+        self.assertIn("[kod wyjścia: 1]", result.stdout)
+
+    def test_missing_tool_is_not_run(self):
+        result = subprocess.run([sys.executable, EXEC, "--role", "validator", "--", "tflint"], capture_output=True,
+                                text=True, encoding="utf-8", check=False,
+                                env={**os.environ, "PATH": str(self.dir)})
+        self.assertIn("NOT_RUN", result.stdout)
+
+    def test_user_consent_allows_listed_commands_only(self):
+        self.allow.write_text(json.dumps({"commands": {"*": ["make lint"], "orchestrator": ["dotnet build", "terraform plan",
+                                                                                              "bash", "node", "python -c"]}}),
+                              encoding="utf-8")
+        self.assertIsNone(fx.check("orchestrator", ["dotnet", "build", "src/App.sln"]))
+        self.assertIsNone(fx.check("analyst", ["make", "lint"]))
+        self.assertIsNotNone(fx.check("analyst", ["dotnet", "build"]))
+        for argv in (["bash", "-c", "ls"], ["node", "x.js"], ["python", "-c", "print(1)"], ["terraform", "apply"]):
+            self.assertIsNotNone(fx.check("orchestrator", argv), argv)
+        allowed, ignored = fx.user_allowed("orchestrator")
+        self.assertEqual(allowed, ["make lint", "dotnet build", "terraform plan"])
+        self.assertEqual(len(ignored), 3)
+
+    def test_consent_keeps_hard_limits(self):
+        self.allow.write_text(json.dumps({"commands": {"orchestrator": ["cat", "git push", "kubectl get"]}}), encoding="utf-8")
+        self.assertIsNotNone(fx.check("orchestrator", ["cat", str(Path.home() / "x.txt")]))
+        self.assertIsNotNone(fx.check("orchestrator", ["cat", ".env"]))
+        self.assertIsNotNone(fx.check("orchestrator", ["git", "push", "-u", "origin", "main"]))
+        self.assertIsNotNone(fx.check("orchestrator", ["kubectl", "get", "secret", "db"]))
+
+    def test_rejection_explains_how_to_allow(self):
+        problem = fx.check("orchestrator", ["terraform", "plan"])
+        self.assertIn('"terraform plan"', problem)
+        self.assertIn(str(self.allow), problem)
+
+    def test_broken_consent_file_grants_nothing(self):
+        self.allow.write_text("{nie json", encoding="utf-8")
+        self.assertIsNotNone(fx.check("orchestrator", ["dotnet", "build"]))
+        self.assertTrue(fx.user_allowed("orchestrator")[1])
+
+    def run_guard(self, payload):
+        return subprocess.run([sys.executable, str(ROOT / "runtime" / "guard_bash.py")], input=json.dumps(payload),
+                              capture_output=True, text=True, encoding="utf-8", check=False,
+                              env={**os.environ, fx.ALLOW_FILE_ENV: str(self.allow)})
+
+    def test_agents_cannot_edit_consent_file_or_runtime(self):
+        for agent in ("agent-3x3", "agent-3x3-devops", "flowkit:agent-3x3-implementer"):
+            for path in (str(self.allow), str(ROOT / "runtime" / "flowkit_exec.py")):
+                result = self.run_guard({"agent_type": agent, "tool_name": "Write", "tool_input": {"file_path": path}})
+                self.assertEqual(result.returncode, 2, (agent, path))
+        allowed = self.run_guard({"agent_type": "agent-3x3-devops", "tool_name": "Edit",
+                                  "tool_input": {"file_path": str(self.dir / "k8s.yaml")}})
+        self.assertEqual(allowed.returncode, 0)
+        user = self.run_guard({"tool_name": "Write", "tool_input": {"file_path": str(self.allow)}})
+        self.assertEqual(user.returncode, 0)
+
+
+class TestRolePermissionContract(unittest.TestCase):
+
+    def test_agents_runtime_roles_and_guard_agree(self):
+        import build_agents
+        self.assertEqual(build_agents.EXEC_ROLES, guard.ROLES)
+        for agent, role in build_agents.EXEC_ROLES.items():
+            self.assertIn(role, fx.ROLE_COMMANDS, agent)
+            self.assertIn("Bash", build_agents.CLAUDE_TOOLS[agent], agent)
+            source = (ROOT / "agents" / f"{agent}_agent.md").read_text(encoding="utf-8")
+            self.assertIn("execute", yaml.safe_load(source.split("---", 2)[1])["tools"], agent)
+        for agent in set(build_agents.AGENTS) - set(build_agents.EXEC_ROLES):
+            self.assertNotIn("Bash", build_agents.CLAUDE_TOOLS[agent], agent)
+
+    def test_read_only_roles_cannot_write_or_deliver(self):
+        for role in ("analyzer", "verifier", "diagnostics", "validator"):
+            for command in (["md-to-docx", "a.md", "a.docx"], ["git", "commit", "-m", "x"], ["git", "push", "-u", "origin", "a"]):
+                self.assertIsNotNone(fx.check(role, command), (role, command))
 
 
 class TestLocalOnlySolution(unittest.TestCase):
@@ -445,13 +561,13 @@ class TestLocalOnlySolution(unittest.TestCase):
 
     def test_plugin_hook_guards_bash(self):
         hooks = json.loads((ROOT / "hooks" / "hooks.json").read_text(encoding="utf-8"))["hooks"]["PreToolUse"][0]
-        self.assertEqual(hooks["matcher"], "Bash")
+        self.assertEqual(hooks["matcher"], "Bash|Edit|Write|MultiEdit|NotebookEdit")
         self.assertIn("guard_bash.py", hooks["hooks"][0]["command"])
 
     def test_orchestrator_procedures_exist(self):
         source = (ROOT / "agents" / "agent-3x3_agent.md").read_text(encoding="utf-8")
         names = set(re.findall(r"`([a-z-]+\.md)`", source)) - {"flowkit-project.md"}
-        self.assertEqual(len(names), 5)
+        self.assertEqual(len(names), 6)
         for name in names:
             self.assertTrue((ROOT / "runtime" / "procedures" / name).exists(), name)
 
@@ -460,7 +576,7 @@ class TestEvalRunner(unittest.TestCase):
 
     def test_trigger_set_has_positive_and_negative_cases(self):
         data = yaml.safe_load((ROOT / "tests" / "evals" / "triggers.yaml").read_text(encoding="utf-8"))["skills"]
-        self.assertEqual(len(data), 4)
+        self.assertEqual(len(data), 5)
         for groups in data.values():
             self.assertEqual(len(groups["should_trigger"]) + len(groups["should_not_trigger"]), 10)
             self.assertGreaterEqual(len(groups["should_not_trigger"]), 3)
@@ -472,11 +588,11 @@ class TestEvalRunner(unittest.TestCase):
 
     def test_stream_parser_reads_skills_answer_and_tokens(self):
         events = [
-            json.dumps({"message": {"content": [{"type": "tool_use", "name": "Skill", "input": {"skill": "flowkit:client-meeting-recap"}}]}}),
+            json.dumps({"message": {"content": [{"type": "tool_use", "name": "Skill", "input": {"skill": "flowkit:flowkit-client-meeting-recap"}}]}}),
             json.dumps({"type": "result", "result": "OK", "usage": {"input_tokens": 10, "output_tokens": 5}}),
         ]
         parsed = run_evals.parse_events(events)
-        self.assertEqual(parsed["skills"], ["client-meeting-recap"])
+        self.assertEqual(parsed["skills"], ["flowkit-client-meeting-recap"])
         self.assertEqual(parsed["answer"], "OK")
         self.assertEqual(parsed["usage"], {"input_tokens": 10, "output_tokens": 5})
 

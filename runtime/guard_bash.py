@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from flowkit_exec import check  # noqa: E402
+from flowkit_exec import allow_file, check  # noqa: E402
 
 EXECUTOR = Path(__file__).resolve().parent / "flowkit_exec.py"
 ROLES = {
@@ -22,8 +22,23 @@ ROLES = {
     "agent-3x3-implementer": "implementer",
     "agent-3x3-diagnostics": "diagnostics",
     "agent-3x3-analyst": "analyst",
+    "agent-3x3-validator": "validator",
 }
 PYTHON = {"python", "python3", "py", "python.exe", "python3.exe", "py.exe"}
+EDIT_TOOLS = {"Edit", "Write", "MultiEdit", "NotebookEdit"}
+
+
+def protected_edit(tool_input: dict) -> str | None:
+    """Plik zgód użytkownika i runtime FlowKit zmienia tylko użytkownik."""
+    raw = str(tool_input.get("file_path") or tool_input.get("notebook_path") or "")
+    if not raw:
+        return None
+    target = resolved(raw)
+    if target == allow_file().resolve():
+        return "plik zgód użytkownika może zmieniać tylko użytkownik"
+    if EXECUTOR.parent in target.parents:
+        return "pliki runtime FlowKit może zmieniać tylko użytkownik"
+    return None
 
 
 def unsafe_shell_syntax(command: str) -> str | None:
@@ -86,6 +101,12 @@ def main() -> int:
         return 2
     name = str(data.get("agent_type") or "").rsplit(":", 1)[-1]
     if not name.startswith("agent-3x3"):
+        return 0
+    if data.get("tool_name") in EDIT_TOOLS:
+        problem = protected_edit(data.get("tool_input") or {})
+        if problem:
+            print(f"FlowKit zablokował zmianę pliku: {problem}.", file=sys.stderr)
+            return 2
         return 0
     role = ROLES.get(name)
     if role is None:

@@ -1,210 +1,38 @@
-# FlowKit — Agent Skills & Agents Library
+# FlowKit
 
-> Uniwersalna biblioteka umiejętności (**Agent Skills**) i agentów (**Agents**) dla **Claude Code**, **GitHub Copilot**, **OpenAI Codex / ChatGPT**, **Cursor** oraz **Antigravity**. Zoptymalizowana pod kątem automatyzacji zadań **Analityka Biznesowo-Systemowego** oraz **Inżyniera DevOps**.
+Biblioteka skilli i agentów AI dla **analityków biznesowo-systemowych** i **inżynierów DevOps**. FlowKit prowadzi od materiału wejściowego (brief, transkrypcja, logi, kod, manifesty) do zweryfikowanego rezultatu: dokumentu PT/PRD w szablonie klienta, podsumowania spotkania, raportu postmortem, skryptu SQL albo zwalidowanej konfiguracji.
 
-Repozytorium spełnia standard otwartych skilli AI oraz posiada manifest [`.claude-plugin/plugin.json`](.claude-plugin/plugin.json) kompatybilny z katalogami **Agent Marketplace**.
+Zasady, na których opiera się całe rozwiązanie:
 
----
+- **Brak źródła = brak treści.** Fakty mają wskazane źródło, a luki są oznaczane (`DO POTWIERDZENIA`, `OPEN-NNN`), nie uzupełniane „typowymi” treściami.
+- **Statusy zgodne z tym, co faktycznie wykonano.** Sprawdzenie, którego nie uruchomiono, ma status `NOT_RUN`, nigdy `PASS`.
+- **Praca lokalna i kontrolowana.** Agenci nie korzystają z sieci ani MCP; polecenia uruchamiają tylko przez lokalny executor z listą dozwoloną dla roli.
+- **Decyzje ryzykowne należą do człowieka.** Wdrożenia, usuwanie, commit, push i publikacja zawsze czekają na zgodę.
 
-## 📚 Katalog skilli (Skills Catalog)
-
-### 📊 Analiza biznesowa i systemowa
-
-| Skill | Wersja | Opis | Ścieżka |
-|---|---|---|---|
-| **client-pt-prd-writer** | `2.8` | Tworzy precyzyjną dokumentację techniczną (PT) i PRD wyłącznie na bazie materiałów źródłowych. Zawiera scenariusze akceptacyjne **Given-When-Then (Gherkin)**, **Definition of Done (DoD)**, wyłączenia **Non-Goals** oraz obsługę szablonów klienta (`.docx`, `.md`). Opcjonalny tryb **dokumentu końcowego bez dopisków** — czysty dokument w szablonie klienta. **Diagramy oparte na źródłach** (architektura, procesy, sekwencje, model danych) osadzane w DOCX i Markdown oraz polskie nazwy statusów w tabelach. | [`skills/client-pt-prd-writer/`](skills/client-pt-prd-writer/) |
-| **client-meeting-recap** | `1.3` | Przekształca surowe transkrypcje (`.vtt`, `.docx`, `.txt`) w 2-częściowe podsumowanie: **Część A (Wewnętrzny Radar Ryzyk / Scope Creep dla zespołu, z cytatami jako dowodami)** oraz **Część B (Oficjalny mail do klienta z zadaniami DRI i klauzulą weryfikacji 48h)** — w osobnych plikach. | [`skills/client-meeting-recap/`](skills/client-meeting-recap/) |
-
-### 🗄️ Dane i SQL
-
-| Skill | Wersja | Opis | Ścieżka |
-|---|---|---|---|
-| **sql-data-assistant** | `1.0` | Przygotowuje bezpieczne zapytania, zestawienia i skrypty poprawy danych dla PostgreSQL, SQL Server, Oracle, MySQL i MariaDB: typ bazy, zmienne, transakcja, ochrona przed nadpisaniem, domyślne `ROLLBACK` i proste instrukcje dla testera lub serwisanta. Agent nigdy nie łączy się z bazą. | [`skills/sql-data-assistant/`](skills/sql-data-assistant/) |
-
-### ⚙️ DevOps i Infrastruktura
-
-| Skill | Wersja | Opis | Ścieżka |
-|---|---|---|---|
-| **devops-incident-postmortem** | `1.4` | Generuje bezobwiniający raport postmortem zgodny ze standardami **Google SRE i PagerDuty**. Zawiera klasyfikację SEV-1/SEV-2, role (Incident Commander), wieloczynnikowy łańcuch przyczyn (**Trigger, Amplifier, Detection/Process Gap**, 5 Whys), rejestr Status Page oraz zadania PREVENT/DETECT/MITIGATE. | [`skills/devops-incident-postmortem/`](skills/devops-incident-postmortem/) |
-
-### 🛠️ Szablony narzędziowe
-
-| Narzędzie | Opis | Ścieżka |
-|---|---|---|
-| **_template** | Czysty wzorzec do szybkiego tworzenia nowego skilla z wymaganym nagłówkiem YAML. | [`skills/_template/`](skills/_template/) |
+Wersja: **1.8.0** · Licencja: [MIT](LICENSE) · Historia zmian: [CHANGELOG.md](CHANGELOG.md)
 
 ---
 
-## 🤖 Architektura i katalog agentów (Agents Catalog)
+## Spis treści
 
-FlowKit realizuje dwuwarstwową architekturę agentów oddzielającą logikę domenową od specyfiki danego hosta:
-- **`agents/core/`** — platformowo neutralne kontrakty, reguły, formaty wyjściowe i stany procesowe (`DISCOVER`, `PLAN`, `EXECUTE`, `VERIFY`, `REPORT_PROGRESS`, `ASK_USER`, `WAIT_FOR_APPROVAL`).
-- **`agents/*_agent.md`** — pełne definicje zachowania, jedyne miejsce ich edycji.
-- **`agents/adapters/claude-code/`** i **`agents/adapters/vscode/`** — pliki instalowane u użytkownika, generowane poleceniem `python scripts/build_agents.py`. Walidator odrzuca adaptery niezgodne ze źródłem.
-
-### Orkiestrator
-
-| Agent | Plik | Opis |
-|---|---|---|
-| **agent-3x3** | [`agent-3x3_agent.md`](agents/agent-3x3_agent.md) | Główny orkiestrator. Iteracyjny development: max 3 kroki na iterację, wymuszone podsumowanie (`REPORT_PROGRESS`) i potwierdzenie użytkownika (`ASK_USER`). Obsługuje prefiksy `ANALYZE:` `VERIFY:` `PLAN:` `SPEC:` `DRY:` `LOG:` `DEVOPS:` `DIAG:` `BA:` `SQL:` `SHIP:` `AUTO:`. Koordynuje subagenty. |
-
-### Subagenty (wywoływane przez orkiestratora)
-
-| Agent | Plik | Tryb | Opis |
-|---|---|---|---|
-| **agent-3x3-analyzer** | [`agent-3x3-analyzer_agent.md`](agents/agent-3x3-analyzer_agent.md) | read-only | Analiza kodu, zależności, struktury. Zwraca findings `[CRITICAL]/[WARNING]/[INFO]`, listę `Scanned:` i `Not checked:` oraz odróżnia fakty od hipotez. |
-| **agent-3x3-verifier** | [`agent-3x3-verifier_agent.md`](agents/agent-3x3-verifier_agent.md) | read-only | Weryfikacja implementacji per 9 wymiarów (`Logic`, `Contracts`, `Tests`, `Dependencies`, `Security`, `Performance`, `Consistency`, `Docs`, `Requirements`). Raportuje `[PASS]`, `[WARN]`, `[FAIL]` oraz `[NOT VERIFIED]` (zakaz fałszywych passów bez testów). |
-| **agent-3x3-planner** | [`agent-3x3-planner_agent.md`](agents/agent-3x3-planner_agent.md) | read-only | Plan iteracji 3x3 z etykietami ryzyka i estymacją Effort per krok i per iterację. |
-| **agent-3x3-implementer** | [`agent-3x3-implementer_agent.md`](agents/agent-3x3-implementer_agent.md) | read+write | Realizuje jeden atomowy krok. Self-check diffa przed zwrotem statusu. Zwraca DONE/PARTIAL/BLOCKED. Ścisła whitelist operacji. |
-| **agent-3x3-devops** | [`agent-3x3-devops_agent.md`](agents/agent-3x3-devops_agent.md) | read+write | CI/CD, Docker, Kubernetes, Terraform, Azure/AWS/GCP, sekrety, monitoring. Obsługuje tryb standalone (bez Orkiestratora). |
-| **agent-3x3-pm** | [`agent-3x3-pm_agent.md`](agents/agent-3x3-pm_agent.md) | read-only | User stories (US-N), acceptance criteria (AC-N), ADR, decyzje produktowe. |
-| **agent-3x3-diagnostics** | [`agent-3x3-diagnostics_agent.md`](agents/agent-3x3-diagnostics_agent.md) | read-only | Diagnostyka logów, klastra, kontenerów i konfiguracji oraz runbooki. Bez zmian w środowisku. |
-| **agent-3x3-analyst** | [`agent-3x3-analyst_agent.md`](agents/agent-3x3-analyst_agent.md) | read+write | Analiza wymagań, procesu i wpływu zmiany, backlog, przypadki testowe i UAT na lokalnych dokumentach Word, Excel, PDF i tekstowych. |
-
-### Prefiksy orkiestratora
-
-Prefiksy są opcjonalne. Bez prefiksu `agent-3x3` sam rozpoznaje rodzaj zadania, informuje o wybranym trybie i uruchamia właściwy skill lub subagenta.
-
-| Prefiks | Akcja |
-|---|---|
-| `ANALYZE:` | wywołuje Analyzer jako pierwszy krok |
-| `VERIFY:` | wywołuje Verifier jako pierwszy krok |
-| `PLAN:` | wywołuje Planner jako pierwszy krok |
-| `SPEC:` | wywołuje PM agenta (user stories + acceptance criteria) |
-| `DRY:` | planuje ≤3 kroków i czeka na potwierdzenie |
-| `LOG:` | dołącza każdą iterację do `AGENT_LOG.md` |
-| `DEVOPS:` | wywołuje agenta DevOps |
-| `DIAG:` | uruchamia diagnostykę tylko do odczytu |
-| `BA:` | uruchamia analityka biznesowo-systemowego |
-| `SQL:` | przygotowuje bezpieczne zapytanie, zestawienie lub skrypt poprawy danych |
-| `SHIP:` | po weryfikacji i Twojej zgodzie przygotowuje gałąź, commit, push i PR |
-| `AUTO:` | realizuje całe zadanie na rekomendacjach: na każdym checkpoincie przyjmuje opcję 1, pytania rozstrzyga domyślną propozycją (`ASSUMPTION-NNN (AUTO)`), zatrzymuje się tylko przy krokach `[HIGH]`, usuwaniu, dostarczeniu i publikacji; na końcu oddaje listę przyjętych decyzji |
-
-Prefiksy można łączyć od lewej do prawej: `PLAN: LOG: zadanie`, `SPEC: PLAN: zadanie`, `AUTO: BA: zadanie`.
+1. [Szybki start](#szybki-start)
+2. [Wymagania](#wymagania)
+3. [Skille](#skille)
+4. [Agenci](#agenci)
+5. [Jak to działa](#jak-to-działa)
+6. [Konfiguracja](#konfiguracja)
+7. [Bezpieczeństwo i ograniczenia](#bezpieczeństwo-i-ograniczenia)
+8. [Obsługiwane platformy](#obsługiwane-platformy)
+9. [Instalacja](#instalacja)
+10. [Aktualizacja z wersji 1.7](#aktualizacja-z-wersji-17)
+11. [Rozwiązywanie problemów](#rozwiązywanie-problemów)
+12. [Rozwój i współtworzenie](#rozwój-i-współtworzenie)
 
 ---
 
-## 🛡️ Praca lokalna i bezpieczeństwo
+## Szybki start
 
-- **Bez MCP i narzędzi webowych:** agenci mają jawne listy narzędzi i pracują na plikach oraz poleceniach lokalnych.
-- **Kontrolowane polecenia:** agenci uruchamiają polecenia tylko przez `runtime/flowkit_exec.py`, bez powłoki i według listy dozwolonej dla roli.
-- **Granica katalogu roboczego:** ścieżki w poleceniach agenta (także po `..`, `~` i dowiązaniach symbolicznych) muszą leżeć w katalogu, w którym uruchomiono agenta. Materiały z innego miejsca skopiuj do projektu albo dopisz ich katalog do zmiennej środowiskowej `FLOWKIT_EXTRA_PATHS` (kilka katalogów rozdziel `;` w Windows, `:` w Linux/macOS). Ustawia ją tylko użytkownik — hook odrzuca przypisania zmiennych w poleceniach agenta.
-- **Czego runtime nie zabezpiecza:** to lista dozwolonych poleceń, a nie izolacja systemowa (sandbox). Testy uruchamiane przez agenta (`pytest`, `npm test` itd.) wykonują kod projektu z uprawnieniami użytkownika, a skrypty i narzędzia mogą odczytać pliki wskazane w konfiguracji projektu.
-- **Twarda blokada w Claude Code:** hook `runtime/guard_bash.py` odrzuca każde inne polecenie agenta FlowKit. Zwykłe sesje nie są objęte tym hookiem.
-- **Lista poleceń roli:** `python runtime/flowkit_exec.py --role <rola> -- help`.
-- **Dokumenty Word:** `read-document` czyta `.docx`/`.dotx`/`.xlsx`/`.pdf` oraz pliki tekstowe i kod źródłowy (`.cs`, `.py`, `.sql`, `.config` itd., UTF-8, UTF-16 i CP1250), a `md-to-docx` zapisuje DOCX z Markdown na kopii szablonu klienta (`--template` lub `--reference-doc`), z kompletem jego stylów, nagłówkami i stopkami. Diagramy mermaid i SVG są osadzane jako PNG. Szczegóły: [docx-engine.md](skills/client-pt-prd-writer/references/docx-engine.md).
-- **Ochrona danych:** wyniki poleceń są skracane, sekrety ukrywane, a pliki takie jak `.env` i klucze prywatne niedostępne.
-- **VS Code:** Copilot nie korzysta z tego hooka, dlatego zostaw włączone potwierdzanie poleceń w terminalu.
-- **Zasady projektu:** skopiuj [`docs/flowkit-project.template.md`](docs/flowkit-project.template.md) do projektu jako `flowkit-project.md`.
-- **Testy skilli:** `python scripts/run_evals.py triggers --dry-run` pokazuje scenariusze, a uruchomienie bez `--dry-run` korzysta z lokalnego Claude Code. Limity czasu: `--timeout` (scenariusz, domyślnie 600 s) i `--total-timeout` (sesja, 3600 s). Statusy: `PASS`, `FAIL` (jakość), `TIMEOUT`, `ERROR`, `SKIPPED` (infrastruktura); wyniki zapisują się po każdym scenariuszu.
-
----
-
-## 🌐 Macierz kompatybilności platform
-
-| Platforma | Skille | Agenty | Instalator | Poziom integracji |
-|---|---|---|---|---|
-| **Claude Code** | Natywne (`~/.claude/skills/`) | Dedykowane (`agents/adapters/claude-code/`) | `install.ps1` / `install.sh -Platform claude` | **Natywne / Pełne** (zweryfikowane CI) |
-| **VS Code Copilot** | Natywne (`.prompt.md`) | Dedykowane `.agent.md` (`agents/adapters/vscode/`) | `install.ps1` / `install.sh -Platform vscode` | **Natywne / Pełne** (zweryfikowane CI) |
-| **Antigravity** | Otwarty standard Agent Skills | Bundle wtyczki (`.claude-plugin/plugin.json`) | Marketplace / repo bundle | **Natywne / Pełne** (v1.3.0) |
-| **Cursor** | `.cursor/rules/<skill>.mdc` | Reguły workspace | Ręczny / skopiowanie reguł | **Instrukcja konfiguracji** |
-| **OpenAI Codex / ChatGPT** | Instructions + Knowledge files | Custom GPT System Prompt | Ręczny eksport | **Instrukcja konfiguracji** |
-
----
-
-## 🚀 Instalacja
-
-### Claude Code — skille
-
-#### Opcja A: Automatyczny instalator (rekomendowane)
-
-```powershell
-# Windows (PowerShell) — instalacja skilla globalnie
-.\scripts\install.ps1 -SkillName client-pt-prd-writer
-
-# Opcjonalnie: instalacja w lokalnym projekcie
-.\scripts\install.ps1 -SkillName client-pt-prd-writer -TargetPath ./.claude/skills
-```
-
-```bash
-# Linux / macOS
-./scripts/install.sh skill client-pt-prd-writer
-```
-
-#### Opcja B: Ręczna instalacja skilli
-
-- **Globalnie**: skopiuj folder wybranego skilla do `~/.claude/skills/<skill-name>`.
-- **W projekcie**: skopiuj folder do `.claude/skills/<skill-name>`.
-- **W Claude.ai (Web Projects)**: załącz plik `SKILL.md` oraz szablony z `templates/` w sekcji **Project Knowledge**.
-
----
-
-### Claude Code — agenty
-
-Agenty instaluje się do `~/.claude/agents/` (globalni) lub `.claude/agents/` (lokalni w projekcie).
-
-#### Opcja A: Automatyczny instalator (PowerShell / Bash)
-
-```powershell
-# Windows — instalacja agentów dla Claude Code (domyślnie ~/.claude/agents)
-.\scripts\install.ps1 -AgentName all -Platform claude
-
-# Windows — agenci VS Code Copilot trafiają do .github/agents bieżącego katalogu, więc uruchom z katalogu projektu
-& C:\sciezka\do\flowkit\scripts\install.ps1 -AgentName all -Platform vscode
-
-# Bezpieczna symulacja instalacji (dry-run)
-.\scripts\install.ps1 -AgentName all -DryRun
-
-# Wymuszenie nadpisania istniejących konfiguracji
-.\scripts\install.ps1 -AgentName all -Force
-```
-
-```bash
-# Linux / macOS — instalacja dla Claude Code
-./scripts/install.sh agent all --platform claude
-
-# Linux / macOS — agenci VS Code Copilot trafiają do .github/agents bieżącego katalogu projektu
-/sciezka/do/flowkit/scripts/install.sh agent all --platform vscode
-
-# Tryb symulacji (dry-run)
-./scripts/install.sh agent all --dry-run
-```
-
-Orkiestrator uruchamiaj jako główny wątek sesji:
-
-```bash
-claude --agent agent-3x3
-```
-
-#### Opcja B: Ręczna instalacja agentów
-
-- Dla **Claude Code**: skopiuj pliki z [`agents/adapters/claude-code/`](agents/adapters/claude-code/) do `~/.claude/agents/` (globalnie) lub `.claude/agents/` (w projekcie).
-- Dla **VS Code Copilot**: skopiuj pliki z [`agents/adapters/vscode/`](agents/adapters/vscode/) do `.github/agents/`.
-- Pliki w [`agents/core/`](agents/core/) zawierają nadrzędne kontrakty zachowań i formatów wyjściowych niezależne od platformy.
-
----
-
-### GitHub Copilot
-
-Skille mogą być wykorzystywane przez Copilota w VS Code, Visual Studio oraz JetBrains:
-
-1. **Prompt Files (`.prompt.md`)**: W katalogu `.github/prompts/` znajdują się gotowe wywołania Copilot Chat dla każdego skilla (np. `/client-pt-prd-writer`).
-2. **Plik referencyjny w sesji czatu**: W Copilot Chat wpisz `#file:skills/<skill-name>/SKILL.md` i zadaj pytanie.
-3. **Reguły całego projektu**: Wklej zasady danego skilla do pliku [`.github/copilot-instructions.md`](.github/copilot-instructions.md).
-4. **Globalne instrukcje użytkownika**: Dodaj treść do ustawień VS Code: `github.copilot.chat.codeGeneration.instructions`.
-
----
-
-### OpenAI Codex / ChatGPT / Cursor
-
-- **Cursor**: Utwórz plik `.cursor/rules/<skill-name>.mdc` w swoim projekcie i wklej zawartość `skills/<skill-name>/SKILL.md`.
-- **Custom GPTs / OpenAI Assistant**: Wklej treść sekcji *Zasady nadrzędne* do pola **Instructions**, a szablony i checklisty załącz jako pliki w sekcji **Knowledge**.
-
----
-
-### Agent Marketplace & Antigravity
-
-Dzięki manifestom [`.claude-plugin/plugin.json`](.claude-plugin/plugin.json) i [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) repozytorium jest gotowym pakietem (bundle) udostępniającym wszystkie skille i agentów. W Claude Code:
+Claude Code, instalacja jako wtyczka (skille, agenci, runtime i hook bezpieczeństwa):
 
 ```bash
 claude plugin marketplace add marant6891/flowkit
@@ -214,98 +42,298 @@ claude plugin marketplace add marant6891/flowkit
 claude plugin install flowkit@flowkit
 ```
 
----
-
-## 📄 Standard silnika dokumentacji (.docx / Markdown)
-
-Zarówno skille analityczne (`client-pt-prd-writer`, `client-meeting-recap`), jak i agenci (`agent-3x3`, `agent-3x3-implementer`) stosują **inteligentny, deterministyczny standard obsługi dokumentów**:
-
-1. **Priorytet 1: `python-docx` (`import docx`)** — podstawowa, wiodąca biblioteka do odczytu szablonów i generowania plików Word (`.docx`). Zapewnia pełne zachowanie stylów klienta, nagłówków, stopek i tabel.
-2. **Inteligentna detekcja środowiska**: Przed generowaniem agent/skill sprawdza, jakie biblioteki są rzeczywiście zainstalowane w bieżącym środowisku (`python-docx`, `mammoth`, `docx2txt`, `pypandoc`).
-3. **Korzystanie z bibliotek zainstalowanych**: Nigdy nie są doinstalowywane losowe biblioteki w tle — narzędzia korzystają z tego, czym dysponuje system użytkownika.
-4. **Spójność w sesji**: Wybrany silnik obowiązuje przez całą sesję (brak przełączania bibliotek między turami).
-5. **Czysty fallback**: W razie braku bibliotek `.docx` generowany jest w 100% ustrukturyzowany plik Markdown (`.md`) z czytelną informacją o możliwości zainstalowania `python-docx` (`pip install python-docx`).
-
-Szczegółowy przewodnik silnika znajduje się w [`skills/client-pt-prd-writer/references/docx-engine.md`](skills/client-pt-prd-writer/references/docx-engine.md).
-
----
-
-## ➕ Jak dodać nowy skill do repozytorium?
-
-1. Skopiuj folder [`skills/_template/`](skills/_template/) do nowego katalogu `skills/<nowa-nazwa>/`.
-2. Zmień nazwę `SKILL.template.md` na `SKILL.md` i wypełnij plik (nagłówek YAML musi zawierać pola `name`, `version`, `tags` i `description`).
-3. Dodaj wymagane `CHANGELOG.md`, `templates/` i `checklists/` (co najmniej jeden plik `.md` w każdym) oraz opcjonalne `examples/` i `references/`.
-4. Dopisz nowy skill do tabeli w sekcji [Katalog skilli](#-katalog-skilli-skills-catalog) w niniejszym pliku.
-5. Zgłoś zmianę przez Pull Request (lokalnie uruchom `python scripts/validate_skills.py`; ten sam walidator działa w CI).
-
----
-
-## 🔒 Bezpieczeństwo i ochrona autora
-
-> [!IMPORTANT]
-> To repozytorium jest **publiczne**. Poniższe zasady chronią autora oraz użytkowników przed przypadkowym ujawnieniem danych wrażliwych.
-
-### Co nigdy nie trafia do repozytorium
-
-Plik [`.gitignore`](.gitignore) wyklucza następujące kategorie — **nie commituj ich nigdy**:
-
-| Kategoria | Przykłady | Ryzyko |
-|---|---|---|
-| Sekrety i klucze | `.env`, `*.key`, `*.pem`, `*.token`, `credentials.*` | Wycieki kluczy API, cloud access |
-| Dane klientów | `*.vtt`, `input/`, `source-materials/`, `client-data/` | GDPR, NDA, poufność |
-| Sesje agenta | `agent-context/`, `AGENT_LOG.md` | Dane robocze z projektów klientów |
-| Klucze chmurowe | `.aws/`, `.azure/`, `.gcloud/`, `service-account*.json` | Nieautoryzowany dostęp do infrastruktury |
-
-### Bezpieczne użytkowanie skilli i agentów
-
-```
-❌ Nie wklejaj:  transkrypcji spotkań klientów, danych osobowych, nazw klientów,
-                 kluczy API, haseł, production hostnames
-
-✅ Zamiast tego: używaj zanonimizowanych przykładów lub pliku lokalnego
-                 (agent odczyta z dysku, plik nie wejdzie do kontekstu publicznego)
-```
-
-### Pliki agentów a bezpieczeństwo
-
-- Pliki `*_agent.md` zawierają **wyłącznie instrukcje behawioralne** — żadnych danych, kluczy ani historii sesji.
-- `AGENT_CONTEXT_*.md` generowane podczas sesji **nie są commitowane** (`.gitignore`). Służą jako prywatna pamięć robocza.
-- Agent DevOps (`agent-3x3-devops`) ma jawną regułę: **nigdy nie hardkoduje sekretów** — zawsze używa referencji zmiennych (`${{ secrets.X }}`, vault paths).
-
-### Zasady dla kontrybutorów
-
-- **Brak bezpośredniego push do `main`**: wszystkie zmiany przez Pull Request na gałęziach `feat/*`, `fix/*`, `docs/*`.
-- **Brak danych klientów w przykładach**: pliki w `examples/` muszą używać fikcyjnych, zanonimizowanych danych.
-- **Walidacja CI przed merge**: `python scripts/validate_skills.py` musi przejść na zielono.
-- **Brak sekretów w commitach**: skonfiguruj lokalne `pre-commit` lub użyj [git-secrets](https://github.com/awslabs/git-secrets).
-
-### Zalecana konfiguracja pre-commit (opcjonalne, lokalne)
+Uruchom orkiestrator jako główny wątek sesji w katalogu projektu:
 
 ```bash
-# Instalacja git-secrets (macOS)
-brew install git-secrets
-git secrets --install
-git secrets --register-aws
-
-# Instalacja detect-secrets (Python)
-pip install detect-secrets
-detect-secrets scan > .secrets.baseline
+claude --agent agent-3x3
 ```
 
-```powershell
-# Windows — skanowanie przed commitem (PowerShell)
-git diff --cached --name-only | ForEach-Object { Select-String -Path $_ -Pattern "password|secret|token|key" -CaseSensitive:$false }
+Przykładowe zadania:
+
+```text
+Przygotuj dokument PT na podstawie materiałów z folderu materialy/ w szablonie szablon-klienta.dotx.
+Podsumuj spotkanie z pliku spotkanie.vtt i przygotuj mail do klienta.
+DEVOPS: przygotuj Dockerfile dla aplikacji i zwaliduj go.
+AUTO: BA: przygotuj backlog z przypadkami testowymi z dokumentu wymagania.docx.
 ```
 
-### Ochrona gałęzi `main`
-
-Bezpośredni push do `main` jest zablokowany regułą GitHub Ruleset ([`protect-main.json`](.github/rulesets/protect-main.json) — wymaga zaimportowania w *Settings → Rules → Rulesets*), która wymaga też zielonego wyniku CI (`validate`). Wszystkie zmiany (zarówno społeczności, jak i właściciela) trafiają do `main` wyłącznie przez Pull Request.
+Orkiestrator sam rozpoznaje rodzaj zadania i wybiera skill lub subagenta. Instalacja dla VS Code Copilot i instalacja ręczna: [Instalacja](#instalacja).
 
 ---
 
-## 📋 Zasady inżynierskie i licencja
+## Wymagania
 
-- **Zasady inżynierskie**: Wszystkie standardy pracy, konwencje commitów oraz strategię gałęzi opisuje dokument [**`DEVELOPMENT.md`**](DEVELOPMENT.md).
-- **Licencja**: Kod udostępniany jest na otwartej licencji [MIT](LICENSE).  
-  Skille i agenty są narzędziami generującymi treści — **odpowiedzialność za weryfikację wygenerowanych dokumentów spoczywa na użytkowniku**.
-- **Brak gwarancji**: Repozytorium jest udostępniane "as is". Autor nie ponosi odpowiedzialności za decyzje podjęte na podstawie output agentów bez weryfikacji przez człowieka.
+| Składnik | Wymagany do | Instalacja |
+|---|---|---|
+| Python 3.10+ | executor, hook, skrypty skilli | wymagany |
+| `python-docx` | zapis i kontrola plików Word (`md-to-docx`) | `pip install python-docx` |
+| `pyyaml` | silnik diagramów skilla PT/PRD | `pip install pyyaml` |
+| Pandoc | alternatywny silnik DOCX bez szablonu | `winget install JohnMacFarlane.Pandoc` |
+| mermaid-cli | diagramy mermaid w DOCX | `npm install -g @mermaid-js/mermaid-cli` |
+| Playwright lub CairoSVG | konwersja SVG → PNG | `pip install playwright` + `playwright install chromium` |
+| LibreOffice | opcjonalny podgląd PDF (`--pdf`) | pakiet systemowy |
+| `pypdf` | odczyt PDF | `pip install pypdf` |
+| Walidatory DevOps | agent Validator | `terraform`, `tflint`, `hadolint`, `helm`, `kubeconform`, `yamllint`, `actionlint`, `shellcheck`, Docker — według potrzeb |
+
+Brak opcjonalnego narzędzia nie przerywa pracy: odpowiednie sprawdzenie dostaje status `NOT_RUN`, a agent podaje polecenie instalacji. Stan środowiska pokazuje `flowkit_exec.py --role analyst -- detect-docx-libs`.
+
+---
+
+## Skille
+
+Wszystkie skille mają prefiks `flowkit-`. Skill uruchamia się automatycznie, gdy prośba pasuje do jego opisu, albo przez orkiestrator.
+
+### Analiza biznesowa i systemowa
+
+| Skill | Wersja | Opis | Ścieżka |
+|---|---|---|---|
+| **flowkit-client-pt-prd-writer** | `2.9` | Dokument PT/PRD dla klienta wyłącznie na podstawie materiałów, w szablonie klienta (`.docx`, `.dotx`, `.md`) z kompletem jego stylów. Wariant skrócony dla małych zmian (1–3 strony) i pełny; tryb roboczy z oznaczeniami źródeł albo dokument końcowy bez dopisków. User stories Given-When-Then, Definition of Done, kontrola pokrycia wymagań testami, diagramy oparte na źródłach, tryb `AUTO`. | [`skills/flowkit-client-pt-prd-writer/`](skills/flowkit-client-pt-prd-writer/) |
+| **flowkit-client-meeting-recap** | `1.4` | Z transkrypcji (`.vtt`, `.docx`, `.txt`) dwa osobne pliki: wewnętrzny radar ryzyk z cytatami jako dowodami oraz szkic maila do klienta z decyzjami, zadaniami i właścicielami potwierdzonymi w rozmowie oraz prośbą o korekty w ustalonym oknie. | [`skills/flowkit-client-meeting-recap/`](skills/flowkit-client-meeting-recap/) |
+
+### Dane i SQL
+
+| Skill | Wersja | Opis | Ścieżka |
+|---|---|---|---|
+| **flowkit-sql-data-assistant** | `1.1` | Zapytania, zestawienia i skrypty poprawy danych dla PostgreSQL, SQL Server, Oracle, MySQL i MariaDB w trybach `READ_ONLY`, `DATA_INVESTIGATION` i `DATA_REPAIR`: transakcja, kontrola liczby rekordów, domyślne `ROLLBACK`, zachowanie poprzednich wartości i skrypt odtworzenia. Nigdy nie łączy się z bazą. | [`skills/flowkit-sql-data-assistant/`](skills/flowkit-sql-data-assistant/) |
+
+### DevOps i SRE
+
+| Skill | Wersja | Opis | Ścieżka |
+|---|---|---|---|
+| **flowkit-devops-sre-review** | `1.0` | Przegląd niezawodności usługi na podstawie plików: SLI/SLO i error budget, alerty, metryki RED/USE, sondy, requests i limits, HPA i PDB, backup i RPO/RTO, koszt. Ustalenia z dowodem `plik:linia`, rekomendacje z sygnałem, progiem i uzasadnieniem. | [`skills/flowkit-devops-sre-review/`](skills/flowkit-devops-sre-review/) |
+| **flowkit-devops-incident-postmortem** | `1.4` | Bezobwiniający raport postmortem: klasyfikacja SEV, oś czasu, łańcuch przyczyn (Trigger, Amplifier, Detection/Process Gap, 5 Whys), komunikacja i działania PREVENT/DETECT/MITIGATE. | [`skills/flowkit-devops-incident-postmortem/`](skills/flowkit-devops-incident-postmortem/) |
+
+Nowy skill zaczyna się od wzorca [`skills/_template/`](skills/_template/) — patrz [Rozwój i współtworzenie](#rozwój-i-współtworzenie).
+
+---
+
+## Agenci
+
+Orkiestrator `agent-3x3` koordynuje pracę w iteracjach (najwyżej 3 kroki, podsumowanie, decyzja użytkownika) i deleguje zadania do subagentów.
+
+| Agent | Uprawnienia | Zadanie |
+|---|---|---|
+| **agent-3x3** | odczyt, edycja, testy, dostarczenie po zgodzie | Orkiestrator: dobór trybu i skilla, plan, delegacja, weryfikacja, gałąź/commit/PR po zgodzie |
+| **agent-3x3-analyst** | odczyt, edycja, dokumenty | Wymagania, proces, analiza wpływu, backlog, przypadki testowe i UAT na dokumentach Word, Excel, PDF i tekstowych |
+| **agent-3x3-analyzer** | tylko odczyt | Analiza kodu i zależności z rozróżnieniem faktów i hipotez |
+| **agent-3x3-planner** | tylko odczyt | Plan iteracji z etykietami ryzyka i szacunkiem pracy |
+| **agent-3x3-pm** | tylko odczyt | User stories, kryteria akceptacji, ADR |
+| **agent-3x3-implementer** | edycja, testy | Jeden atomowy krok zmiany z samokontrolą diffa |
+| **agent-3x3-verifier** | tylko odczyt, testy | Weryfikacja w 9 wymiarach; bez uruchomionych testów `[NOT VERIFIED]` |
+| **agent-3x3-devops** | edycja, bez wykonywania poleceń | CI/CD, Docker, Kubernetes, IaC, chmura; polecenia zmieniające środowisko tylko jako propozycja `REQUIRES APPROVAL` |
+| **agent-3x3-diagnostics** | tylko odczyt | Logi, stan klastra i kontenerów, runbooki |
+| **agent-3x3-validator** | tylko odczyt, walidatory | Statyczna walidacja Terraform, Dockerfile, compose, Helm, Kubernetes YAML, CI, skryptów i JSON; bez wdrażania i dostępu do klastra |
+
+Definicje źródłowe są w [`agents/*_agent.md`](agents/), kontrakty niezależne od platformy w [`agents/core/`](agents/core/), a pliki instalowane u użytkownika w [`agents/adapters/`](agents/adapters/) (generowane przez `python scripts/build_agents.py`).
+
+### Prefiksy orkiestratora
+
+Prefiksy są opcjonalne — bez nich orkiestrator sam dobiera działanie i podaje je w linii `Mode:`. Można je łączyć: `PLAN: LOG: zadanie`, `AUTO: BA: zadanie`.
+
+| Prefiks | Działanie |
+|---|---|
+| `ANALYZE:` · `VERIFY:` · `PLAN:` · `SPEC:` | zaczyna od Analyzera, Verifiera, Plannera albo PM |
+| `BA:` · `DEVOPS:` · `DIAG:` · `SQL:` | analityk, DevOps, diagnostyka albo skill SQL |
+| `DRY:` | pokazuje plan i czeka na potwierdzenie |
+| `LOG:` | zapisuje iteracje w `AGENT_LOG.md` |
+| `SHIP:` | po weryfikacji i zgodzie: gałąź, commit, push, PR |
+| `FAST:` / `STRICT:` | wymusza tryb ryzyka (patrz niżej) |
+| `AUTO:` | realizuje całe zadanie na rekomendacjach i oddaje listę przyjętych decyzji |
+
+---
+
+## Jak to działa
+
+### Tryby ryzyka
+
+| Tryb | Kiedy | Zachowanie |
+|---|---|---|
+| `FAST` | prosta zmiana w jednym pliku, pytanie, podsumowanie | bez subagentów i pośrednich checkpointów; jedno podsumowanie |
+| `STANDARD` | typowe zadania | iteracje po 3 kroki z checkpointem |
+| `STRICT` | produkcja, migracje, dane, uprawnienia, operacje nieodwracalne (wybierany automatycznie) | zgoda przed każdym krokiem średniego i wysokiego ryzyka, weryfikacja po każdej zmianie, rollback ustalony przed zmianą |
+
+Żaden tryb, także `AUTO`, nie pomija zgody na kroki wysokiego ryzyka, usuwanie, dostarczenie i publikację.
+
+### Dokumenty klienta
+
+1. Agent pyta o znane źródła danych do przygotowania i weryfikacji dokumentu (w trybie `AUTO` pracuje na dostarczonych materiałach).
+2. Czyta materiały i szablon poleceniem `read-document` (Word, Excel, PDF, tekst, kod źródłowy; duże pliki partiami).
+3. Pisze treść w Markdown według zasad skilla: tylko ze źródeł, zwięźle, z oznaczonymi lukami.
+4. Zapisuje DOCX poleceniem `md-to-docx` na kopii szablonu klienta — dokument ma komplet jego stylów, numerację, nagłówki i stopki. `--template` zachowuje stronę tytułową i metryczkę, `--set POLE=WARTOŚĆ` wypełnia pola szablonu, diagramy mermaid i SVG trafiają do dokumentu jako PNG.
+5. Konwerter ponownie otwiera wynik i porównuje jego strukturę ze źródłem (`Kontrola DOCX: PASS/FAIL`); opcjonalnie tworzy podgląd PDF.
+
+Szczegóły: [docx-engine.md](skills/flowkit-client-pt-prd-writer/references/docx-engine.md).
+
+### Infrastruktura
+
+Diagnostics zbiera dowody → DevOps przygotowuje zmianę w plikach → Validator uruchamia statyczne walidatory → użytkownik zatwierdza wdrożenie i wykonuje je sam lub przez zatwierdzony pipeline → Diagnostics sprawdza efekt. Agenci przekazują sobie jeden blok `HANDOFF` z objawami, dowodami, hipotezami, planem walidacji i wynikiem ([devops-loop.md](runtime/procedures/devops-loop.md)).
+
+### Statusy
+
+Wszyscy agenci i raporty używają tych samych statusów: `PASS` (sprawdzone, zaliczone), `FAIL` (sprawdzone, niezaliczone), `NOT_RUN` (nie wykonano — brak narzędzia, dostępu lub warunku wstępnego), `UNKNOWN` (za mało danych), `BLOCKED` (zatrzymane przez brak uprawnień lub zależność).
+
+---
+
+## Konfiguracja
+
+| Ustawienie | Gdzie | Do czego służy |
+|---|---|---|
+| `flowkit-project.md` | katalog główny projektu | zasady projektu czytane przez orkiestrator na starcie; wzór: [`docs/flowkit-project.template.md`](docs/flowkit-project.template.md) |
+| `FLOWKIT_EXTRA_PATHS` | zmienna środowiskowa | dodatkowe katalogi poza projektem, z których agenci mogą czytać (rozdzielone `;` w Windows, `:` w Linux/macOS) |
+| `~/.flowkit/allow.json` | katalog domowy (inna ścieżka: `FLOWKIT_ALLOW_FILE`) | polecenia spoza listy roli, które świadomie pozwalasz agentom wykonywać |
+
+Przykład pliku zgód — wpis to początek polecenia, dla wszystkich ról (`"*"`) albo dla jednej roli:
+
+```json
+{
+  "commands": {
+    "*": ["make lint"],
+    "orchestrator": ["dotnet build", "terraform plan"],
+    "validator": ["checkov -d"]
+  }
+}
+```
+
+Agent wykonuje te polecenia sam, zamiast odsyłać je do czatu. Wpisy otwierające dowolne polecenia (`bash`, `pwsh`, samo `python` lub `node`, `python -c`, `node -e`) są pomijane. Aktywne zgody i listę poleceń roli pokazuje:
+
+```bash
+python ~/.claude/flowkit/runtime/flowkit_exec.py --role orchestrator -- help
+```
+
+Zmienne środowiskowe i plik zgód ustawia tylko użytkownik: hook odrzuca przypisania zmiennych w poleceniach agentów i blokuje im edycję pliku zgód.
+
+---
+
+## Bezpieczeństwo i ograniczenia
+
+**Co jest egzekwowane**
+
+- **Executor z listą dozwoloną dla roli** ([`runtime/flowkit_exec.py`](runtime/flowkit_exec.py)): polecenia bez powłoki, potoków i przekierowań; każda rola ma minimalny zestaw poleceń (`help` je pokazuje).
+- **Hook w Claude Code** ([`runtime/guard_bash.py`](runtime/guard_bash.py)): agent FlowKit nie uruchomi polecenia z pominięciem executora i nie zmieni pliku zgód ani plików runtime. Zwykłe sesje nie są objęte hookiem.
+- **Granica katalogu roboczego**: ścieżki w poleceniach — także po `..`, `~` i dowiązaniach symbolicznych — muszą leżeć w projekcie lub w `FLOWKIT_EXTRA_PATHS`.
+- **Ochrona danych**: wyniki poleceń są skracane, sekrety ukrywane, pliki `.env`, klucze i obiekty `Secret` niedostępne.
+- **Ochrona gałęzi**: push tylko nowej gałęzi, nigdy do `main`/`master` ani z wymuszeniem; `main` przyjmuje zmiany wyłącznie przez PR z zaliczonym CI ([ruleset](.github/rulesets/protect-main.json)).
+- **Bez sieci i MCP**: agenci mają jawne listy narzędzi bez narzędzi webowych.
+
+**Czego FlowKit nie zabezpiecza**
+
+- Executor to lista dozwolonych poleceń, a **nie izolacja systemowa (sandbox)**. Testy uruchamiane przez agenta (`pytest`, `npm test` itd.) wykonują kod projektu z uprawnieniami użytkownika.
+- **VS Code Copilot nie uruchamia hooka** — zostaw włączone potwierdzanie poleceń w terminalu i zmian w plikach.
+- Wygenerowane dokumenty, skrypty i konfiguracje wymagają przeglądu przez człowieka przed użyciem.
+
+**Dane w repozytorium**
+
+To repozytorium jest publiczne. Nie commituj sekretów, danych klientów ani plików roboczych agentów (`agent-context/`, `AGENT_LOG.md`) — wyklucza je [`.gitignore`](.gitignore). Przykłady w `examples/` i `tests/fixtures/` używają wyłącznie fikcyjnych danych.
+
+---
+
+## Obsługiwane platformy
+
+`TESTED` — sprawdzone automatycznie w CI · `PARTIAL` — CI sprawdza pliki, ale nie instalację ani działanie na platformie · `UNVERIFIED` — opis konfiguracji, bez testów.
+
+| Platforma | Skille | Agenci i runtime | Status | Ograniczenia |
+|---|---|---|---|---|
+| **Claude Code** | `~/.claude/skills/` lub wtyczka | adaptery `agents/adapters/claude-code/`, hook | `PARTIAL` | CI waliduje adaptery, manifest, hook i runtime; instalacja w Claude Code nie jest testowana w CI |
+| **VS Code Copilot** | `.github/skills/`, prompty `.github/prompts/` | adaptery `agents/adapters/vscode/` | `PARTIAL` | brak hooka — potwierdzanie poleceń w terminalu |
+| **Antigravity** | standard Agent Skills | bundle wtyczki | `UNVERIFIED` | brak testów |
+| **Cursor** | `.cursor/rules/<skill>.mdc` | — | `UNVERIFIED` | tylko treść skilli, bez agentów i runtime |
+| **ChatGPT / Codex** | Instructions + Knowledge | — | `UNVERIFIED` | tylko treść skilli, bez agentów i runtime |
+
+---
+
+## Instalacja
+
+### Claude Code — wtyczka (zalecane)
+
+Patrz [Szybki start](#szybki-start). Wtyczka instaluje skille, agentów, runtime i hook.
+
+### Claude Code — instalator
+
+```powershell
+# Windows: agenci i runtime (~/.claude/agents, ~/.claude/flowkit/runtime)
+.\scripts\install.ps1 -AgentName all -Platform claude
+
+# Skille instaluje się pojedynczo (~/.claude/skills)
+.\scripts\install.ps1 -SkillName flowkit-client-pt-prd-writer
+```
+
+```bash
+# Linux / macOS
+./scripts/install.sh agent all --platform claude
+./scripts/install.sh skill flowkit-client-pt-prd-writer
+```
+
+Opcje: `-DryRun` / `--dry-run` (symulacja), `-Force` / `--force` (nadpisanie bez pytania), `-Uninstall` / `--uninstall`, `-TargetPath` (instalacja skilla w projekcie, np. `./.claude/skills`).
+
+### VS Code Copilot
+
+Uruchom instalator **z katalogu projektu** — agenci trafiają do `.github/agents`, runtime do `.github/flowkit/runtime`, skille do `.github/skills`:
+
+```powershell
+& C:\sciezka\do\flowkit\scripts\install.ps1 -AgentName all -Platform vscode
+& C:\sciezka\do\flowkit\scripts\install.ps1 -SkillName flowkit-client-pt-prd-writer -Platform vscode
+```
+
+Prompty skilli dla Copilot Chat są w [`.github/prompts/`](.github/prompts/) (np. `/flowkit-client-pt-prd-writer`).
+
+### Instalacja ręczna
+
+- Skille: skopiuj `skills/<nazwa>/` do `~/.claude/skills/` (Claude Code) lub `.github/skills/` (VS Code).
+- Agenci: skopiuj pliki z `agents/adapters/claude-code/` do `~/.claude/agents/` albo z `agents/adapters/vscode/` do `.github/agents/`, a katalog `runtime/` do `~/.claude/flowkit/runtime` lub `.github/flowkit/runtime`.
+- Cursor i ChatGPT: wklej treść `SKILL.md` do reguł (`.cursor/rules/<nazwa>.mdc`) albo do Instructions, a szablony i checklisty dołącz jako pliki.
+
+---
+
+## Aktualizacja z wersji 1.7
+
+1. Zainstaluj ponownie agentów i runtime (`-AgentName all`) oraz potrzebne skille — runtime zawiera nowe zabezpieczenia i polecenia.
+2. **Usuń stare katalogi skilli bez prefiksu** `flowkit-` (np. `~/.claude/skills/client-pt-prd-writer`, `.github/skills/client-meeting-recap`), inaczej skille będą widoczne podwójnie.
+3. Agenci czytają teraz tylko pliki z katalogu projektu. Materiały z innych miejsc skopiuj do projektu albo ustaw `FLOWKIT_EXTRA_PATHS`.
+4. Polecenia, które agenci mają wykonywać sami (np. budowanie projektu), dopisz do pliku zgód.
+
+Pełna lista zmian: [CHANGELOG.md](CHANGELOG.md).
+
+---
+
+## Rozwiązywanie problemów
+
+| Komunikat | Przyczyna | Co zrobić |
+|---|---|---|
+| `ODRZUCONO: polecenie niedozwolone dla roli …` | polecenia nie ma na liście roli | jeśli ma je wykonywać agent, dopisz podany prefiks do pliku zgód; komunikat wskazuje też role, którym wolno je uruchomić |
+| `ODRZUCONO: ścieżka poza katalogiem roboczym` | plik leży poza projektem | skopiuj plik do projektu albo dopisz katalog do `FLOWKIT_EXTRA_PATHS` |
+| `BRAK NARZĘDZIA: … (status: NOT_RUN)` | narzędzie nie jest zainstalowane | zainstaluj je (patrz [Wymagania](#wymagania)) i powtórz krok |
+| `BRAK SILNIKA DOCX` (kod 3) | brak `python-docx` i Pandoc | `pip install python-docx` |
+| `KONTROLA: FAIL` (kod 4) | DOCX zapisany, ale jego struktura nie zgadza się ze źródłem | sprawdź ostrzeżenia (brakujące obrazy, nagłówki spoza stylów szablonu) przed oddaniem dokumentu |
+| diagram mermaid jako blok kodu | brak lokalnego mermaid-cli | `npm install -g @mermaid-js/mermaid-cli` |
+| `FlowKit zablokował zmianę pliku` | agent próbował zmienić plik zgód lub runtime | te pliki zmienia tylko użytkownik |
+
+---
+
+## Rozwój i współtworzenie
+
+```bash
+pip install pyyaml python-docx
+python scripts/validate_all.py      # skille, agenci, manifesty i testy jednostkowe (to samo uruchamia CI)
+python scripts/build_agents.py      # po każdej zmianie agents/*_agent.md
+python scripts/run_evals.py triggers --dry-run   # scenariusze aktywacji skilli
+```
+
+Ewaluacja z lokalnym Claude Code (`run_evals.py` bez `--dry-run`) ma limity czasu `--timeout` (scenariusz, 600 s) i `--total-timeout` (sesja, 3600 s), zapisuje wyniki po każdym scenariuszu i rozróżnia błędy jakości (`FAIL`) od błędów infrastruktury (`TIMEOUT`, `ERROR`, `SKIPPED`).
+
+**Nowy skill**
+
+1. Skopiuj [`skills/_template/`](skills/_template/) do `skills/flowkit-<nazwa>/` (prefiks `flowkit-` jest wymagany).
+2. Zmień `SKILL.template.md` na `SKILL.md` i uzupełnij nagłówek YAML: `name` (równy nazwie katalogu), `version`, `tags` (co najmniej 3), `description`.
+3. Dodaj `CHANGELOG.md`, `templates/` i `checklists/` (co najmniej jeden plik `.md` w każdym), opcjonalnie `examples/` i `references/`.
+4. Dopisz skill do tabeli w sekcji [Skille](#skille), do instalatorów i do `tests/evals/triggers.yaml`.
+5. Uruchom `python scripts/validate_all.py` i zgłoś zmianę przez Pull Request.
+
+**Zasady repozytorium**
+
+- Zmiany tylko przez Pull Request z gałęzi `feat/*`, `fix/*` lub `docs/*`; bezpośredni push do `main` jest zablokowany.
+- Przykłady i dane testowe są fikcyjne; żadnych sekretów ani danych klientów w commitach.
+- Konwencje pracy, commitów i gałęzi: [DEVELOPMENT.md](DEVELOPMENT.md), [CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+Skille i agenci generują treści, które wymagają weryfikacji przez człowieka. Repozytorium jest udostępniane „as is”, na licencji [MIT](LICENSE).

@@ -54,7 +54,7 @@ Files:
   ...
 Done: <2 sentences: what was created/changed>
 Security: <findings or "none detected">
-Validate: <read-only commands for the Diagnostics agent or user to run, e.g. `terraform validate`, `kubectl apply --dry-run=client -f <file>`, `hadolint Dockerfile`, or "none">
+Validate: <static checks for the Validator agent, e.g. `terraform fmt -check`, `terraform validate`, `hadolint Dockerfile`, `docker compose config -q`, `helm lint <chart>`, `kubeconform <file>`, or "none">
 Apply: <commands that change an environment, marked REQUIRES APPROVAL, or "none">
 Next: <one concrete follow-up action or "none">
 ```
@@ -72,6 +72,8 @@ Next: <one concrete suggestion>
 ```
 
 ## Rules
+
+- When the Orchestrator passes a `HANDOFF:` block (procedure `devops-loop.md`), fill Proposed change, Validation plan and Risk and rollback; keep a hypothesis marked as a hypothesis
 
 - One concern per invocation unless Orchestrator specifies otherwise
 - Never run or request automatic execution of `terraform apply/destroy`, `kubectl apply/delete`, `helm install/upgrade`, `docker push` or mutating cloud CLI commands; list them under `Apply:` for a human decision

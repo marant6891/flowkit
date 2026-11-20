@@ -3,7 +3,7 @@
 # Obsługuje flagi: --dry-run, --force, --platform claude|vscode, --uninstall
 #
 # Przykłady:
-#   ./scripts/install.sh skill client-pt-prd-writer --dry-run
+#   ./scripts/install.sh skill flowkit-client-pt-prd-writer --dry-run
 #   ./scripts/install.sh agent all --platform claude --force
 #   ./scripts/install.sh agent agent-3x3 --platform vscode
 
@@ -66,8 +66,8 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-AVAILABLE_SKILLS=("client-pt-prd-writer" "client-meeting-recap" "devops-incident-postmortem" "sql-data-assistant")
-AVAILABLE_AGENTS=("agent-3x3" "agent-3x3-analyzer" "agent-3x3-verifier" "agent-3x3-planner" "agent-3x3-implementer" "agent-3x3-devops" "agent-3x3-pm" "agent-3x3-diagnostics" "agent-3x3-analyst")
+AVAILABLE_SKILLS=("flowkit-client-pt-prd-writer" "flowkit-client-meeting-recap" "flowkit-devops-incident-postmortem" "flowkit-sql-data-assistant" "flowkit-devops-sre-review")
+AVAILABLE_AGENTS=("agent-3x3" "agent-3x3-analyzer" "agent-3x3-verifier" "agent-3x3-planner" "agent-3x3-implementer" "agent-3x3-devops" "agent-3x3-pm" "agent-3x3-diagnostics" "agent-3x3-analyst" "agent-3x3-validator")
 
 if [ -z "$MODE" ]; then
     echo ""

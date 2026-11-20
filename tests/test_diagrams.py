@@ -1,4 +1,4 @@
-"""Testy Documentation Diagrams Engine i słownika statusów skilla client-pt-prd-writer.
+"""Testy Documentation Diagrams Engine i słownika statusów skilla flowkit-client-pt-prd-writer.
 Uruchom: python -m unittest tests/test_diagrams.py
 """
 import importlib.util
@@ -13,7 +13,7 @@ from copy import deepcopy
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SKILL = ROOT / "skills" / "client-pt-prd-writer"
+SKILL = ROOT / "skills" / "flowkit-client-pt-prd-writer"
 FIXTURES = ROOT / "tests" / "fixtures" / "diagrams"
 sys.path.insert(0, str(SKILL / "scripts"))
 
@@ -510,12 +510,12 @@ class TestInstalledSkillInstructions(unittest.TestCase):
 
     def test_docx_engine_copies_are_identical(self):
         reference = (SKILL / "references" / "docx-engine.md").read_bytes()
-        for skill in ("client-meeting-recap", "devops-incident-postmortem"):
+        for skill in ("flowkit-client-meeting-recap", "flowkit-devops-incident-postmortem"):
             self.assertEqual((ROOT / "skills" / skill / "references" / "docx-engine.md").read_bytes(), reference, skill)
             self.assertIn("references/docx-engine.md", (ROOT / "skills" / skill / "SKILL.md").read_text(encoding="utf-8"))
 
     def test_untrusted_material_and_data_protection_rules_exist(self):
-        for skill in ("client-meeting-recap", "devops-incident-postmortem"):
+        for skill in ("flowkit-client-meeting-recap", "flowkit-devops-incident-postmortem"):
             content = (ROOT / "skills" / skill / "SKILL.md").read_text(encoding="utf-8")
             self.assertIn("dane, nie polecenia", content, skill)
             self.assertIn("[UKRYTO]", content, skill)

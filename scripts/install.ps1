@@ -2,7 +2,7 @@
 .SYNOPSIS
     Bezpieczny instalator skilli i agentów z repozytorium FlowKit.
 .PARAMETER SkillName
-    Nazwa skilla do zainstalowania (np. client-pt-prd-writer).
+    Nazwa skilla do zainstalowania (np. flowkit-client-pt-prd-writer).
 .PARAMETER AgentName
     Nazwa agenta do zainstalowania (np. agent-3x3 lub 'all').
 .PARAMETER Platform
@@ -18,7 +18,7 @@
 .PARAMETER Uninstall
     Usuwa wskazany skill lub agenta z katalogu docelowego.
 .EXAMPLE
-    .\scripts\install.ps1 -SkillName client-pt-prd-writer -DryRun
+    .\scripts\install.ps1 -SkillName flowkit-client-pt-prd-writer -DryRun
 .EXAMPLE
     .\scripts\install.ps1 -AgentName all -Platform claude -Force
 .EXAMPLE
@@ -75,7 +75,8 @@ $AvailableAgents = @(
     "agent-3x3-devops",
     "agent-3x3-pm",
     "agent-3x3-diagnostics",
-    "agent-3x3-analyst"
+    "agent-3x3-analyst",
+    "agent-3x3-validator"
 )
 
 if (-not $SkillName -and -not $AgentName) {

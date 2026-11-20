@@ -30,6 +30,7 @@ CORE_TERMS = {
     "agent-3x3-pm": ["US-1", "AC-1", "Given", "ADR-N"],
     "agent-3x3-diagnostics": ["DIAGNOSTICS:", "Probable cause:", "REQUIRES APPROVAL"],
     "agent-3x3-analyst": ["ANALYST:", "read-document", "Critical review"],
+    "agent-3x3-validator": ["VALIDATOR:", "NOT_RUN", "Overall:", "Not validated:"],
 }
 
 

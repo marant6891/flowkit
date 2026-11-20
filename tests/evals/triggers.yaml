@@ -1,6 +1,6 @@
 # Testy aktywacji skilli: czy właściwy skill uruchamia się, a niewłaściwy pozostaje nieaktywny.
 skills:
-  client-pt-prd-writer:
+  flowkit-client-pt-prd-writer:
     should_trigger:
       - Przygotuj dokument PT dla zmiany w formularzu zamówienia na podstawie załączonego zgłoszenia.
       - Napisz PRD dla nowej funkcji eksportu raportów.
@@ -13,7 +13,7 @@ skills:
       - Podsumuj to spotkanie w mailu do klienta.
       - Przygotuj raport postmortem z awarii bazy danych.
       - Wyjaśnij różnicę między REST a GraphQL.
-  client-meeting-recap:
+  flowkit-client-meeting-recap:
     should_trigger:
       - Podsumuj to spotkanie na podstawie transkrypcji VTT.
       - Przygotuj mail z ustaleniami po spotkaniu z klientem.
@@ -26,7 +26,7 @@ skills:
       - Zaplanuj agendę przyszłego spotkania.
       - Przetłumacz ten mail na angielski.
       - Przeanalizuj logi aplikacji z ostatniej godziny.
-  sql-data-assistant:
+  flowkit-sql-data-assistant:
     should_trigger:
       - Przygotuj zapytanie SQL pokazujące zamówienia klienta z ostatniego miesiąca.
       - Potrzebuję zestawienia z bazy z liczbą zgłoszeń według statusu.
@@ -39,7 +39,7 @@ skills:
       - Przygotuj Dockerfile dla bazy PostgreSQL.
       - Podsumuj spotkanie o migracji bazy danych.
       - Wyjaśnij, czym jest normalizacja danych.
-  devops-incident-postmortem:
+  flowkit-devops-incident-postmortem:
     should_trigger:
       - Przygotuj postmortem po wczorajszej awarii produkcji.
       - Zrób RCA tego incydentu na podstawie logów i alertów.
@@ -52,3 +52,16 @@ skills:
       - Przygotuj pipeline CI w GitHub Actions.
       - Podsumuj spotkanie zespołu DevOps.
       - Dodaj alert dla wysokiego użycia pamięci.
+  flowkit-devops-sre-review:
+    should_trigger:
+      - Zrób przegląd SRE tej usługi na podstawie manifestów i reguł alertów.
+      - Oceń gotowość produkcyjną serwisu płatności pod kątem niezawodności.
+      - Czy nasze SLO i alerty są dobrze ustawione? Sprawdź pliki w monitoring/.
+      - Przejrzyj sondy, requests i limity oraz HPA w tym chart Helm.
+      - Oceń backup i RPO/RTO naszej bazy na podstawie tej konfiguracji.
+      - Mamy alert fatigue, przeanalizuj nasze reguły Prometheus.
+    should_not_trigger:
+      - Przygotuj postmortem po wczorajszej awarii.
+      - Napisz Dockerfile dla aplikacji Go.
+      - Podsumuj spotkanie zespołu SRE.
+      - Przygotuj zapytanie SQL o liczbę zamówień.

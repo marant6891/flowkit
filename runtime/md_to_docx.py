@@ -31,6 +31,9 @@ import tempfile
 import zipfile
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from flowkit_exec import EXTRA_PATHS_ENV, allowed_roots, within_allowed  # noqa: E402
+
 CONTENT_MARKER = "[[FLOWKIT:TREŚĆ]]"
 MERMAID_BLOCK = re.compile(r"^```+\s*mermaid[^\n]*\n(.*?)^```+[ \t]*$", re.DOTALL | re.MULTILINE)
 IMAGE = re.compile(r'!\[([^\]]*)\]\(\s*<?([^)\s>]+)>?(\s+"[^"]*")?\s*\)')
@@ -158,6 +161,7 @@ def svg_to_png(svg: Path, png: Path) -> str | None:
 
 def resolve_images(text: str, base_dir: Path, images_dir: Path, report: Report) -> str:
     converted: dict[Path, Path] = {}
+    roots = [*allowed_roots(), images_dir.resolve()]  # katalog roboczy, FLOWKIT_EXTRA_PATHS i wyrenderowane diagramy
 
     def replace(match: re.Match) -> str:
         alt, target, title = match.group(1), match.group(2), match.group(3) or ""
@@ -167,6 +171,9 @@ def resolve_images(text: str, base_dir: Path, images_dir: Path, report: Report) 
         path = Path(target)
         path = path if path.is_absolute() else (base_dir / path)
         path = path.resolve()
+        if not within_allowed(path, roots):
+            report.warn(f"obraz poza katalogiem roboczym nie jest osadzany: {target} (zmienna {EXTRA_PATHS_ENV})")
+            return alt or "[obraz]"
         if not path.exists():
             report.warn(f"brak pliku obrazu: {target}")
             return match.group(0)

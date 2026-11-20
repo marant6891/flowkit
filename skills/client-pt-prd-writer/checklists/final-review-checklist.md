@@ -13,7 +13,7 @@
 ## B. Szablon
 - [ ] Użyto szablonu użytkownika (jeśli był) – kolejność, numeracja, nazwy sekcji, style zachowane.
 - [ ] Brak pozostawionych placeholderów i tekstów instruktażowych szablonu.
-- [ ] Sekcje niedotyczące mają „Nie dotyczy – uzasadnienie”; sekcje bez danych mają „Brak danych – OPEN-NNN”.
+- [ ] Szablon użytkownika: sekcje niedotyczące mają „Nie dotyczy.”; szablon zapasowy: sekcji niedotyczących nie ma, są wymienione jednym zdaniem w Zakresie. Sekcje bez danych mają „Brak danych – OPEN-NNN”.
 - [ ] Metryczka i historia zmian są wypełnione (nieznane pola: DO POTWIERDZENIA).
 - [ ] Format pliku zgodny z szablonem / prośbą; dokument otwarty i sprawdzony wizualnie.
 
@@ -45,6 +45,15 @@
 - [ ] Dokument zrozumiały dla osoby nietechnicznej; skróty w słowniku.
 - [ ] Wskazano, kto musi podjąć jakie decyzje.
 - [ ] Długość adekwatna do wielkości zmiany – brak treści „na wypełnienie”.
+
+## E2. Zwięzłość
+- [ ] Objętość mieści się w tabeli z Etapu 5 SKILL.md albo przekroczenie jest uzasadnione.
+- [ ] Każda informacja występuje raz; w innych sekcjach jest tylko jej ID (kryteria akceptacji nie są powielone w FR, US, testach i macierzy).
+- [ ] Brak zdań wprowadzających przed tabelami, wypełniaczy („Niniejszy dokument…”, „W ramach zmiany…”) i podsumowań sekcji.
+- [ ] Streszczenie zarządcze ma najwyżej 5 zdań; kontekst – jeden akapit.
+- [ ] Mała zmiana bez szablonu użytkownika: użyto wariantu skróconego (6 rozdziałów, 1–3 strony).
+- [ ] Żadna tabela nie ma mniej niż 3 wierszy, chyba że narzuca ją szablon użytkownika.
+- [ ] Każdy scenariusz Given-When-Then opisuje odrębne zachowanie; DoD nie zawiera ogólnych formułek.
 
 ## F. Tryb „Dokument końcowy bez dopisków” (tylko gdy użytkownik o niego poprosił)
 - [ ] Użytkownik wprost poprosił o wersję bez dopisków; tryb nie został włączony domyślnie.

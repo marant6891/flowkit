@@ -1,12 +1,15 @@
 """Testy lokalnej warstwy bezpieczeństwa FlowKit.
 Uruchom: python -m unittest tests/test_runtime.py
 """
+import argparse
 import importlib.util
 import json
+import os
 import re
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 import zipfile
 from pathlib import Path
@@ -33,7 +36,7 @@ class TestCommandPolicy(unittest.TestCase):
             "verifier": ["pytest -q", "python -m unittest tests/test_a.py", "dotnet test", "go test ./...", "git diff"],
             "analyzer": ["rg TODO src", "tsc --noEmit", "git log -5"],
             "implementer": ["pytest -x tests/test_a.py", "eslint src/a.js"],
-            "orchestrator": ["git status", "git add src/a.py", "git commit -m opis", "git push -u origin feat/a",
+            "orchestrator": ["python -m unittest tests/test_a.py", "pytest -q", "dotnet test", "tsc --noEmit", "git status", "git add src/a.py", "git commit -m opis", "git push -u origin feat/a",
                              "gh pr create --fill", "python C:/x/client-pt-prd-writer/scripts/generate_diagram.py m.yaml"],
             "analyst": ["read-document brief.docx --outline", "python /x/client-pt-prd-writer/scripts/check_status_labels.py d.md"],
         }
@@ -167,6 +170,26 @@ class TestLocalDocuments(unittest.TestCase):
         with self.assertRaises(ValueError):
             fx.word_lines(path)
 
+    def test_source_code_and_text_files_are_read(self):
+        code = self.dir / "Program.cs"
+        code.write_text("namespace A {\n  // zażółć\n}\n", encoding="utf-8-sig")
+        self.assertEqual(fx.document_lines(code), ["namespace A {", "  // zażółć", "}"])
+        legacy = self.dir / "stary.sql"
+        legacy.write_bytes("SELECT 'Łódź';".encode("cp1250"))
+        self.assertEqual(fx.document_lines(legacy), ["SELECT 'Łódź';"])
+        utf16 = self.dir / "App.config"
+        utf16.write_text("<config/>", encoding="utf-16")
+        self.assertEqual(fx.document_lines(utf16), ["<config/>"])
+        binary = self.dir / "a.dll"
+        binary.write_bytes(b"MZ\0\0\x90")
+        with self.assertRaises(ValueError):
+            fx.document_lines(binary)
+
+    def test_rejection_hint_points_to_the_right_role_or_command(self):
+        self.assertIn("verifier", fx.check("analyzer", ["pytest", "-q"]))
+        self.assertIn("md-to-docx", fx.check("orchestrator", ["pandoc", "a.md"]))
+        self.assertNotIn("md-to-docx", fx.check("orchestrator", ["python", "evil.py"]))
+
     def test_sensitive_document_is_rejected(self):
         path = self.dir / ".env"
         path.write_text("A=1", encoding="utf-8")
@@ -261,7 +284,7 @@ class TestDocxWriting(unittest.TestCase):
         for option, output in (("--template", "a.docx"), ("--reference-doc", "b.docx")):
             result = subprocess.run([sys.executable, EXEC, "--role", "analyst", "--", "md-to-docx", str(self.dir / "dok.md"),
                                      str(self.dir / output), option, str(self.dir / "szablon.docx")],
-                                    capture_output=True, text=True, encoding="utf-8", check=False)
+                                    capture_output=True, text=True, encoding="utf-8", check=False, cwd=self.dir)
             self.assertEqual(result.returncode, 0, result.stdout)
             doc = Document(self.dir / output)
             self.assertEqual(doc.sections[0].footer.paragraphs[0].text, "Stopka klienta")
@@ -274,6 +297,114 @@ class TestDocxWriting(unittest.TestCase):
         self.assertLess(texts.index("Strona tytułowa"), texts.index("Zakres"))
         self.assertLess(texts.index("Zakres"), texts.index("Zakończenie szablonu"))
         self.assertNotIn("[[FLOWKIT:TREŚĆ]]", texts)
+
+
+class TestWorkspaceBoundary(unittest.TestCase):
+
+    def setUp(self):
+        self.outside = tempfile.TemporaryDirectory()
+        self.addCleanup(self.outside.cleanup)
+        self.outside_dir = Path(self.outside.name).resolve()
+        (self.outside_dir / "tajne.txt").write_text("x", encoding="utf-8")
+        self.workspace = tempfile.TemporaryDirectory()
+        self.addCleanup(self.workspace.cleanup)
+        self.previous = Path.cwd()
+        os.chdir(self.workspace.name)
+        self.addCleanup(os.chdir, self.previous)
+        self.addCleanup(os.environ.pop, fx.EXTRA_PATHS_ENV, None)
+        os.environ.pop(fx.EXTRA_PATHS_ENV, None)
+        Path("dok.md").write_text("# A", encoding="utf-8")
+
+    def test_paths_outside_workspace_are_rejected(self):
+        outside = str(self.outside_dir / "tajne.txt")
+        for argv in (["read-document", outside], ["read-document", "../tajne.txt"], ["rg", "x", outside],
+                     ["grep", "-r", "x", str(self.outside_dir)], ["find", str(self.outside_dir), "-name", "*.txt"],
+                     ["md-to-docx", "dok.md", "wynik.docx", "--reference-doc", str(self.outside_dir / "s.docx")],
+                     ["md-to-docx", "dok.md", "wynik.docx", f"--template={self.outside_dir / 's.docx'}"],
+                     ["md-to-docx", "dok.md", str(self.outside_dir / "wynik.docx")],
+                     ["read-document", "~/.ssh/config"]):
+            problem = fx.check("analyst" if argv[0] != "find" else "analyzer", argv)
+            self.assertIsNotNone(problem, argv)
+            self.assertIn("poza katalogiem roboczym", problem, argv)
+
+    def test_paths_inside_workspace_and_non_paths_are_allowed(self):
+        Path("docs").mkdir()
+        for role, argv in (("analyst", ["read-document", "dok.md", "--lines", "1-20"]),
+                           ("analyst", ["read-document", "./docs/../dok.md"]),
+                           ("analyzer", ["git", "show", "HEAD:README.md"]),
+                           ("analyzer", ["rg", "TODO", "src/app"]),
+                           ("orchestrator", ["gh", "pr", "create", "--title", "feat: a/b"]),
+                           ("diagnostics", ["kubectl", "get", "deployment/app", "-n", "prod", "-o", "yaml"])):
+            self.assertIsNone(fx.check(role, argv), argv)
+
+    def test_extra_paths_are_configured_by_the_user(self):
+        os.environ[fx.EXTRA_PATHS_ENV] = str(self.outside_dir)
+        self.assertIsNone(fx.check("analyst", ["read-document", str(self.outside_dir / "tajne.txt")]))
+
+    def test_symlink_escape_is_rejected(self):
+        try:
+            Path("link").symlink_to(self.outside_dir, target_is_directory=True)
+        except (OSError, NotImplementedError):
+            self.skipTest("system nie pozwala tworzyć dowiązań symbolicznych")
+        self.assertIsNotNone(fx.check("analyst", ["read-document", "link/tajne.txt"]))
+
+    def test_skill_script_path_is_allowed_but_its_arguments_are_checked(self):
+        script = "C:/x/client-pt-prd-writer/scripts/check_status_labels.py"
+        self.assertIsNone(fx.check("analyst", ["python", script, "dok.md"]))
+        self.assertIsNotNone(fx.check("analyst", ["python", script, str(self.outside_dir / "tajne.txt")]))
+
+    def test_docx_images_outside_workspace_are_not_embedded(self):
+        import md_to_docx as md
+        report = md.Report()
+        image = self.outside_dir / "a.png"
+        image.write_bytes(b"x")
+        text = md.resolve_images(f"![logo]({image.as_posix()})", Path.cwd(), Path.cwd() / "img", report)
+        self.assertEqual(text, "logo")
+        self.assertIn("poza katalogiem roboczym", report.warnings[0])
+
+
+class TestEvalRunnerLimits(unittest.TestCase):
+
+    def test_hanging_process_is_stopped(self):
+        started = time.monotonic()
+        status, _, error = run_evals.run_process([sys.executable, "-c", "import time; time.sleep(30)"], ".", 1)
+        self.assertEqual(status, "TIMEOUT")
+        self.assertLess(time.monotonic() - started, 15)
+        self.assertIn("1 s", error)
+
+    def test_infrastructure_errors_are_not_quality_failures(self):
+        item = {"skill": "client-meeting-recap", "prompt": "x", "expected": True}
+        usage = {"input_tokens": 0, "output_tokens": 0}
+        timeout = run_evals.evaluate(item, {"status": "TIMEOUT", "error": "przekroczono", "usage": usage})
+        failed = run_evals.evaluate(item, {"status": "OK", "error": "", "usage": usage, "skills": [], "answer": ""})
+        self.assertEqual(timeout["status"], "TIMEOUT")
+        self.assertEqual(failed["status"], "FAIL")
+        self.assertEqual(run_evals.summary([timeout])[1], 2)
+        self.assertEqual(run_evals.summary([timeout, failed])[1], 1)
+
+    def test_partial_results_are_saved_and_session_limit_skips_the_rest(self):
+        items = [{"skill": "s", "prompt": "p", "expected": True}, {"skill": "s", "prompt": "q", "expected": False}]
+        calls = []
+
+        def fake_execute(prompt, model, baseline, dry_run, timeout):
+            calls.append(prompt)
+            time.sleep(0.2)
+            return {"status": "OK", "error": "", "skills": ["s"], "answer": "", "finished": True,
+                    "usage": {"input_tokens": 1, "output_tokens": 1}}
+
+        original = run_evals.execute
+        run_evals.execute = fake_execute
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                target = Path(tmp) / "wynik.json"
+                args = argparse.Namespace(model="sonnet", dry_run=False, timeout=10, total_timeout=0.1)
+                rows = run_evals.run_all(items, args, target)
+                saved = json.loads(target.read_text(encoding="utf-8"))
+        finally:
+            run_evals.execute = original
+        self.assertEqual(calls, ["p"])
+        self.assertEqual([r["status"] for r in rows], ["PASS", "SKIPPED"])
+        self.assertEqual(saved, rows)
 
 
 class TestLocalOnlySolution(unittest.TestCase):

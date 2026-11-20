@@ -10,6 +10,7 @@ Kody wyjścia: kod polecenia, 2 = polecenie odrzucone, 3 = brak wymaganej biblio
 from __future__ import annotations
 
 import importlib.util
+import os
 import re
 import shutil
 import subprocess
@@ -56,7 +57,8 @@ BUILTINS = {
 }
 
 ROLE_COMMANDS = {
-    "orchestrator": HELP + GIT_READ + SEARCH + DELIVERY + DOCUMENTS + DOCUMENT_WRITE,
+    # Orkiestrator uruchamia testy i kontrole statyczne w ścieżce szybkiej („make the change, run its check”).
+    "orchestrator": HELP + GIT_READ + SEARCH + STATIC + TESTS + DELIVERY + DOCUMENTS + DOCUMENT_WRITE,
     "analyzer": HELP + GIT_READ + SEARCH + STATIC,
     "verifier": HELP + GIT_READ + SEARCH + STATIC + TESTS,
     "implementer": HELP + STATIC + TESTS + DOCUMENTS + DOCUMENT_WRITE,
@@ -124,6 +126,70 @@ def delivery_problem(argv: list[str]) -> str | None:
     return None
 
 
+# --- Granica katalogu roboczego ------------------------------------------------
+# Agent widzi tylko katalog, w którym go uruchomiono, i katalogi dopisane przez użytkownika w zmiennej
+# FLOWKIT_EXTRA_PATHS (lista rozdzielona ';' w Windows lub ':' w Linux/macOS). Hook odrzuca przypisania
+# zmiennych w poleceniu agenta, więc listę zmienia tylko użytkownik.
+EXTRA_PATHS_ENV = "FLOWKIT_EXTRA_PATHS"
+
+
+def allowed_roots() -> list[Path]:
+    roots = [Path.cwd().resolve()]
+    for item in os.environ.get(EXTRA_PATHS_ENV, "").split(os.pathsep):
+        if item.strip():
+            roots.append(Path(item.strip()).expanduser().resolve())
+    return roots
+
+
+def within_allowed(path: Path, roots: list[Path] | None = None) -> bool:
+    """Ścieżka po rozwinięciu `..`, `~` i dowiązań symbolicznych musi leżeć w dozwolonym katalogu."""
+    try:
+        target = path.expanduser().resolve()
+    except (OSError, RuntimeError, ValueError):
+        return False
+    return any(target == root or root in target.parents for root in roots or allowed_roots())
+
+
+def path_candidates(argv: list[str], skip: set[int]) -> list[str]:
+    """Argumenty, które wyglądają na ścieżki: separator, `.`/`~` na początku, litera dysku albo istniejący plik."""
+    found = []
+    for index, token in enumerate(argv[1:], 1):
+        if index in skip or "://" in token:
+            continue
+        value = token.split("=", 1)[1] if token.startswith("-") and "=" in token else token
+        if value.startswith("-") or not value:
+            continue
+        drive = re.match(r"^[A-Za-z]:[\\/]", value)
+        if ":" in value and not drive:
+            continue  # rewizje git (HEAD:plik), typy kubectl, pola klucz:wartość
+        if drive or "/" in value or "\\" in value or value.startswith((".", "~")) or Path(value).exists():
+            found.append(value)
+    return found
+
+
+def path_problem(argv: list[str], skip: set[int]) -> str | None:
+    roots = allowed_roots()
+    for value in path_candidates(argv, skip):
+        if not within_allowed(Path(value), roots):
+            return (f"ścieżka poza katalogiem roboczym: {value}. Skopiuj plik do projektu albo poproś użytkownika "
+                    f"o dopisanie katalogu do zmiennej {EXTRA_PATHS_ENV}")
+    return None
+
+
+DOCX_TOOLS = ("pandoc", "pypandoc", "mmdc", "rsvg-convert")
+
+
+def rejection_hint(role: str, argv: list[str]) -> str:
+    """Podpowiedź dopasowana do odrzuconego polecenia."""
+    joined = " ".join(argv).lower()
+    if "md-to-docx" in ROLE_COMMANDS[role] and (argv[0] in DOCX_TOOLS or "docx" in joined or "pandoc" in joined):
+        return " (zapis DOCX: md-to-docx <wejście.md> <wynik.docx> [--template szablon])"
+    others = [r for r, prefixes in ROLE_COMMANDS.items() if r != role and any(matches(argv, p) for p in prefixes)]
+    if others:
+        return f" (polecenie należy do ról: {', '.join(others)} — przekaż krok właściwemu agentowi)"
+    return ""
+
+
 def check(role: str, raw_argv: list[str]) -> str | None:
     """Zwraca powód odrzucenia albo None, gdy polecenie jest dozwolone."""
     if role not in ROLE_COMMANDS:
@@ -138,13 +204,14 @@ def check(role: str, raw_argv: list[str]) -> str | None:
             return f"zabroniona opcja: {token}"
         if SENSITIVE_PATH.search(token):
             return f"dostęp do pliku wrażliwego jest zabroniony: {token}"
-    if role in SKILL_SCRIPT_ROLES and is_skill_script(argv):
+    skill_script = role in SKILL_SCRIPT_ROLES and is_skill_script(argv)
+    problem = path_problem(argv, {1} if skill_script else set())
+    if problem:
+        return problem
+    if skill_script:
         return None
     if not any(matches(argv, prefix) for prefix in ROLE_COMMANDS[role]):
-        hint = ""
-        if argv[0] in ("pandoc", "pypandoc", "mmdc", "npx", "rsvg-convert", *PYTHON_NAMES) and "md-to-docx" in ROLE_COMMANDS[role]:
-            hint = " (zapis DOCX: md-to-docx <wejście.md> <wynik.docx> [--reference-doc szablon])"
-        return f"polecenie niedozwolone dla roli {role}: {' '.join(argv[:3])}{hint}"
+        return f"polecenie niedozwolone dla roli {role}: {' '.join(argv[:3])}{rejection_hint(role, argv)}"
     if argv[0] == "kubectl":
         if any("secret" in token.lower() for token in argv[1:]):
             return "odczyt obiektów Secret jest zabroniony"
@@ -286,9 +353,29 @@ def document_lines(path: Path) -> list[str]:
         return excel_lines(path)
     if suffix == ".pdf":
         return pdf_lines(path)
-    if suffix in TEXT_SUFFIXES:
-        return path.read_text(encoding="utf-8", errors="replace").splitlines()
-    raise ValueError(f"nieobsługiwany format: {suffix}")
+    if suffix in TEXT_SUFFIXES or is_text_file(path):
+        return read_text_lines(path)
+    raise ValueError(f"nieobsługiwany format: {suffix or 'brak rozszerzenia'} (plik binarny; obsługiwane: "
+                     ".docx, .dotx, .xlsx, .xlsm, .pdf i pliki tekstowe, w tym kod źródłowy)")
+
+
+def is_text_file(path: Path) -> bool:
+    """Kod źródłowy i inne pliki tekstowe rozpoznawane po treści: brak bajtów zerowych w początku pliku."""
+    with path.open("rb") as handle:
+        head = handle.read(8192)
+    if head.startswith((b"\xff\xfe", b"\xfe\xff")):
+        return True  # UTF-16 z BOM (np. pliki z Visual Studio)
+    return b"\0" not in head
+
+
+def read_text_lines(path: Path) -> list[str]:
+    data = path.read_bytes()
+    if data.startswith((b"\xff\xfe", b"\xfe\xff")):
+        return data.decode("utf-16", errors="replace").splitlines()
+    try:
+        return data.decode("utf-8-sig").splitlines()
+    except UnicodeDecodeError:
+        return data.decode("cp1250", errors="replace").splitlines()  # starsze polskie pliki Windows
 
 
 def read_document(args: list[str]) -> int:

@@ -1,6 +1,6 @@
 ---
 name: client-pt-prd-writer
-version: "2.6"
+version: "2.8"
 tags: [analyst, prd, pt, requirements, documentation, client, gherkin, dod, diagrams]
 description: >
   Tworzy profesjonalną dokumentację PT/PRD (projekt techniczny, specyfikacja
@@ -39,8 +39,10 @@ a nie kompletność wszystkich sekcji.
    Nie dodawaj funkcji, ról, integracji, NFR ani etapów, których nie ma w źródle.
    Pomysły spoza źródła możesz zgłosić wyłącznie jako `Rekomendacja` w osobnej
    sekcji, wyraźnie oddzielonej od wymagań.
-4. **Sekcje są warunkowe, nie obowiązkowe.** Sekcja, której zmiana nie dotyczy,
-   dostaje jedno zdanie: „Nie dotyczy – <uzasadnienie ze źródła>”. Sekcja, dla
+4. **Sekcje są warunkowe, nie obowiązkowe.** W szablonie użytkownika sekcja, której
+   zmiana nie dotyczy, dostaje samo „Nie dotyczy.” (uzasadnienie tylko, gdy nie jest
+   oczywiste). W szablonie zapasowym sekcji warunkowych, które nie dotyczą zmiany,
+   **nie umieszczaj wcale** — wymień je jednym zdaniem w sekcji „Zakres”. Sekcja, dla
    której brak danych: „Brak danych – patrz OPEN-NNN”. Nie wypełniaj sekcji tylko
    dlatego, że istnieje w szablonie.
 5. **Szablon użytkownika ma pierwszeństwo** nad szablonem zapasowym tego skilla
@@ -64,10 +66,14 @@ a nie kompletność wszystkich sekcji.
     dopisków” (patrz osobny rozdział): oznaczenia znikają z dokumentu, ale
     zasady 1, 3, 6 i 7 obowiązują bez zmian – pochodzenie treści prowadzisz
     wtedy poza dokumentem.
+
 13. **Polskie nazwy w tabelach.** Statusy, priorytety i wymagalność zapisuj po polsku
     według [słownika statusów](./references/status-vocabulary.md), także gdy źródło
     podaje je po angielsku (np. `Must` → `Wymagane`, `In Progress` → `W toku`).
     Wyjątkiem są wartości narzucone przez szablon klienta.
+14. **Zwięzłość.** Dokument ma być krótki i konkretny — patrz „Zasady zwięzłości” w Etapie 5.
+    Każdą informację zapisuj raz, w jednym miejscu; w innych sekcjach odwołuj się do jej ID.
+    Rozwlekłość nie jest rzetelnością: zdanie, które nic nie dodaje, usuń.
 
 # Etap 0: Ustal szablon i format wyjściowy
 
@@ -86,8 +92,18 @@ a nie kompletność wszystkich sekcji.
      z treścią, np. strona tytułowa) albo `--reference-doc` (same style), zgodnie z
      [instrukcją DOCX](./references/docx-engine.md). Markdown oddajesz tylko, gdy `md-to-docx` zwróci
      kod 3 (brak silnika), z dokładnym komunikatem i instrukcją instalacji.
-3. **Jeśli brak szablonu:** użyj [szablonu zapasowego](./templates/client-pt-prd-template.md)
-   i oddaj dokument w formacie, o który prosi użytkownik.
+3. **Jeśli brak szablonu:** wybierz **wariant dokumentu** i oddaj dokument w formacie, o który
+   prosi użytkownik:
+
+   | Wariant | Kiedy | Szablon |
+   |---|---|---|
+   | **Skrócony** (domyślny dla małych zmian) | do 3 wymagań, jeden obszar aplikacji, bez nowych integracji, migracji danych, zmian uprawnień i architektury | [szablon skrócony](./templates/client-pt-prd-compact-template.md): 6 rozdziałów, 1–3 strony |
+   | **Pełny** | pozostałe zmiany albo gdy użytkownik prosi o pełny dokument | [szablon pełny](./templates/client-pt-prd-template.md) |
+
+   Wybór podaj jednym zdaniem w Etapie 4 („Wariant skrócony – zmiana obejmuje 2 wymagania w jednym
+   ekranie”). Użytkownik może go zmienić. Gdy w trakcie pracy zakres urośnie ponad kryteria, przejdź na
+   wariant pełny i powiedz o tym. Wariant skrócony nie zwalnia z zasad 1–3, 6 i 7: brakujące
+   informacje nadal są `OPEN-NNN`.
 4. Gdy użytkownik dostarczy poprzedni dokument jako wzór – przejmij z niego
    strukturę, styl i poziom szczegółowości, **nie treść merytoryczną**.
 5. Ustal tryb wyniku: **roboczy z oznaczeniami** (domyślny) czy **końcowy bez
@@ -160,7 +176,7 @@ Nie opisuj stacku, architektury ani modułów niezwiązanych ze zmianą.
 
 Przed napisaniem pełnego dokumentu przedstaw użytkownikowi krótko:
 1. jak rozumiesz zmianę (3–5 zdań, ze wskazaniem źródeł),
-2. które sekcje szablonu zostaną wypełnione, które oznaczysz „Nie dotyczy”,
+2. wariant dokumentu (skrócony/pełny, gdy brak szablonu) oraz które sekcje zostaną wypełnione, które oznaczysz „Nie dotyczy”,
    a które „Brak danych”,
 3. listę pytań (Etap 2) i proponowanych `ASSUMPTION`,
 4. plan diagramów z decyzją dla każdego procesu, przepływu, integracji i relacji między
@@ -172,8 +188,10 @@ lukami oznaczonymi jako `OPEN` (bez zgadywania) i listą pytań na końcu.
 
 # Etap 5: Pisanie dokumentu
 
-Pisz w strukturze szablonu (Etap 0). Obszary treści, które należy umieścić w
-odpowiednich sekcjach szablonu – **tylko jeśli dotyczą zmiany**:
+Pisz w strukturze szablonu (Etap 0). W **wariancie skróconym** obowiązuje tylko jego 6 rozdziałów:
+poniższa tabela nie dodaje rozdziałów, a wskazuje, czy temat ma się pojawić jako punkt listy.
+W wariancie pełnym i szablonie użytkownika obszary treści umieszczaj w odpowiednich sekcjach
+– **tylko jeśli dotyczą zmiany**:
 
 | Obszar | Kiedy wymagany |
 |---|---|
@@ -197,11 +215,11 @@ odpowiednich sekcjach szablonu – **tylko jeśli dotyczą zmiany**:
 | Ryzyka i zależności | zawsze – tylko zidentyfikowane, ze źródłem |
 | Rekomendacje (poza wymaganiami) | opcjonalnie |
 | Słownik pojęć | gdy w dokumencie są skróty/terminy |
-| Macierz śledzenia wymagań | gdy jest ≥ 3 wymagań FR |
+| Macierz śledzenia wymagań | gdy jest ≥ 6 wymagań FR i powiązania nie wynikają z kolumn tabel FR/US/TEST |
 | Tematy do wyjaśnienia | zawsze (może zawierać „Brak otwartych tematów”) |
 
 Zasady pisania:
-- Każde FR, US, NFR, INT, DATA, RISK w tabeli ma kolumnę „Źródło”.
+- Każde FR, US, NFR, INT, DATA, RISK ma źródło: w tabeli kolumna „Źródło”, w liście dopisek w nawiasie.
 - Priorytet, właściciel, termin i miara są wpisywane **tylko ze źródła**; inaczej
   `DO POTWIERDZENIA` + OPEN.
 - Gdy źródło określa wymagalność w skali MoSCoW, użyj kolumny „Wymagalność” z wartościami
@@ -211,6 +229,36 @@ Zasady pisania:
   podstaw do kryterium, nie wymyślaj progu – oznacz OPEN.
 - Streszczenie zarządcze pisz na końcu, z treści dokumentu, bez nowych faktów.
 - Zobacz [przykłady: źródło vs zmyślenie](./examples/sourced-vs-invented.md).
+
+**Zasady zwięzłości** (obowiązują zawsze, także w szablonie użytkownika):
+
+| Wielkość zmiany | Orientacyjna objętość treści (bez strony tytułowej i metryczki) |
+|---|---|
+| Mała: do 3 FR, jeden obszar (wariant skrócony) | 1–3 strony |
+| Średnia: 4–10 FR lub kilka obszarów | 4–8 stron |
+| Duża: ponad 10 FR, integracje, migracja | do 15 stron; więcej tylko, gdy wymaga tego treść źródeł |
+
+- **Raz, w jednym miejscu.** Kryterium akceptacji jest w US (Given-When-Then) albo w tabeli FR, nie w obu.
+  Plan testów odwołuje się do scenariuszy US (`US-001/S1`) i dodaje tylko testy, których scenariusze nie
+  pokrywają. Ryzyko opisane w Ryzykach nie wraca w Analizie wpływu — tam tylko jego ID.
+- **Tabela tylko, gdy porządkuje dane:** co najmniej 3 wiersze, które porównuje się w tych samych
+  kolumnach. 1–2 elementy zapisz jako punkt listy albo zdanie. Nie twórz osobnej tabeli dla każdego
+  typu identyfikatora (GOAL, SC, OOS, CHG, NFR, RISK…) – przy małej zmianie wystarczy lista z ID.
+  Tabele narzucone przez szablon użytkownika zostają.
+- Bez zdań wprowadzających przed tabelą („Poniższa tabela przedstawia…”).
+  Komórka tabeli: jedno zdanie, najlepiej do 15 słów.
+- **Szablon użytkownika przy małej zmianie:** sekcje niedotyczące dostają samo „Nie dotyczy.”, a w
+  pozostałych pisz po kilka punktów – nie rozbudowuj treści do rozmiaru sekcji.
+- **Bez wypełniaczy:** „Niniejszy dokument…”, „W ramach zmiany…”, „Należy zauważyć, że…”, „Celem
+  sekcji jest…”, powtarzanie tytułu sekcji w pierwszym zdaniu, podsumowania na końcu sekcji.
+- **Streszczenie zarządcze:** najwyżej 5 zdań. **Kontekst:** najwyżej 1 akapit.
+- **User stories:** jedna linia na krok Given/When/Then; scenariusz tylko dla odrębnego zachowania
+  (ścieżka główna + rzeczywiste przypadki brzegowe ze źródła), zwykle 1–3 na US. Nie dopisuj
+  scenariusza „dla formalności”.
+- **DoD:** tylko kryteria tej zmiany (wynikające ze źródeł, wymagań i testów), bez ogólnych formułek.
+- **Oznaczenia pochodzenia** w kolumnie „Źródło” albo jednym dopiskiem na końcu akapitu — nie po
+  każdym zdaniu z osobna, gdy cały akapit ma to samo źródło.
+- Przy szablonie użytkownika obowiązuje jego struktura, ale treść w każdej sekcji jest tak samo zwięzła.
 
 # Etap 5a: Diagramy (obowiązkowa ocena, diagram gdy poprawia zrozumienie)
 
@@ -239,6 +287,10 @@ Znalezione braki popraw albo zapisz jako `OPEN-NNN`.
 Uruchom `${CLAUDE_SKILL_DIR}/scripts/check_status_labels.py` na gotowym dokumencie, a jeśli są diagramy, przejdź też przez
 [checklistę jakości diagramów](./checklists/diagram-quality-checklist.md).
 
+Wykonaj **test zwięzłości**: usuń powtórzenia między sekcjami (zostaw ID), wypełniacze, zdania
+wprowadzające przed tabelami i sekcje warunkowe, które nie dotyczą zmiany. Porównaj objętość z
+tabelą z Etapu 5; przekroczenie uzasadnij jednym zdaniem w odpowiedzi.
+
 Przejdź przez [checklistę końcową](./checklists/final-review-checklist.md),
 w tym **test pochodzenia treści**: przejrzyj dokument zdanie po zdaniu i dla
 każdego zdania merytorycznego wskaż źródło. Zdanie bez źródła usuń, przenieś do
@@ -249,12 +301,12 @@ diagramu z opisem, każde OPEN z treści jest w tabeli „Tematy do wyjaśnienia
 
 # Sekcja „Tematy do wyjaśnienia”
 
-| ID | Temat | Opis | Dlaczego wymaga wyjaśnienia | Wpływ | Właściciel decyzji | Priorytet | Status | Data decyzji |
-|---|---|---|---|---|---|---|---|---|
-| OPEN-001 | [Temat] | [Czego brakuje] | [Na co wpływa] | Wysoki/Średni/Niski | [Osoba/rola ze źródła lub DO POTWIERDZENIA] | Wysoki/Średni/Niski | Otwarty | – |
+| ID | Temat | Czego brakuje i na co wpływa | Właściciel decyzji | Priorytet | Status |
+|---|---|---|---|---|---|
+| OPEN-001 | [Temat] | [Czego brakuje] – wpływa na [FR/US/obszar] | [Osoba/rola ze źródła lub DO POTWIERDZENIA] | Wysoki/Średni/Niski | Otwarty |
 
 Zasady: patrz [przykład](./examples/open-questions-section.md). Po decyzji
-przenieś treść do właściwej sekcji, zmień status na `ROZSTRZYGNIĘTY`, wpisz datę
+przenieś treść do właściwej sekcji, zmień status na `ROZSTRZYGNIĘTY (DD.MM.RRRR)`
 i zaktualizuj wymagania, testy, macierz i historię zmian dokumentu.
 
 # Tryb „Dokument końcowy bez dopisków”
@@ -323,6 +375,6 @@ pominięte.
 1. Potwierdzenie szablonu i formatu wyjściowego (Etap 0).
 2. Rozumienie zmiany + rejestr źródeł + plan sekcji + pytania (Etapy 1–4).
 3. Po odpowiedzi: pełny dokument w formacie szablonu.
-4. Pod dokumentem (w odpowiedzi, nie w dokumencie): liczba otwartych tematów
+4. Pod dokumentem (w odpowiedzi, nie w dokumencie, najwyżej 10 linii): liczba otwartych tematów
    OPEN, lista ASSUMPTION do potwierdzenia, sekcje oznaczone „Nie dotyczy”,
    lista diagramów z katalogiem ich plików, tematy bez diagramu z powodem oraz pominięte kontrole.

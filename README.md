@@ -12,7 +12,7 @@ Repozytorium spełnia standard otwartych skilli AI oraz posiada manifest [`.clau
 
 | Skill | Wersja | Opis | Ścieżka |
 |---|---|---|---|
-| **client-pt-prd-writer** | `2.6` | Tworzy precyzyjną dokumentację techniczną (PT) i PRD wyłącznie na bazie materiałów źródłowych. Zawiera scenariusze akceptacyjne **Given-When-Then (Gherkin)**, **Definition of Done (DoD)**, wyłączenia **Non-Goals** oraz obsługę szablonów klienta (`.docx`, `.md`). Opcjonalny tryb **dokumentu końcowego bez dopisków** — czysty dokument w szablonie klienta. **Diagramy oparte na źródłach** (architektura, procesy, sekwencje, model danych) osadzane w DOCX i Markdown oraz polskie nazwy statusów w tabelach. | [`skills/client-pt-prd-writer/`](skills/client-pt-prd-writer/) |
+| **client-pt-prd-writer** | `2.8` | Tworzy precyzyjną dokumentację techniczną (PT) i PRD wyłącznie na bazie materiałów źródłowych. Zawiera scenariusze akceptacyjne **Given-When-Then (Gherkin)**, **Definition of Done (DoD)**, wyłączenia **Non-Goals** oraz obsługę szablonów klienta (`.docx`, `.md`). Opcjonalny tryb **dokumentu końcowego bez dopisków** — czysty dokument w szablonie klienta. **Diagramy oparte na źródłach** (architektura, procesy, sekwencje, model danych) osadzane w DOCX i Markdown oraz polskie nazwy statusów w tabelach. | [`skills/client-pt-prd-writer/`](skills/client-pt-prd-writer/) |
 | **client-meeting-recap** | `1.3` | Przekształca surowe transkrypcje (`.vtt`, `.docx`, `.txt`) w 2-częściowe podsumowanie: **Część A (Wewnętrzny Radar Ryzyk / Scope Creep dla zespołu, z cytatami jako dowodami)** oraz **Część B (Oficjalny mail do klienta z zadaniami DRI i klauzulą weryfikacji 48h)** — w osobnych plikach. | [`skills/client-meeting-recap/`](skills/client-meeting-recap/) |
 
 ### 🗄️ Dane i SQL
@@ -88,13 +88,15 @@ Prefiksy można łączyć od lewej do prawej: `PLAN: LOG: zadanie`, `SPEC: PLAN:
 
 - **Bez MCP i narzędzi webowych:** agenci mają jawne listy narzędzi i pracują na plikach oraz poleceniach lokalnych.
 - **Kontrolowane polecenia:** agenci uruchamiają polecenia tylko przez `runtime/flowkit_exec.py`, bez powłoki i według listy dozwolonej dla roli.
+- **Granica katalogu roboczego:** ścieżki w poleceniach agenta (także po `..`, `~` i dowiązaniach symbolicznych) muszą leżeć w katalogu, w którym uruchomiono agenta. Materiały z innego miejsca skopiuj do projektu albo dopisz ich katalog do zmiennej środowiskowej `FLOWKIT_EXTRA_PATHS` (kilka katalogów rozdziel `;` w Windows, `:` w Linux/macOS). Ustawia ją tylko użytkownik — hook odrzuca przypisania zmiennych w poleceniach agenta.
+- **Czego runtime nie zabezpiecza:** to lista dozwolonych poleceń, a nie izolacja systemowa (sandbox). Testy uruchamiane przez agenta (`pytest`, `npm test` itd.) wykonują kod projektu z uprawnieniami użytkownika, a skrypty i narzędzia mogą odczytać pliki wskazane w konfiguracji projektu.
 - **Twarda blokada w Claude Code:** hook `runtime/guard_bash.py` odrzuca każde inne polecenie agenta FlowKit. Zwykłe sesje nie są objęte tym hookiem.
 - **Lista poleceń roli:** `python runtime/flowkit_exec.py --role <rola> -- help`.
-- **Dokumenty Word:** `read-document` czyta `.docx`/`.dotx`/`.xlsx`/`.pdf`, a `md-to-docx` zapisuje DOCX z Markdown na kopii szablonu klienta (`--template` lub `--reference-doc`), z kompletem jego stylów, nagłówkami i stopkami. Diagramy mermaid i SVG są osadzane jako PNG. Szczegóły: [docx-engine.md](skills/client-pt-prd-writer/references/docx-engine.md).
+- **Dokumenty Word:** `read-document` czyta `.docx`/`.dotx`/`.xlsx`/`.pdf` oraz pliki tekstowe i kod źródłowy (`.cs`, `.py`, `.sql`, `.config` itd., UTF-8, UTF-16 i CP1250), a `md-to-docx` zapisuje DOCX z Markdown na kopii szablonu klienta (`--template` lub `--reference-doc`), z kompletem jego stylów, nagłówkami i stopkami. Diagramy mermaid i SVG są osadzane jako PNG. Szczegóły: [docx-engine.md](skills/client-pt-prd-writer/references/docx-engine.md).
 - **Ochrona danych:** wyniki poleceń są skracane, sekrety ukrywane, a pliki takie jak `.env` i klucze prywatne niedostępne.
 - **VS Code:** Copilot nie korzysta z tego hooka, dlatego zostaw włączone potwierdzanie poleceń w terminalu.
 - **Zasady projektu:** skopiuj [`docs/flowkit-project.template.md`](docs/flowkit-project.template.md) do projektu jako `flowkit-project.md`.
-- **Testy skilli:** `python scripts/run_evals.py triggers --dry-run` pokazuje scenariusze, a uruchomienie bez `--dry-run` korzysta z lokalnego Claude Code.
+- **Testy skilli:** `python scripts/run_evals.py triggers --dry-run` pokazuje scenariusze, a uruchomienie bez `--dry-run` korzysta z lokalnego Claude Code. Limity czasu: `--timeout` (scenariusz, domyślnie 600 s) i `--total-timeout` (sesja, 3600 s). Statusy: `PASS`, `FAIL` (jakość), `TIMEOUT`, `ERROR`, `SKIPPED` (infrastruktura); wyniki zapisują się po każdym scenariuszu.
 
 ---
 

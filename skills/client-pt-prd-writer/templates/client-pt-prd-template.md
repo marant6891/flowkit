@@ -1,7 +1,8 @@
 <!--
 Szablon ZAPASOWY. Używaj go tylko, gdy użytkownik nie dostarczył własnego szablonu.
-Sekcje oznaczone (warunkowa) wypełniaj tylko, gdy dotyczą zmiany; inaczej wpisz
-„Nie dotyczy – <uzasadnienie>” albo „Brak danych – patrz OPEN-NNN”.
+Sekcje oznaczone (warunkowa) umieszczaj tylko, gdy dotyczą zmiany. Niedotyczące usuń
+i wymień jednym zdaniem w sekcji 3 („Pominięto sekcje: …”). Brak danych: „Brak danych – patrz OPEN-NNN”.
+Zwięzłość: każda informacja raz, tabele bez zdań wprowadzających, objętość wg SKILL.md (Etap 5).
 Usuń wszystkie komentarze i placeholdery [..] przed oddaniem dokumentu.
 Statusy, priorytety i wymagalność zapisuj po polsku (references/status-vocabulary.md).
 Gdy źródło stosuje MoSCoW, zamień kolumnę „Priorytet” na „Wymagalność”
@@ -40,12 +41,12 @@ Oznaczenia w dokumencie: `SRC-NNN` – informacja potwierdzona źródłem;
 
 ## 1. Streszczenie zarządcze
 
-[3–8 zdań, pisane na końcu, tylko z treści dokumentu: problem, co się zmienia,
+[Najwyżej 5 zdań, pisane na końcu, tylko z treści dokumentu: problem, co się zmienia,
 efekt dla klienta, kluczowe ryzyka i decyzje oczekujące.]
 
 ## 2. Kontekst i cel zmiany
 
-[Obecny stan i powód zmiany – ze źródłem.]
+[Jeden akapit: obecny stan i powód zmiany – ze źródłem.]
 
 | ID | Cel | Mierzalny efekt | Źródło |
 |---|---|---|---|
@@ -64,6 +65,8 @@ efekt dla klienta, kluczowe ryzyka i decyzje oczekujące.]
 | ID | Element wyłączony | Powód wyłączenia / Ryzyko Scope Creep | Źródło |
 |---|---|---|---|
 | OOS-001 | [Element] | [Dlaczego tego świadomie NIE robimy w tej zmianie] | SRC-001 |
+
+Pominięto sekcje: [lista sekcji warunkowych, których zmiana nie dotyczy].
 
 ## 4. Proces obecny i docelowy (warunkowa)
 
@@ -87,31 +90,20 @@ efekt dla klienta, kluczowe ryzyka i decyzje oczekujące.]
 
 ## 6. Wymagania funkcjonalne
 
-| ID | Wymaganie | Priorytet | Kryterium akceptacji | US | Źródło | Status |
-|---|---|---|---|---|---|---|
-| FR-001 | [Wymaganie] | [Wysoki/Średni/Niski ze źródła lub DO POTWIERDZENIA] | [Sprawdzalne kryterium] | US-001 | SRC-001 | Proponowane / Zaakceptowane |
+| ID | Wymaganie | Priorytet | Kryterium akceptacji | Źródło | Status |
+|---|---|---|---|---|---|
+| FR-001 | [Wymaganie] | [Wysoki/Średni/Niski ze źródła lub DO POTWIERDZENIA] | [Sprawdzalne kryterium albo „US-001”] | SRC-001 | Proponowane / Zaakceptowane |
 
 ## 7. User stories (warunkowa)
 
-### US-001: [Tytuł User Story]
+### US-001: [Tytuł] (FR-001, SRC-001)
 
-**Jako** [rola użytkownika]  
-**chcę** [akcja / funkcja w systemie]  
-**aby** [mierzalna korzyść biznesowa].
+**Jako** [rola] **chcę** [akcja], **aby** [korzyść].
 
-Źródło: SRC-001 · Powiązane wymagania: FR-001
-
-**Kryteria akceptacji (Format Given-When-Then / Scenariusze Gherkin):**
-
-- **Scenariusz 1 (Ścieżka główna — Happy Path):**
-  - **Mając (Given):** [stan początkowy systemu / zalogowany użytkownik z uprawnieniem X]
-  - **Gdy (When):** [użytkownik wykonuje akcję Y z prawidłowymi danymi]
-  - **Wtedy (Then):** [system reaguje w określony sposób Z i zapisuje stan]
-
-- **Scenariusz 2 (Przypadek brzegowy / Błąd walidacji):**
-  - **Mając (Given):** [stan początkowy]
-  - **Gdy (When):** [użytkownik wprowadza nieprawidłowe dane lub przekracza limit]
-  - **Wtedy (Then):** [system wyświetla czytelny komunikat błędu i blokuje operację]
+| Scenariusz | Mając (Given) | Gdy (When) | Wtedy (Then) |
+|---|---|---|---|
+| S1 Ścieżka główna | [stan początkowy] | [akcja] | [oczekiwany wynik] |
+| S2 [Przypadek brzegowy ze źródła] | [stan] | [akcja] | [wynik] |
 
 ## 8. Wymagania niefunkcjonalne (warunkowa – tylko ze źródeł)
 
@@ -154,19 +146,19 @@ spełnia kryteria z Etapu 5a; każdy węzeł musi występować w tekście i tabe
 
 ## 14. Plan testów
 
+Scenariusze akceptacyjne: US-001/S1–S2 [odwołania do US]. Dodatkowe testy (tylko te, których US nie pokrywają):
+
 | ID | Scenariusz | Oczekiwany wynik | Wymaganie |
 |---|---|---|---|
-| TEST-001 | [Scenariusz] | [Wynik] | FR-001 |
+| TEST-001 | [np. regresja, integracja, migracja] | [Wynik] | FR-001 |
 
 ## 15. Kryteria ukończenia zmiany (Definition of Done - DoD)
 
-| Lp. | Kryterium DoD | Odpowiedzialny | Status weryfikacji |
-|---|---|---|---|
-| 1 | Kod wdrożony i przeszedł Code Review | Tech Lead / Dev | [ ] |
-| 2 | Testy jednostkowe i integracyjne wykonane bez błędów | Dev / QA | [ ] |
-| 3 | Scenariusze akceptacyjne (US Given-When-Then) zweryfikowane na środowisku testowym | QA / Analityk | [ ] |
-| 4 | Dokumentacja API / techniczna zaktualizowana | Analityk / Dev | [ ] |
-| 5 | Akceptacja biznesowa (UAT / Demo) klienta uzyskana | Product Owner / Klient | [ ] |
+[Tylko kryteria tej zmiany, ze źródeł, wymagań i testów – bez ogólnych formułek.]
+
+| Lp. | Kryterium DoD | Odpowiedzialny |
+|---|---|---|
+| 1 | [np. Scenariusze US-001–US-003 zaliczone na środowisku testowym] | [Rola ze źródła lub DO POTWIERDZENIA] |
 
 ## 16. Wdrożenie i rollback (warunkowa)
 
@@ -194,7 +186,7 @@ Rollback: [Sposób wycofania – ze źródła lub OPEN.]
 |---|---|
 | [Pojęcie] | [Wyjaśnienie] |
 
-## 20. Macierz śledzenia wymagań (warunkowa – od 3 FR)
+## 20. Macierz śledzenia wymagań (warunkowa – od 6 FR, gdy powiązania nie wynikają z tabel)
 
 | Wymaganie | User story | Test | Komponent | Źródło | Status |
 |---|---|---|---|---|---|
@@ -204,12 +196,12 @@ Rollback: [Sposób wycofania – ze źródła lub OPEN.]
 
 ### 21.1 Założenia
 
-| ID | Założenie | Uzasadnienie | Do potwierdzenia przez | Status |
-|---|---|---|---|---|
-| ASSUMPTION-001 | [Założenie] | [Dlaczego bezpieczne] | [Osoba/rola] | Do potwierdzenia |
+| ID | Założenie | Do potwierdzenia przez | Status |
+|---|---|---|---|
+| ASSUMPTION-001 | [Założenie] | [Osoba/rola] | Do potwierdzenia |
 
 ### 21.2 Tematy do wyjaśnienia
 
-| ID | Temat | Opis | Dlaczego wymaga wyjaśnienia | Wpływ | Właściciel decyzji | Priorytet | Status | Data decyzji |
-|---|---|---|---|---|---|---|---|---|
-| OPEN-001 | [Temat] | [Czego brakuje] | [Na co wpływa] | [W/Ś/N] | [Osoba lub DO POTWIERDZENIA] | [W/Ś/N] | Otwarty | – |
+| ID | Temat | Czego brakuje i na co wpływa | Właściciel decyzji | Priorytet | Status |
+|---|---|---|---|---|---|
+| OPEN-001 | [Temat] | [Czego brakuje] – wpływa na [FR/US/obszar] | [Osoba lub DO POTWIERDZENIA] | [W/Ś/N] | Otwarty |

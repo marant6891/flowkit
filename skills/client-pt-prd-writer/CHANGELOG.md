@@ -1,5 +1,21 @@
 # Historia zmian skilla client-pt-prd-writer
 
+## 2.8 (20.11.2026)
+
+### Wariant skrócony dla małych zmian
+- Nowy szablon `client-pt-prd-compact-template.md`: 6 rozdziałów, 1–3 strony, listy zamiast tabel.
+- Bez szablonu użytkownika skill sam wybiera wariant: skrócony dla zmian do 3 wymagań w jednym obszarze, bez integracji, migracji, uprawnień i architektury; pełny dla pozostałych.
+- Tabela tylko przy co najmniej 3 wierszach; 1–2 elementy jako lista. Bez osobnych tabel dla każdego typu identyfikatora.
+- W szablonie użytkownika przy małej zmianie: „Nie dotyczy.” i po kilka punktów w pozostałych sekcjach.
+
+## 2.7 (20.11.2026)
+
+### Zwięzłość dokumentu
+- Nowa zasada zwięzłości z orientacyjną objętością zależną od wielkości zmiany (2–4, 4–8, do 15 stron).
+- Każda informacja raz: kryteria akceptacji nie są powielane w FR, US, testach i macierzy; plan testów odwołuje się do scenariuszy US.
+- Szablon zapasowy: niedotyczące sekcje warunkowe są pomijane i wymieniane jednym zdaniem; US jako zwarta tabela Given-When-Then; DoD bez ogólnych formułek; krótsze tabele OPEN i ASSUMPTION; macierz śledzenia od 6 FR.
+- Etap 6 zawiera test zwięzłości, a checklista końcowa sekcję E2.
+
 ## 2.6 (19.11.2026)
 
 ### Zapis DOCX zgodny z szablonem

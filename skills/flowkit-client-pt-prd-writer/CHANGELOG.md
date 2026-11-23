@@ -1,5 +1,13 @@
 # Historia zmian skilla flowkit-client-pt-prd-writer
 
+## 3.0 (23.11.2026)
+
+### Wersja dla klienta
+- Nowy tryb wyniku: czysta treść bez oznaczeń źródeł, identyfikatorów roboczych i „DO POTWIERDZENIA” — także w tabelach, streszczeniu i podsumowaniach.
+- Wszystkie wątpliwości w ostatnim rozdziale „Kwestie do wyjaśnienia” (K-NN) oraz „Przyjęte założenia do potwierdzenia” (Z-NN); w treści tylko odwołanie „Do ustalenia (K-NN)”.
+- Pochodzenie treści w rejestrze poza dokumentem, z mapowaniem K-NN ↔ OPEN-NNN.
+- Skrypt `check_client_version.py` (`--mode client|final`) wykrywa pozostawione dopiski w DOCX i Markdown oraz odwołania bez punktu w sekcji końcowej.
+
 ## 2.9 (20.11.2026)
 
 - Kontrola pokrycia w wariancie pełnym: wymagania bez testu i testy bez wymagania są zgłaszane, bez fikcyjnych powiązań.

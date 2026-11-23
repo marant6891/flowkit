@@ -57,6 +57,13 @@
 - [ ] Żadna tabela nie ma mniej niż 3 wierszy, chyba że narzuca ją szablon użytkownika.
 - [ ] Każdy scenariusz Given-When-Then opisuje odrębne zachowanie; DoD nie zawiera ogólnych formułek.
 
+## G. Wersja dla klienta (tylko gdy użytkownik o nią poprosił)
+- [ ] Treść, tabele, streszczenie i podsumowania nie zawierają oznaczeń źródeł, identyfikatorów roboczych, „DO POTWIERDZENIA”, „Brak danych”, interpretacji ani kolumn „Źródło”.
+- [ ] Brakujące informacje w treści to wyłącznie odwołania „Do ustalenia (K-NN)”; streszczenie i podsumowania nie mają odwołań.
+- [ ] Ostatni rozdział „Kwestie do wyjaśnienia” zawiera każdą kwestię K-NN (i założenia Z-NN) w języku klienta, bez wewnętrznych obaw i identyfikatorów.
+- [ ] Rejestr pochodzenia z mapowaniem K-NN ↔ OPEN-NNN i Z-NN ↔ ASSUMPTION-NNN oddano poza dokumentem.
+- [ ] `check_client_version.py --mode client` zwraca `PASS`.
+
 ## F. Tryb „Dokument końcowy bez dopisków” (tylko gdy użytkownik o niego poprosił)
 - [ ] Użytkownik wprost poprosił o wersję bez dopisków; tryb nie został włączony domyślnie.
 - [ ] Dokument ma dokładnie strukturę udostępnionego szablonu – żadnych sekcji dodanych przez skill (Materiały źródłowe, Założenia, Tematy do wyjaśnienia, Rekomendacje), o ile szablon ich nie przewiduje.

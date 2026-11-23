@@ -38,7 +38,8 @@ class TestCommandPolicy(unittest.TestCase):
             "implementer": ["pytest -x tests/test_a.py", "eslint src/a.js"],
             "orchestrator": ["python -m unittest tests/test_a.py", "pytest -q", "dotnet test", "tsc --noEmit", "git status", "git add src/a.py", "git commit -m opis", "git push -u origin feat/a",
                              "gh pr create --fill", "python C:/x/flowkit-client-pt-prd-writer/scripts/generate_diagram.py m.yaml"],
-            "analyst": ["read-document brief.docx --outline", "python /x/flowkit-client-pt-prd-writer/scripts/check_status_labels.py d.md"],
+            "analyst": ["read-document brief.docx --outline", "python /x/flowkit-client-pt-prd-writer/scripts/check_status_labels.py d.md",
+                        "python /x/flowkit-client-pt-prd-writer/scripts/check_client_version.py d.docx --mode client"],
         }
         for role, commands in allowed.items():
             for command in commands:

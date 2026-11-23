@@ -1,6 +1,6 @@
 ---
 name: flowkit-client-pt-prd-writer
-version: "2.9"
+version: "3.0"
 tags: [analyst, prd, pt, requirements, documentation, client, gherkin, dod, diagrams]
 description: >
   Tworzy profesjonalną dokumentację PT/PRD (projekt techniczny, specyfikacja
@@ -10,8 +10,9 @@ description: >
   .md), a gdy go brak, na szablonie zapasowym. Użyj, gdy użytkownik prosi o
   dokument PT, PRD, specyfikację lub dokumentację zmiany, change request,
   analizę wpływu lub dokumentację rozwoju aplikacji dla klienta. Na życzenie
-  oddaje też wersję końcową bez dopisków (bez oznaczeń źródeł i tematów
-  otwartych) dokładnie w udostępnionym szablonie. Ocenia procesy, przepływy,
+  oddaje wersję dla klienta (czysta treść bez oznaczeń źródeł, wątpliwości
+  zebrane w sekcji na końcu dokumentu) albo wersję końcową bez dopisków
+  dokładnie w udostępnionym szablonie. Ocenia procesy, przepływy,
   integracje i relacje między systemami lub komponentami, a gdy poprawia to
   zrozumienie, dodaje do dokumentu diagramy oparte wyłącznie na źródłach.
 ---
@@ -61,11 +62,14 @@ a nie kompletność wszystkich sekcji.
    `ASSUMPTION-001`, `OPEN-001`, `Q-001`, `REC-001`.
 10. **Izolacja materiałów źródłowych (Context Boundary):** Przy wprowadzaniu materiałów zaleca się wydzielenie bloków `<source_materials>...</source_materials>` oraz `<user_template>...</user_template>`. Chroni to model przed myleniem instrukcji skilla ze specyfikacją klienta.
 11. **Format User Stories (Gherkin) i DoD:** Każde User Story powinno zawierać scenariusze w formacie Given-When-Then (Gherkin), a dokument określać sprawdzalne Definition of Done (DoD).
-12. **Dwa tryby wyniku.** Domyślny jest tryb roboczy (z oznaczeniami pochodzenia
-    z zasady 2). Na wyraźną prośbę użytkownika stosuj tryb „Dokument końcowy bez
-    dopisków” (patrz osobny rozdział): oznaczenia znikają z dokumentu, ale
-    zasady 1, 3, 6 i 7 obowiązują bez zmian – pochodzenie treści prowadzisz
-    wtedy poza dokumentem.
+12. **Trzy tryby wyniku.**
+    - **Roboczy** (domyślny) — oznaczenia pochodzenia z zasady 2 w całym dokumencie; dla zespołu.
+    - **Wersja dla klienta** — czysta treść bez oznaczeń, wątpliwości tylko w sekcji końcowej
+      „Kwestie do wyjaśnienia” (patrz osobny rozdział).
+    - **Dokument końcowy bez dopisków** — czysta treść i brak otwartych kwestii; luki rozstrzyga
+      wcześniej użytkownik (patrz osobny rozdział).
+    W trybach dla klienta i końcowym oznaczenia znikają z dokumentu, ale zasady 1, 3, 6 i 7
+    obowiązują bez zmian – pochodzenie treści prowadzisz w rejestrze poza dokumentem.
 
 13. **Polskie nazwy w tabelach.** Statusy, priorytety i wymagalność zapisuj po polsku
     według [słownika statusów](./references/status-vocabulary.md), także gdy źródło
@@ -106,10 +110,13 @@ a nie kompletność wszystkich sekcji.
    informacje nadal są `OPEN-NNN`.
 4. Gdy użytkownik dostarczy poprzedni dokument jako wzór – przejmij z niego
    strukturę, styl i poziom szczegółowości, **nie treść merytoryczną**.
-5. Ustal tryb wyniku: **roboczy z oznaczeniami** (domyślny) czy **końcowy bez
-   dopisków**. Tryb końcowy włącz tylko, gdy użytkownik prosi o to wprost
-   (np. „bez dopisków”, „wersja końcowa”, „czysty dokument”, „do wysłania
-   klientowi”). W razie wątpliwości zapytaj jednym pytaniem.
+5. Ustal tryb wyniku (zasada 12):
+   - **wersja dla klienta** — gdy użytkownik prosi o dokument „dla klienta”, „do wysłania klientowi”,
+     „czysty”, „bez dopisków o źródłach”, a zostały otwarte kwestie;
+   - **końcowy bez dopisków** — gdy prosi o „wersję końcową / ostateczną” albo wszystkie kwestie są
+     rozstrzygnięte;
+   - **roboczy** — w pozostałych przypadkach.
+   W razie wątpliwości zapytaj jednym pytaniem, pokazując te trzy możliwości.
 
 # Etap 1: Zebranie materiałów i inwentaryzacja źródeł
 
@@ -276,13 +283,17 @@ Zasady pisania:
    jest to folder `scripts/` obok tego pliku `SKILL.md`.
    Styl opisuje [system wizualny](./references/diagram-design-system.md); szablon klienta ma pierwszeństwo.
 4. **Tryb końcowy:** najpierw rozstrzygnij wszystkie niewiadome z użytkownikiem, potem uruchom skrypty
-   z `--mode final`. Uwagi pod rysunkiem mogą zawierać tylko neutralne sformułowania zaakceptowane przez użytkownika.
+   z `--mode final`. **Wersja dla klienta:** także `--mode final`, a niewiadome dotyczące diagramu trafiają
+   do sekcji „Kwestie do wyjaśnienia”. Uwagi pod rysunkiem mogą zawierać tylko neutralne sformułowania zaakceptowane przez użytkownika.
 
 # Etap 6: Weryfikacja przed oddaniem
 
 Najpierw wykonaj **krytyczny przegląd** dokumentu z perspektywy osoby, która ma go podważyć: przypadki
 brzegowe, sprzeczności, wymagania niesprawdzalne, niejawne założenia i treści wykraczające poza źródła.
 Znalezione braki popraw albo zapisz jako `OPEN-NNN`.
+
+W wersji dla klienta uruchom `${CLAUDE_SKILL_DIR}/scripts/check_client_version.py <dokument> --mode client`,
+a w trybie końcowym z `--mode final`; wynik musi być `PASS`.
 
 Uruchom `${CLAUDE_SKILL_DIR}/scripts/check_status_labels.py` na gotowym dokumencie, a jeśli są diagramy, przejdź też przez
 [checklistę jakości diagramów](./checklists/diagram-quality-checklist.md).
@@ -315,6 +326,44 @@ diagramu z opisem, każde OPEN z treści jest w tabeli „Tematy do wyjaśnienia
 Zasady: patrz [przykład](./examples/open-questions-section.md). Po decyzji
 przenieś treść do właściwej sekcji, zmień status na `ROZSTRZYGNIĘTY (DD.MM.RRRR)`
 i zaktualizuj wymagania, testy, macierz i historię zmian dokumentu.
+
+# Tryb „Wersja dla klienta”
+
+Cel: czysty, profesjonalny dokument do przekazania klientowi, gdy **nie wszystko jest jeszcze
+rozstrzygnięte**. Treść dokumentu nie ma żadnych dopisków roboczych, a wszystkie wątpliwości są zebrane
+w jednej sekcji na końcu dokumentu.
+
+1. **Treść dokumentu bez dopisków.** W rozdziałach, tabelach, streszczeniu i podsumowaniach nie ma:
+   `SRC-NNN`, `plik:linia`, kolumn „Źródło” i legendy oznaczeń, `ASSUMPTION-NNN`, `OPEN-NNN`, `Q-NNN`,
+   `REC-NNN`, „DO POTWIERDZENIA”, „Brak danych”, „Nie analizowano”, oznaczeń interpretacji, komentarzy
+   ani placeholderów. Identyfikatory wymagań (`FR-001`, `US-001` itd.) zostają, bo służą klientowi.
+2. **Brakująca informacja w treści** to krótkie odwołanie do punktu na końcu: „Do ustalenia (K-03)”.
+   W tabeli — tylko w komórce, której dotyczy luka. Streszczenie zarządcze i podsumowania nie zawierają
+   odwołań; wolno w nich jedno zdanie: „Kwestie wymagające decyzji opisano w rozdziale <numer>.”
+   Element, który bez brakującej informacji nie ma sensu, opisz tylko w sekcji końcowej.
+3. **Sekcja końcowa „Kwestie do wyjaśnienia”** — ostatni rozdział dokumentu (albo sekcja szablonu
+   przeznaczona na otwarte tematy), w języku klienta, bez wewnętrznych identyfikatorów:
+
+   | Nr | Kwestia | Czego dotyczy | Potrzebna decyzja lub informacja | Kto decyduje |
+   |---|---|---|---|---|
+   | K-01 | Model rozliczeń | Rozdział 6, FR-003 | Czy obsługiwać rozliczenia miesięczne, roczne czy oba warianty | Zamawiający |
+
+   „Kto decyduje” wpisuj tylko ze źródła; bez źródła wpisz „Do wskazania”. Przyjęte założenia wypisz
+   w podsekcji „Przyjęte założenia do potwierdzenia” (numeracja Z-01, Z-02…) z pytaniem o potwierdzenie.
+   Wewnętrzne obawy, ryzyka relacji z klientem i uwagi o jakości materiałów nie trafiają do dokumentu.
+4. **Treść nadal wyłącznie ze źródeł.** Pochodzenie każdej informacji prowadź w **rejestrze pochodzenia**
+   poza dokumentem (`<nazwa-dokumentu>-rejestr-pochodzenia.md`): sekcja → źródła `SRC-NNN`, mapowanie
+   K-NN ↔ OPEN-NNN i Z-NN ↔ ASSUMPTION-NNN. Zasady 1, 3, 6 i 7 obowiązują bez zmian.
+5. **Struktura:** szablon użytkownika ma pierwszeństwo; sekcję końcową dołącz jako ostatni rozdział
+   w stylu szablonu. Szablon zapasowy: sekcje „Materiały źródłowe” i „Założenia i tematy do wyjaśnienia”
+   zastępuje sekcja z pkt 3.
+6. **Diagramy:** generuj z `--mode final`; wątpliwości dotyczące diagramu przenieś do sekcji końcowej
+   zamiast „Uwag do rysunku”.
+7. **Kontrola:** uruchom `${CLAUDE_SKILL_DIR}/scripts/check_client_version.py <dokument> --mode client`
+   (`--questions-heading`, gdy szablon nazywa sekcję inaczej). Wynik musi być `PASS`; każde trafienie
+   popraw w dokumencie, nie w rejestrze.
+8. **Na prośbę oddaj obie wersje:** roboczą z oznaczeniami (dla zespołu) i wersję dla klienta,
+   z tej samej treści.
 
 # Tryb „Dokument końcowy bez dopisków”
 
@@ -350,8 +399,8 @@ użyj szablonu zapasowego z tymi samymi regułami.
 5. **Status dokumentu** w metryczce wpisz taki, jaki wskaże użytkownik; nie
    nadawaj samodzielnie statusu „Zaakceptowany”.
 6. **Weryfikacja:** oprócz zwykłej checklisty wykonaj sekcję F
-   [checklisty końcowej](./checklists/final-review-checklist.md), w tym
-   wyszukiwanie pozostawionych znaczników.
+   [checklisty końcowej](./checklists/final-review-checklist.md) i uruchom
+   `check_client_version.py <dokument> --mode final`.
 
 # Tryb AUTO — cała praca na rekomendacjach
 
@@ -365,7 +414,8 @@ zatrzymywania się, a każde pytanie rozstrzyga swoją rekomendacją:
    merytorycznej: zasady 1, 3, 6 i 7 obowiązują bez zmian.
 3. Plan sekcji i plan diagramów z Etapu 4 realizuj w wersji rekomendowanej (diagram tam, gdzie spełnia
    kryterium).
-4. Status dokumentu: „Roboczy”. W trybie końcowym bez dopisków luki rozstrzygaj według pkt 4 tego trybu:
+4. Status dokumentu: „Roboczy”. W wersji dla klienta luki i założenia trafiają do sekcji „Kwestie do
+   wyjaśnienia” (K-NN, Z-NN). W trybie końcowym bez dopisków luki rozstrzygaj według pkt 4 tego trybu:
    (d) neutralne sformułowanie, a gdy element bez informacji nie ma sensu — (c) pominięcie.
 5. Zapis: jeśli jest szablon, `md-to-docx` z `--template` lub `--reference-doc`; potem Etap 6 w całości.
 6. Zatrzymaj się tylko, gdy: brak materiałów źródłowych, szablon wspomniany, ale niedostępny, polecenie
@@ -375,9 +425,9 @@ zatrzymywania się, a każde pytanie rozstrzyga swoją rekomendacją:
 
 # Format odpowiedzi
 
-W trybie końcowym bez dopisków punkt 4 zastąp: rejestr pochodzenia, lista
-decyzji przyjętych dla luk oraz miejsca z neutralnym sformułowaniem lub
-pominięte.
+W wersji dla klienta punkt 4 zastąp: ścieżka rejestru pochodzenia, liczba kwestii K-NN i założeń
+Z-NN oraz wynik `check_client_version.py`. W trybie końcowym bez dopisków: rejestr pochodzenia,
+lista decyzji przyjętych dla luk oraz miejsca z neutralnym sformułowaniem lub pominięte.
 
 1. Potwierdzenie szablonu i formatu wyjściowego (Etap 0).
 2. Rozumienie zmiany + rejestr źródeł + plan sekcji + pytania (Etapy 1–4).

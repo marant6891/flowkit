@@ -79,7 +79,7 @@ ROLE_COMMANDS = {
 SKILL_SCRIPT_ROLES = {"orchestrator", "analyst"}
 SKILL_SCRIPTS = {
     "flowkit-client-pt-prd-writer": {"generate_diagram.py", "export_diagram.py", "validate_diagram.py", "insert_diagrams.py",
-                             "check_status_labels.py"},
+                             "check_status_labels.py", "check_client_version.py"},
     "flowkit-sql-data-assistant": {"check_sql.py"},
 }
 
@@ -600,8 +600,10 @@ def run(argv: list[str], role: str = "orchestrator") -> int:
     long_running = TESTS + tuple(user_allowed(role)[0])  # testy i zgody użytkownika (np. budowanie)
     timeout = TEST_TIMEOUT if any(matches(name, prefix) for prefix in long_running) else DEFAULT_TIMEOUT
     try:
+        # Wynik jest czytany jako UTF-8, więc skrypty Pythona też piszą w UTF-8 (polskie znaki w Windows).
         result = subprocess.run([executable, *argv[1:]], stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                stdin=subprocess.DEVNULL, timeout=timeout, check=False)
+                                stdin=subprocess.DEVNULL, timeout=timeout, check=False,
+                                env={**os.environ, "PYTHONIOENCODING": "utf-8"})
     except subprocess.TimeoutExpired:
         print(f"PRZEKROCZONO CZAS: {timeout} s (status: UNKNOWN)")
         return 124

@@ -6,6 +6,12 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 
 ## [Unreleased]
 
+### Dodano
+- **Wersja dokumentu dla klienta** w skillu `flowkit-client-pt-prd-writer` 3.0: treść bez dopisków o źródłach i lukach (także w tabelach i podsumowaniach), wątpliwości zebrane w rozdziale końcowym „Kwestie do wyjaśnienia”, kontrola skryptem `check_client_version.py`.
+
+### Naprawiono
+- Polskie znaki w wynikach skryptów Pythona uruchamianych przez executor nie są już zniekształcone w Windows (`PYTHONIOENCODING=utf-8`).
+
 ---
 
 ## [1.8.0] — 2026-11-20

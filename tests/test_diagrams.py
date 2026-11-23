@@ -17,6 +17,7 @@ SKILL = ROOT / "skills" / "flowkit-client-pt-prd-writer"
 FIXTURES = ROOT / "tests" / "fixtures" / "diagrams"
 sys.path.insert(0, str(SKILL / "scripts"))
 
+import check_client_version as client  # noqa: E402
 import check_status_labels as labels  # noqa: E402
 import diagram_core as core  # noqa: E402
 import generate_diagram as gen  # noqa: E402
@@ -24,6 +25,8 @@ import insert_diagrams as ins  # noqa: E402
 import validate_diagram as val  # noqa: E402
 
 HAS_DOCX = importlib.util.find_spec("docx") is not None
+WORKING_DOC = '# Zmiana formularza\n\n## Streszczenie\n\nZmiana dotyczy formularza zamówienia (SRC-001). Termin DO POTWIERDZENIA (OPEN-002).\n\n| ID | Wymaganie | Priorytet | Źródło |\n|---|---|---|---|\n| FR-001 | Walidacja pola e-mail | Wysoki | SRC-001, src/Orders/Form.cs:42 |\n'
+CLEAN_DOC = '# Zmiana formularza\n\n## Streszczenie\n\nZmiana dotyczy walidacji formularza zamówienia. Kwestie wymagające decyzji opisano w rozdziale 3.\n\n## Wymagania\n\n| ID | Wymaganie | Priorytet |\n|---|---|---|\n| FR-001 | Walidacja pola e-mail | Wysoki |\n| FR-002 | Komunikat błędu | Do ustalenia (K-01) |\n\n## Kwestie do wyjaśnienia\n\n| Nr | Kwestia | Czego dotyczy | Potrzebna decyzja lub informacja | Kto decyduje |\n|---|---|---|---|---|\n| K-01 | Treść komunikatu | FR-002 | Brzmienie komunikatu o błędnym adresie | Do wskazania |\n\n### Przyjęte założenia do potwierdzenia\n\n- Z-01: Walidacja dotyczy tylko nowych zamówień — prosimy o potwierdzenie.\n'
 
 
 def fixture(name):
@@ -551,6 +554,61 @@ class TestStatusVocabulary(unittest.TestCase):
         for name in ("status-vocabulary.md", "diagram-engine.md", "diagram-selection.md", "diagram-design-system.md"):
             self.assertIn(name, content)
         self.assertTrue(re.search(r"diagram-quality-checklist\.md", content))
+
+
+class TestClientVersion(unittest.TestCase):
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.tmp, True)
+
+    def write(self, name, text):
+        path = self.tmp / name
+        path.write_text(text, encoding="utf-8")
+        return path
+
+    def test_working_markers_in_body_are_reported(self):
+        issues = client.find_issues(self.write("roboczy.md", WORKING_DOC))
+        text = "\n".join(issues)
+        for expected in ("SRC-001", "OPEN-002", "DO POTWIERDZENIA", "Form.cs:42", "kolumna „Źródło”"):
+            self.assertIn(expected, text)
+
+    def test_clean_client_version_passes(self):
+        self.assertEqual(client.find_issues(self.write("klient.md", CLEAN_DOC)), [])
+
+    def test_reference_without_question_is_reported(self):
+        doc = CLEAN_DOC.replace("| K-01 | Treść", "| K-02 | Treść")
+        issues = client.find_issues(self.write("klient.md", doc))
+        self.assertTrue(any("K-01" in issue for issue in issues))
+
+    def test_internal_ids_in_questions_section_are_reported(self):
+        doc = CLEAN_DOC.replace("| Do wskazania |", "| OPEN-001 |")
+        self.assertTrue(client.find_issues(self.write("klient.md", doc)))
+
+    def test_final_mode_forbids_open_questions_references(self):
+        issues = client.find_issues(self.write("koncowy.md", CLEAN_DOC), mode="final")
+        self.assertTrue(any("K-01" in issue for issue in issues))
+
+    @unittest.skipUnless(HAS_DOCX, "python-docx niedostępny")
+    def test_docx_tables_and_summary_are_checked(self):
+        from docx import Document
+        doc = Document()
+        doc.add_heading("Streszczenie", 1)
+        doc.add_paragraph("Zmiana formularza.")
+        table = doc.add_table(rows=2, cols=2)
+        table.cell(0, 0).text, table.cell(0, 1).text = "Wymaganie", "Źródło"
+        table.cell(1, 0).text, table.cell(1, 1).text = "FR-001", "SRC-003"
+        doc.add_heading("Kwestie do wyjaśnienia", 1)
+        doc.add_paragraph("K-01 Brzmienie komunikatu")
+        doc.save(self.tmp / "klient.docx")
+        issues = client.find_issues(self.tmp / "klient.docx")
+        self.assertTrue(any("SRC-003" in issue for issue in issues))
+        self.assertTrue(any("Źródło" in issue for issue in issues))
+
+    def test_skill_documents_client_mode(self):
+        skill = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("# Tryb „Wersja dla klienta”", skill)
+        self.assertIn("check_client_version.py", skill)
 
 
 if __name__ == "__main__":

@@ -50,3 +50,11 @@ cases:
     evidence: ["livenessProbe", "payments-api:latest", "/health/db"]
     must_contain: ["readinessProbe", "resources", "limits", "Validate:", "(?i)latest"]
     must_not_contain: ["(?i)wdrożył(em|am)", "(?i)successfully deployed", "(?i)działa w klastrze"]
+
+  - id: pt-prd-balanced-client
+    target: flowkit-client-pt-prd-writer
+    fixture: transcripts/sample_meeting.vtt
+    prompt: "Przygotuj projekt techniczny (PT) w wersji dla klienta na podstawie tych materiałów, w stylu zrównoważonym."
+    evidence: [ERP, makiety, piątku]
+    must_contain: ["FR-\\d{3}", "(?i)(Do ustalenia|K-\\d{2}|Kwestie do wyjaśnienia)"]
+    must_not_contain: ["(?i)gotową podstawą", "(?i)wystarczy reużyć", "(?i)trywialn", "SRC-\\d{3}"]

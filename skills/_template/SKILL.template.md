@@ -26,6 +26,7 @@ Opisz zwięźle główny cel i przeznaczenie tego skilla w 2–4 zdaniach. Co sk
 1. **[Zasada rzetelności danych]:** Opisz regułę odnoszącą się do źródeł i ich braku.
 2. **[Zasada zakresu]:** Opisz czego skill nie robi lub co pomija.
 3. **[Zasada formatu wyjściowego]:** Opisz oczekiwany format i strukturę wyniku.
+4. **[Naturalny styl bez znaczników AI]:** W treści wyjściowej nie używaj długich myślników (`—`, `–` — zamiast nich stosuj zwykły łącznik `-`, przecinek lub dwukropek), ozdobnych emoji ani typowych formułek AI (*„Należy zauważyć, że…”*, *„Warto podkreślić…”*).
 
 # Etapy pracy
 

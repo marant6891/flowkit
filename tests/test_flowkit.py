@@ -13,7 +13,12 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import grade_eval  # noqa: E402
+import build_agents  # noqa: E402
 import validate_agents  # noqa: E402
+
+sys.path.insert(0, str(ROOT / "runtime"))
+import flowkit_exec  # noqa: E402
+import guard_bash  # noqa: E402
 
 
 class TestFlowKitContracts(unittest.TestCase):
@@ -167,6 +172,24 @@ class TestFlowKitContracts(unittest.TestCase):
         self.assertTrue(ref2.exists(), "docx-engine.md must exist in flowkit-client-meeting-recap")
         content = ref1.read_text(encoding="utf-8")
         self.assertIn("python-docx", content)
+
+    def test_agent_roles_are_consistent_across_runtime_and_build(self):
+        for agent in build_agents.AGENTS:
+            if agent in guard_bash.NO_EXEC:
+                self.assertNotIn(agent, guard_bash.ROLES)
+                self.assertNotIn(agent, build_agents.EXEC_ROLES)
+            else:
+                self.assertIn(agent, guard_bash.ROLES)
+                role = guard_bash.ROLES[agent]
+                self.assertEqual(build_agents.EXEC_ROLES.get(agent), role)
+                self.assertIn(role, flowkit_exec.ROLE_COMMANDS)
+
+    def test_skill_scripts_match_executor_whitelist(self):
+        for skill, scripts in flowkit_exec.SKILL_SCRIPTS.items():
+            scripts_dir = ROOT / "skills" / skill / "scripts"
+            self.assertTrue(scripts_dir.is_dir(), f"Missing scripts dir for {skill}")
+            for script_name in scripts:
+                self.assertTrue((scripts_dir / script_name).is_file(), f"Missing {skill}/scripts/{script_name}")
 
 
 if __name__ == "__main__":

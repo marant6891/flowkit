@@ -43,8 +43,9 @@ Pick only checks that match the files. Commands run through the `validator` role
 | `Dockerfile` | `hadolint Dockerfile` |
 | Compose | `docker compose config -q` |
 | Helm chart | `helm lint <chart>`, `helm template <name> <chart>` |
-| Kubernetes YAML | `kubeconform <files>`, `yamllint <files>` |
-| GitHub Actions | `actionlint` |
+| Kubernetes YAML | `kubeconform <files>`, `yamllint <files>`, `conftest test <files>`, `kyverno test <dir>` |
+| GitHub Actions | `actionlint`, `zizmor <files>` |
+| Dependencies & Secrets | `osv-scanner <lockfile/dir>`, `gitleaks detect --no-git` |
 | Shell scripts | `shellcheck <files>` |
 | JSON | `check-json <files>` |
 

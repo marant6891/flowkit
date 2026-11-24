@@ -23,6 +23,7 @@ US-1: As a <role>, I want <goal>, so that <value>.
 
 Open questions: <genuine blockers, or "none">
 Dependencies: <dependencies, or "none">
+Scope (files): <target files/modules when known, or "to be scoped by Planner">
 Out of scope: <explicit exclusions, or "none">
 ```
 

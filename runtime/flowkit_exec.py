@@ -35,6 +35,7 @@ GIT_READ = ("git status", "git diff", "git log", "git show", "git rev-parse", "g
 SEARCH = ("rg", "grep", "find")
 STATIC = ("tsc --noEmit", "eslint", "npm ls", "cargo check", "go vet", "pytest --collect-only",
           "python -m pytest --collect-only")
+SECURITY_STATIC = ("semgrep scan", "osv-scanner", "gitleaks detect", "gitleaks dir")
 TESTS = ("npm test", "jest", "pytest", "python -m pytest", "python -m unittest", "cargo test", "go test",
          "dotnet test", "mvn -q test", "mvn test", "mvn -q -Dtest", "gradle test", "gradlew test")
 DIAGNOSTICS = (
@@ -48,8 +49,9 @@ DIAGNOSTICS = (
 # Walidacja statyczna plików konfiguracyjnych: bez dostępu do klastra, chmury i rejestrów obrazów.
 VALIDATION = (
     "terraform fmt -check", "terraform validate", "tflint", "hadolint", "docker compose config -q",
-    "docker compose config --quiet", "helm lint", "helm template", "yamllint", "actionlint", "shellcheck",
-    "kubeconform", "check-json",
+    "docker compose config --quiet", "helm lint", "helm template", "yamllint", "actionlint", "zizmor",
+    "shellcheck", "kubeconform", "conftest test", "kyverno test", "osv-scanner", "gitleaks detect",
+    "gitleaks dir", "check-json",
 )
 DELIVERY = ("git switch -c", "git add", "git commit -m", "git push -u origin", "gh pr create")
 HELP = ("help", "doctor")
@@ -70,8 +72,8 @@ BUILTINS = {
 ROLE_COMMANDS = {
     # Orkiestrator uruchamia testy i kontrole statyczne w ścieżce szybkiej („make the change, run its check”).
     "orchestrator": HELP + GIT_READ + SEARCH + STATIC + TESTS + DELIVERY + DOCUMENTS + DOCUMENT_WRITE,
-    "analyzer": HELP + GIT_READ + SEARCH + STATIC,
-    "verifier": HELP + GIT_READ + SEARCH + STATIC + TESTS,
+    "analyzer": HELP + GIT_READ + SEARCH + STATIC + SECURITY_STATIC,
+    "verifier": HELP + GIT_READ + SEARCH + STATIC + SECURITY_STATIC + TESTS,
     "implementer": HELP + STATIC + TESTS + DOCUMENTS + DOCUMENT_WRITE,
     "diagnostics": HELP + GIT_READ + SEARCH + DIAGNOSTICS + DOCUMENTS,
     "analyst": HELP + GIT_READ + SEARCH + DOCUMENTS + DOCUMENT_WRITE,
@@ -84,7 +86,8 @@ SKILL_SCRIPTS = {
     "flowkit-sql-data-assistant": {"check_sql.py"},
 }
 
-FORBIDDEN_FLAGS = {"--fix", "--write", "--output-file", "-exec", "-execdir", "-ok", "-okdir", "-delete", "-fprint", "-fprintf",
+FORBIDDEN_FLAGS = {"--fix", "--autofix", "--write", "--output-file", "--report-path", "--apply", "--update",
+                   "-exec", "-execdir", "-ok", "-okdir", "-delete", "-fprint", "-fprintf",
                    "-fls", "--pre", "--token", "--as", "--as-group", "--password", "--dependency-update",
                    "--kube-context", "--kubeconfig"}
 SENSITIVE_PATH = re.compile(
@@ -304,6 +307,12 @@ def check(role: str, raw_argv: list[str]) -> str | None:
         return "opcja git zapisująca plik lub uruchamiająca program jest zabroniona"
     if argv[0] in ("git", "gh"):
         return delivery_problem(argv)
+    if argv[0] == "semgrep":
+        joined = " ".join(argv[1:]).lower()
+        if any(bad in joined for bad in ("--config auto", "--config=auto", "http://", "https://", "r/", "p/")):
+            return "semgrep dopuszcza wyłącznie lokalne reguły (bez --config auto i zdalnych URL)"
+        if "--metrics=on" in joined or "--metrics on" in joined:
+            return "semgrep wymaga wyłączonej telemetrii (bez --metrics=on)"
     if argv[0] == "md-to-docx":
         return md_to_docx_problem(argv[1:])
     return None

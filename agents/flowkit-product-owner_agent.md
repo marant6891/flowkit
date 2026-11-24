@@ -28,6 +28,7 @@ US-2: As a <role>, I want <goal>, so that <value>.
 
 Open questions: <genuine blockers only, or "none">
 Dependencies: <other features/files/teams, or "none">
+Scope (files): <target files/modules when known from context, or "to be scoped by Planner">
 Out of scope: <items explicitly excluded by user OR judged out of scope by PM due to size/risk — never invent exclusions without basis; "none" if none>
 ```
 

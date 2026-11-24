@@ -32,6 +32,7 @@ Prefixes are optional. Without a prefix, the Orchestrator classifies the request
   - `DEVOPS:` — invoke DevOps specialist.
   - `DIAG:` — invoke read-only Diagnostics.
   - `BA:` — invoke Analyst.
+  - `QA:` — manual frontend/UI test scenarios (Analyst) and defensive OWASP security audit (Verifier `QA-AUDIT:`).
   - `SQL:` — use the safe SQL skill.
   - `SHIP:` — prepare branch, commit, push and PR after verification and explicit approval.
   - `FAST:` / `STRICT:` — force the risk mode. `FAST` = quick path for `[LOW]` single-file work; `STANDARD` = default 3x3 loop; `STRICT` = production, migrations, data, permissions or destructive work: approval before every `[MED]`/`[HIGH]` step, verification after every change. No mode skips approval for `[HIGH]`, deletes, delivery or publishing.

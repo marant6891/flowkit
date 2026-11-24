@@ -124,12 +124,12 @@ Nowy skill zaczyna się od wzorca [`skills/_template/`](skills/_template/) — p
 
 | Agent | Uprawnienia | Zadanie |
 |---|---|---|
-| **flowkit-analyst** | odczyt, edycja, dokumenty | Wymagania, proces, analiza wpływu, backlog, przypadki testowe i UAT na dokumentach Word, Excel, PDF i tekstowych |
+| **flowkit-analyst** | odczyt, edycja, dokumenty | Wymagania, proces, analiza wpływu, backlog, przypadki testowe, scenariusze testów manualnych frontu, gotowe treści zgłoszeń Jira/Azure DevOps oraz UAT na dokumentach Word, Excel, PDF i tekstowych |
 | **flowkit-code-analyzer** | tylko odczyt | Analiza kodu i zależności z rozróżnieniem faktów i hipotez |
 | **flowkit-planner** | tylko odczyt | Plan iteracji z etykietami ryzyka i szacunkiem pracy |
 | **flowkit-product-owner** | tylko odczyt | User stories, kryteria akceptacji, ADR |
 | **flowkit-implementer** | edycja, testy | Jeden atomowy krok zmiany z samokontrolą diffa |
-| **flowkit-verifier** | tylko odczyt, testy | Weryfikacja kodu w 9 wymiarach (bez testów `[NOT VERIFIED]`) oraz niezależny audyt dokumentów klienckich (`DOC-AUDIT:`) i zmian w skillach/agentach (`SKILL-AUDIT:`) |
+| **flowkit-verifier** | tylko odczyt, testy | Weryfikacja kodu w 9 wymiarach (bez testów `[NOT VERIFIED]`), niezależny audyt dokumentów klienckich (`DOC-AUDIT:`), zmian w skillach/agentach (`SKILL-AUDIT:`) oraz defensywny audyt bezpieczeństwa OWASP i testów frontu (`QA-AUDIT:`) |
 | **flowkit-devops** | edycja, bez wykonywania poleceń | CI/CD, Docker, Kubernetes, IaC, chmura; polecenia zmieniające środowisko tylko jako propozycja `REQUIRES APPROVAL` |
 | **flowkit-diagnostics** | tylko odczyt | Logi, stan klastra i kontenerów, runbooki |
 | **flowkit-validator** | tylko odczyt, walidatory | Statyczna walidacja Terraform, Dockerfile, compose, Helm, Kubernetes YAML, CI, skryptów i JSON; bez wdrażania i dostępu do klastra |
@@ -143,7 +143,7 @@ Prefiksy są opcjonalne — bez nich orkiestrator sam dobiera działanie i podaj
 | Prefiks | Działanie |
 |---|---|
 | `ANALYZE:` · `VERIFY:` · `PLAN:` · `SPEC:` | zaczyna od Analyzera, Verifiera, Plannera albo PM |
-| `BA:` · `DEVOPS:` · `DIAG:` · `SQL:` | analityk, DevOps, diagnostyka albo skill SQL |
+| `BA:` · `QA:` · `DEVOPS:` · `DIAG:` · `SQL:` | analityk, testy manualne frontu i audyt OWASP (`QA:`), DevOps, diagnostyka albo skill SQL |
 | `DRY:` | pokazuje plan i czeka na potwierdzenie |
 | `LOG:` | zapisuje iteracje w `AGENT_LOG.md` |
 | `SHIP:` | po weryfikacji i zgodzie: gałąź, commit, push, PR |
@@ -209,6 +209,7 @@ Agent wykonuje te polecenia sam, zamiast odsyłać je do czatu. Wpisy otwierają
 
 ```bash
 python ~/.claude/flowkit/runtime/flowkit_exec.py --role orchestrator -- help
+python ~/.claude/flowkit/runtime/flowkit_exec.py --role orchestrator -- doctor
 ```
 
 Zmienne środowiskowe i plik zgód ustawia tylko użytkownik: hook odrzuca przypisania zmiennych w poleceniach agentów i blokuje im edycję pliku zgód.

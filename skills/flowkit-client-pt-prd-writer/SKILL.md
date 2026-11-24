@@ -1,6 +1,6 @@
 ---
 name: flowkit-client-pt-prd-writer
-version: "3.0"
+version: "3.1"
 tags: [analyst, prd, pt, requirements, documentation, client, gherkin, dod, diagrams]
 description: >
   Tworzy profesjonalną dokumentację PT/PRD (projekt techniczny, specyfikacja
@@ -57,6 +57,9 @@ a nie kompletność wszystkich sekcji.
    kątem diagramu; diagram powstaje, gdy poprawia zrozumienie (patrz Etap 5a).
 8. Język zrozumiały dla klienta biznesowego, precyzyjny technicznie, jedna
    terminologia domenowa (zgodna z materiałami klienta – nie zmieniaj jego nazw).
+   Sekcje techniczne pisz zgodnie z wybranym profilem (domyślnie **zrównoważonym** —
+   patrz Etap 5) i **bez sformułowań bagatelizujących pracochłonność** (*„proste”*,
+   *„wystarczy”*, *„gotowa podstawa”*, *„łatwo reużyć”*, *„drobna modyfikacja”*).
 9. Identyfikatory zawsze trzycyfrowe: `GOAL-001`, `SC-001`, `OOS-001`, `CHG-001`,
    `FR-001`, `US-001`, `NFR-001`, `INT-001`, `DATA-001`, `TEST-001`, `RISK-001`,
    `ASSUMPTION-001`, `OPEN-001`, `Q-001`, `REC-001`.
@@ -117,6 +120,8 @@ a nie kompletność wszystkich sekcji.
      rozstrzygnięte;
    - **roboczy** — w pozostałych przypadkach.
    W razie wątpliwości zapytaj jednym pytaniem, pokazując te trzy możliwości.
+6. Ustal **profil stylu sekcji technicznych**: domyślnie **zrównoważony** (chyba że użytkownik
+   wskaże **biznesowy** albo **techniczny** — patrz Etap 5).
 
 # Etap 1: Zebranie materiałów i inwentaryzacja źródeł
 
@@ -183,7 +188,8 @@ Nie opisuj stacku, architektury ani modułów niezwiązanych ze zmianą.
 
 Przed napisaniem pełnego dokumentu przedstaw użytkownikowi krótko:
 1. jak rozumiesz zmianę (3–5 zdań, ze wskazaniem źródeł),
-2. wariant dokumentu (skrócony/pełny, gdy brak szablonu) oraz które sekcje zostaną wypełnione, które oznaczysz „Nie dotyczy”,
+2. wariant dokumentu (skrócony/pełny, gdy brak szablonu), profil stylu sekcji technicznych
+   (domyślnie: zrównoważony) oraz które sekcje zostaną wypełnione, które oznaczysz „Nie dotyczy”,
    a które „Brak danych”,
 3. listę pytań (Etap 2) i proponowanych `ASSUMPTION`,
 4. plan diagramów z decyzją dla każdego procesu, przepływu, integracji i relacji między
@@ -237,6 +243,17 @@ Zasady pisania:
 - Streszczenie zarządcze pisz na końcu, z treści dokumentu, bez nowych faktów.
 - Zobacz [przykłady: źródło vs zmyślenie](./examples/sourced-vs-invented.md).
 
+**Styl sekcji technicznych i zakaz bagatelizowania nakładu** (Analiza wpływu, Architektura, Integracje, Model danych):
+
+- **Zakaz oceniania łatwości i sugerowania „taniego reużycia”.** Nie pisz, że coś jest *„proste”*, *„trywialne”*, *„wystarczy podpiąć/reużyć”*, *„stanowi gotową podstawę”* albo że to *„drobna zmiana”*. Jeśli istnieje pokrewny mechanizm, opisz fakt neutralnie i wskaż zakres potrzebnych prac (np. analizę dopasowania, rozbudowę lub konfigurację, obsługę błędów, testy regresyjne).
+- **Wybierz ton sekcji technicznych** według ustalonego profilu (Etap 0):
+
+| Profil | Dla kogo | Jak pisać sekcje techniczne |
+|---|---|---|
+| **Biznesowy** | Zarząd, PM/PO klienta | Opisuj wpływ na działanie systemu, procesy, zależności i decyzje biznesowe. Unikaj nazw klas, metod i technicznego żargonu w treści głównej (ewentualne szczegóły przenieś do przypisu lub załącznika). |
+| **Zrównoważony** *(domyślny)* | Klient + zespół wdrożeniowy | Łącz konkret techniczny z kontekstem biznesowym: każda nazwa modułu, serwisu lub integracji występuje z krótkim opisem jej roli i wpływu na zachowanie aplikacji oraz testy. Unikaj suchego, „maszynowego” wyliczania plików bez wyjaśnienia po co. |
+| **Techniczny** | Architekt / zespół dev klienta | Pełna precyzja techniczna (komponenty, endpointy, tabele, kontrakty danych i miejsca w kodzie), przy zachowaniu zakazu bagatelizowania pracochłonności. |
+
 **Zasady zwięzłości** (obowiązują zawsze, także w szablonie użytkownika):
 
 | Wielkość zmiany | Orientacyjna objętość treści (bez strony tytułowej i metryczki) |
@@ -289,7 +306,8 @@ Zasady pisania:
 # Etap 6: Weryfikacja przed oddaniem
 
 Najpierw wykonaj **krytyczny przegląd** dokumentu z perspektywy osoby, która ma go podważyć: przypadki
-brzegowe, sprzeczności, wymagania niesprawdzalne, niejawne założenia i treści wykraczające poza źródła.
+brzegowe, sprzeczności, wymagania niesprawdzalne, niejawne założenia, treści wykraczające poza źródła,
+sformułowania bagatelizujące pracochłonność oraz zgodność sekcji technicznych z wybranym profilem stylu.
 Znalezione braki popraw albo zapisz jako `OPEN-NNN`.
 
 W wersji dla klienta uruchom `${CLAUDE_SKILL_DIR}/scripts/check_client_version.py <dokument> --mode client`,

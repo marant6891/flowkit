@@ -75,7 +75,7 @@ Orkiestrator sam rozpoznaje rodzaj zadania i wybiera skill lub subagenta. Instal
 | Playwright lub CairoSVG | konwersja SVG → PNG | `pip install playwright` + `playwright install chromium` |
 | LibreOffice | opcjonalny podgląd PDF (`--pdf`) | pakiet systemowy |
 | `pypdf` | odczyt PDF | `pip install pypdf` |
-| Walidatory DevOps | agent Validator | `terraform`, `tflint`, `hadolint`, `helm`, `kubeconform`, `yamllint`, `actionlint`, `shellcheck`, Docker — według potrzeb |
+| Walidatory DevOps i bezpieczeństwa | agenci Validator i Verifier | `terraform`, `tflint`, `hadolint`, `helm`, `kubeconform`, `conftest`, `kyverno`, `yamllint`, `actionlint`, `zizmor`, `shellcheck`, `semgrep` (reguły lokalne), `osv-scanner`, `gitleaks`, Docker — według potrzeb |
 
 Brak opcjonalnego narzędzia nie przerywa pracy: odpowiednie sprawdzenie dostaje status `NOT_RUN`, a agent podaje polecenie instalacji. Stan środowiska pokazuje `flowkit_exec.py --role analyst -- detect-docx-libs`.
 
@@ -223,7 +223,8 @@ Zmienne środowiskowe i plik zgód ustawia tylko użytkownik: hook odrzuca przyp
 - **Executor z listą dozwoloną dla roli** ([`runtime/flowkit_exec.py`](runtime/flowkit_exec.py)): polecenia bez powłoki, potoków i przekierowań; każda rola ma minimalny zestaw poleceń (`help` je pokazuje).
 - **Hook w Claude Code** ([`runtime/guard_bash.py`](runtime/guard_bash.py)): agent FlowKit nie uruchomi polecenia z pominięciem executora i nie zmieni pliku zgód ani plików runtime. Zwykłe sesje nie są objęte hookiem.
 - **Granica katalogu roboczego**: ścieżki w poleceniach — także po `..`, `~` i dowiązaniach symbolicznych — muszą leżeć w projekcie lub w `FLOWKIT_EXTRA_PATHS`.
-- **Ochrona danych**: wyniki poleceń są skracane, sekrety ukrywane, pliki `.env`, klucze i obiekty `Secret` niedostępne.
+- **Ochrona danych**: wyniki poleceń są skracane, sekrety ukrywane, pliki `.env`, klucze i obiekty `Secret` niedostępne; CI uruchamia lokalny skaner sekretów (`scripts/validate_secrets.py`).
+- **Narzędzia bezpieczeństwa offline**: `semgrep scan` w executorze działa wyłącznie na lokalnych regułach (blokada `--config auto`, zdalnych URL i `--autofix`), a wszystkie walidatory (`zizmor`, `conftest`, `kyverno`, `osv-scanner`, `gitleaks`) pracują bez modyfikacji plików.
 - **Ochrona gałęzi**: push tylko nowej gałęzi, nigdy do `main`/`master` ani z wymuszeniem; `main` przyjmuje zmiany wyłącznie przez PR z zaliczonym CI ([ruleset](.github/rulesets/protect-main.json)).
 - **Bez sieci i MCP**: agenci mają jawne listy narzędzi bez narzędzi webowych.
 

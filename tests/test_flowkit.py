@@ -15,6 +15,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import grade_eval  # noqa: E402
 import build_agents  # noqa: E402
 import validate_agents  # noqa: E402
+import validate_secrets  # noqa: E402
 
 sys.path.insert(0, str(ROOT / "runtime"))
 import flowkit_exec  # noqa: E402
@@ -190,6 +191,22 @@ class TestFlowKitContracts(unittest.TestCase):
             self.assertTrue(scripts_dir.is_dir(), f"Missing scripts dir for {skill}")
             for script_name in scripts:
                 self.assertTrue((scripts_dir / script_name).is_file(), f"Missing {skill}/scripts/{script_name}")
+
+    def test_secret_scanner_passes_on_repository(self):
+        self.assertEqual(validate_secrets.scan(), [])
+
+    def test_security_tools_enforce_offline_and_readonly_rules(self):
+        self.assertIsNone(flowkit_exec.check("verifier", ["semgrep", "scan", "--config", "rules.yml", "src/"]))
+        self.assertIsNotNone(flowkit_exec.check("verifier", ["semgrep", "scan", "--config", "auto", "src/"]))
+        self.assertIsNotNone(flowkit_exec.check("verifier", ["semgrep", "scan", "--autofix", "src/"]))
+        for cmd in (
+            ["zizmor", ".github/workflows/validate-skills.yml"],
+            ["conftest", "test", "deploy.yaml"],
+            ["kyverno", "test", "policies/"],
+            ["osv-scanner", "--lockfile=requirements.txt"],
+            ["gitleaks", "detect", "--no-git"],
+        ):
+            self.assertIsNone(flowkit_exec.check("validator", cmd), f"validator should allow {cmd}")
 
 
 if __name__ == "__main__":

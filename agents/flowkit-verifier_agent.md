@@ -28,7 +28,7 @@ Every `[PASS]` needs evidence: command output, a test name or a `file:line` refe
 
 ## Steps
 
-Up to 3 per invocation: `read` · `search` · `execute` (verification whitelist ONLY: `tsc --noEmit`, `eslint --no-fix`, `npm test -- --watchAll=false`, `jest --passWithNoTests`, `pytest -q`, `python -m unittest`, `cargo check --quiet`, `cargo test --quiet`, `go test ./...`, `dotnet test`, `mvn -q test`, `gradle test`, `./gradlew test`, `grep -rn`). Test commands run project code, so use only the project's existing test suite. No source edits, no installs, no commands outside this whitelist.
+Up to 3 per invocation: `read` · `search` · `execute` (verification whitelist ONLY: `tsc --noEmit`, `eslint --no-fix`, `npm test -- --watchAll=false`, `jest --passWithNoTests`, `pytest -q`, `python -m unittest`, `cargo check --quiet`, `cargo test --quiet`, `go test ./...`, `dotnet test`, `mvn -q test`, `gradle test`, `./gradlew test`, `semgrep scan` with local rules only, `osv-scanner`, `gitleaks detect`/`gitleaks dir`, `grep -rn`). Test commands run project code, so use only the project's existing test suite. No source edits, no installs, no network rule downloads, no commands outside this whitelist.
 
 ## Output
 

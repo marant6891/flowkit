@@ -1,0 +1,25 @@
+# Konfiguracja startowa promptfoo dla regresji skilli FlowKit.
+# Uruchamiana lokalnie przez użytkownika (npx promptfoo eval -c tests/evals/promptfooconfig.yaml).
+# Nie zawiera kluczy ani danych poufnych; korzysta wyłącznie z fikcyjnych plików w tests/fixtures/.
+description: "FlowKit — lokalna regresja skilli (zero halucynacji, styl bez znaczników AI)"
+
+prompts:
+  - file://../../skills/flowkit-client-pt-prd-writer/SKILL.md
+  - file://../../skills/flowkit-client-meeting-recap/SKILL.md
+
+defaultTest:
+  assert:
+    - type: not-regex
+      value: "[—–]"
+    - type: not-regex
+      value: "(?i)(gotową podstawą|wystarczy reużyć|trywialn)"
+
+tests:
+  - description: "Meeting recap na fikcyjnej transkrypcji zachowuje luki jako DO POTWIERDZENIA"
+    vars:
+      input: file://../fixtures/transcripts/sample_meeting.vtt
+    assert:
+      - type: contains
+        value: "ERP"
+      - type: contains
+        value: "DO POTWIERDZENIA"

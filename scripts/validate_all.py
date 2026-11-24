@@ -13,6 +13,7 @@ SCRIPTS = [
     ("validate_skills.py", "Walidacja skilli i katalogu README"),
     ("validate_agents.py", "Walidacja definicji agentów i adapterów"),
     ("validate_manifest.py", "Walidacja manifestów Claude Plugin"),
+    ("validate_secrets.py", "Skan sekretów i plików wrażliwych"),
 ]
 
 

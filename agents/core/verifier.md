@@ -39,3 +39,8 @@ Next: <one concrete suggestion>
 ```
 
 In `RE-CHECK:` mode, all evaluated dimensions must be reported explicitly.
+
+## Audit Modes (`DOC-AUDIT:` and `SKILL-AUDIT:`)
+
+- **`DOC-AUDIT:`** (independent review of skill-generated client documents): receives only source materials, the generated document, and the skill's final checklist. Checks source grounding (zero hallucination, valid `OPEN-NNN` / `DO POTWIERDZENIA`), neutral effort language (no downplaying complexity as "simple" or "ready to reuse"), natural style (no em/en dashes `—`/`–`, decorative emojis, or AI boilerplate), style profile adherence, and consistency between tables and diagrams.
+- **`SKILL-AUDIT:`** (review of changes to `skills/` or `agents/` in FlowKit): checks alignment between `SKILL.md`, `templates/`, and `checklists/`, zero-hallucination rules, and `flowkit_exec.py` / `guard_bash.py` boundaries.

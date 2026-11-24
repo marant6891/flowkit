@@ -74,13 +74,19 @@ def check_skill(skill_path: Path, readme: str) -> None:
             found = latest.group(1) if latest else "none"
             err(f"Latest CHANGELOG.md entry ({found}) does not match frontmatter version ({version})")
 
-    # Linki względne w SKILL.md
+    # Linki względne w SKILL.md + odwołanie do checklisty weryfikacji
+    has_checklist_ref = False
     for link in LINK.findall(body):
         if link.startswith(EXTERNAL):
             continue
-        target = skill_path / link.split("#", 1)[0]
+        clean = link.split("#", 1)[0]
+        if clean.startswith(("checklists/", "./checklists/")):
+            has_checklist_ref = True
+        target = skill_path / clean
         if not target.exists():
             err(f"Broken link in SKILL.md: {link}")
+    if not has_checklist_ref:
+        err("SKILL.md must reference at least one checklist file in checklists/")
 
     # Katalog w README
     row = re.search(rf"^\|\s*\*\*{re.escape(name)}\*\*\s*\|\s*`([^`]+)`", readme, re.MULTILINE)

@@ -129,7 +129,7 @@ Nowy skill zaczyna się od wzorca [`skills/_template/`](skills/_template/) — p
 | **flowkit-planner** | tylko odczyt | Plan iteracji z etykietami ryzyka i szacunkiem pracy |
 | **flowkit-product-owner** | tylko odczyt | User stories, kryteria akceptacji, ADR |
 | **flowkit-implementer** | edycja, testy | Jeden atomowy krok zmiany z samokontrolą diffa |
-| **flowkit-verifier** | tylko odczyt, testy | Weryfikacja w 9 wymiarach; bez uruchomionych testów `[NOT VERIFIED]` |
+| **flowkit-verifier** | tylko odczyt, testy | Weryfikacja kodu w 9 wymiarach (bez testów `[NOT VERIFIED]`) oraz niezależny audyt dokumentów klienckich (`DOC-AUDIT:`) i zmian w skillach/agentach (`SKILL-AUDIT:`) |
 | **flowkit-devops** | edycja, bez wykonywania poleceń | CI/CD, Docker, Kubernetes, IaC, chmura; polecenia zmieniające środowisko tylko jako propozycja `REQUIRES APPROVAL` |
 | **flowkit-diagnostics** | tylko odczyt | Logi, stan klastra i kontenerów, runbooki |
 | **flowkit-validator** | tylko odczyt, walidatory | Statyczna walidacja Terraform, Dockerfile, compose, Helm, Kubernetes YAML, CI, skryptów i JSON; bez wdrażania i dostępu do klastra |
@@ -171,6 +171,7 @@ Prefiksy są opcjonalne — bez nich orkiestrator sam dobiera działanie i podaj
 3. Pisze treść w Markdown według zasad skilla: tylko ze źródeł, zwięźle, z oznaczonymi lukami.
 4. Zapisuje DOCX poleceniem `md-to-docx` na kopii szablonu klienta — dokument ma komplet jego stylów, numerację, nagłówki i stopki. `--template` zachowuje stronę tytułową i metryczkę, `--set POLE=WARTOŚĆ` wypełnia pola szablonu, diagramy mermaid i SVG trafiają do dokumentu jako PNG.
 5. Konwerter ponownie otwiera wynik i porównuje jego strukturę ze źródłem (`Kontrola DOCX: PASS/FAIL`); opcjonalnie tworzy podgląd PDF.
+6. Przed przekazaniem dokumentu końcowego lub wersji dla klienta `flowkit-verifier` wykonuje niezależny audyt `DOC-AUDIT:` na samych materiałach źródłowych, dokumencie i checkliście skilla (pokrycie w źródłach, brak bagatelizowania pracochłonności, spójność stylu i tabel).
 
 Szczegóły: [docx-engine.md](skills/flowkit-client-pt-prd-writer/references/docx-engine.md).
 

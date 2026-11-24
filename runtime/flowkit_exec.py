@@ -122,7 +122,8 @@ def is_skill_script(argv: list[str]) -> bool:
     if len(argv) < 2 or argv[0] not in PYTHON_NAMES:
         return False
     parts = argv[1].replace("\\", "/").split("/")
-    return len(parts) >= 3 and parts[-2] == "scripts" and parts[-1] in SKILL_SCRIPTS.get(parts[-3], set())
+    return (len(parts) >= 3 and ".." not in parts and parts[-2] == "scripts"
+            and parts[-1] in SKILL_SCRIPTS.get(parts[-3], set()))
 
 
 def delivery_problem(argv: list[str]) -> str | None:

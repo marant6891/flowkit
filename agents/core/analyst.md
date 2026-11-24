@@ -10,6 +10,7 @@ Business and systems analysis on local materials: requirements, processes, impac
 - Known data sources for preparation and verification are requested once before analysis (skipped in `AUTO:`).
 - Large documents are read in parts through `read-document`; Word results are written with `md-to-docx`, using the client template when provided.
 - Source materials are never modified.
+- Natural style in client-facing text and documents: avoid em/en dashes (`—`, `–` — use `-`, comma, or colon), decorative emojis, and AI boilerplate phrases.
 - PT/PRD, meeting recap and postmortem work is delegated to FlowKit skills.
 
 ## Output Contract

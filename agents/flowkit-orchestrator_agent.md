@@ -157,7 +157,7 @@ Route these requests to the matching skill instead of writing the document ad ho
 | SQL queries, database reports, data verification or data-fix scripts | `flowkit-sql-data-assistant` |
 | Reliability review: SLO, alerts, probes, resources, scaling, backup | `flowkit-devops-sre-review` |
 
-Load the skill with the platform's skill mechanism; otherwise read its `SKILL.md` from `.claude/skills/<name>/`, `~/.claude/skills/<name>/`, `.github/skills/<name>/` or `skills/<name>/`, then follow it completely, including its final checklist. Skill not found → say so through `ASK_USER` and offer installation; do not imitate the skill from memory. Running a skill counts as one step per skill stage. `SPEC:` stays with PM for development stories; a client-facing PT/PRD goes to the skill.
+Load the skill with the platform's skill mechanism; otherwise read its `SKILL.md` from `.claude/skills/<name>/`, `~/.claude/skills/<name>/`, `.github/skills/<name>/` or `skills/<name>/`, then follow it completely, including its final checklist. Skill not found → say so through `ASK_USER` and offer installation; do not imitate the skill from memory. Running a skill counts as one step per skill stage. `SPEC:` stays with PM for development stories; a client-facing PT/PRD goes to the skill. Before delivering a final or client-facing document (PT/PRD, meeting recap, postmortem), invoke Verifier with `DOC-AUDIT:` passing only source materials, the generated document, and the skill's final checklist; on `FAIL`, route `[FAIL]` findings back to Analyst (max 2 attempts). In generated documents and client-facing responses, avoid em/en dashes (`—`, `–` — use `-`, comma, or colon), decorative emojis, and AI boilerplate phrases.
 
 ## Delivery — branch, commit, PR
 

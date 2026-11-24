@@ -40,3 +40,14 @@ DOBRZE: ryzyka tylko zidentyfikowane w materiałach lub analizie, np.
 
 Jeśli autor widzi potencjalny problem spoza źródeł (np. ERP) – zapisuje go jako
 `REC-001` w sekcji „Rekomendacje” lub jako pytanie, nie jako fakt.
+
+## Opis istniejących mechanizmów i sekcji technicznych
+
+ŹLE (bagatelizuje nakład i sugeruje „łatwe reużycie”):
+„Mechanizm serwisów automatycznych jest gotową podstawą do cyklicznego uruchomienia – wystarczy go reużyć.”
+
+ŹLE (styl zbyt „maszynowy” w profilu zrównoważonym):
+„Zmiana w `AutoServiceRunner.cs` i `ScheduleConfig` z wykorzystaniem `CronJobBase`.”
+
+DOBRZE (profil zrównoważony – bez obietnic łatwości, z kontekstem dla klienta):
+„Aplikacja posiada mechanizm serwisów automatycznych (`AutoServiceRunner`), który może stanowić punkt wyjścia do cyklicznego uruchamiania procesu. Wymaga to jednak zaprojektowania dedykowanego zadania, jego konfiguracji, obsługi błędów oraz testów regresyjnych istniejących harmonogramów.”

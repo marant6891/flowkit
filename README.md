@@ -89,7 +89,7 @@ Wszystkie skille mają prefiks `flowkit-`. Skill uruchamia się automatycznie, g
 
 | Skill | Wersja | Opis | Ścieżka |
 |---|---|---|---|
-| **flowkit-client-pt-prd-writer** | `3.0` | Dokument PT/PRD dla klienta wyłącznie na podstawie materiałów, w szablonie klienta (`.docx`, `.dotx`, `.md`) z kompletem jego stylów. Wariant skrócony dla małych zmian (1–3 strony) i pełny. Trzy tryby wyniku: roboczy z oznaczeniami źródeł, **wersja dla klienta** (czysta treść, wątpliwości zebrane w rozdziale końcowym) i dokument końcowy bez dopisków. User stories Given-When-Then, Definition of Done, kontrola pokrycia wymagań testami, diagramy oparte na źródłach, tryb `AUTO`. | [`skills/flowkit-client-pt-prd-writer/`](skills/flowkit-client-pt-prd-writer/) |
+| **flowkit-client-pt-prd-writer** | `3.1` | Dokument PT/PRD dla klienta wyłącznie na podstawie materiałów, w szablonie klienta (`.docx`, `.dotx`, `.md`) z kompletem jego stylów. Wariant skrócony dla małych zmian (1–3 strony) i pełny. Trzy tryby wyniku: roboczy z oznaczeniami źródeł, **wersja dla klienta** (czysta treść, wątpliwości zebrane w rozdziale końcowym) i dokument końcowy bez dopisków. User stories Given-When-Then, Definition of Done, kontrola pokrycia wymagań testami, diagramy oparte na źródłach, tryb `AUTO`. | [`skills/flowkit-client-pt-prd-writer/`](skills/flowkit-client-pt-prd-writer/) |
 | **flowkit-client-meeting-recap** | `1.4` | Z transkrypcji (`.vtt`, `.docx`, `.txt`) dwa osobne pliki: wewnętrzny radar ryzyk z cytatami jako dowodami oraz szkic maila do klienta z decyzjami, zadaniami i właścicielami potwierdzonymi w rozmowie oraz prośbą o korekty w ustalonym oknie. | [`skills/flowkit-client-meeting-recap/`](skills/flowkit-client-meeting-recap/) |
 
 ### Dane i SQL

@@ -12,7 +12,20 @@ skills:
       - Napraw błąd walidacji w pliku orders.py.
       - Podsumuj to spotkanie w mailu do klienta.
       - Przygotuj raport postmortem z awarii bazy danych.
-      - Wyjaśnij różnicę między REST a GraphQL.
+      - Mam tylko luźny pomysł na aplikację, przeprowadź mnie krok po kroku przez wymagania.
+  flowkit-requirements-workshop:
+    should_trigger:
+      - Mam pomysł na aplikację do obsługi zwrotów w sklepie, przeprowadź mnie przez wymagania.
+      - Poprowadź mnie krok po kroku od koncepcji do specyfikacji, bez trybu automatycznego.
+      - Zróbmy warsztat wymagań dla nowego modułu rezerwacji.
+      - Wznów warsztat wymagań projektu KSeF.
+      - Chcę doprecyzować luźny pomysł i dojść do wymagań biznesowych i technicznych.
+    should_not_trigger:
+      - Przygotuj dokument PT na podstawie załączonego briefu i zgłoszenia.
+      - Podsumuj to spotkanie w mailu do klienta.
+      - Napisz zapytanie SQL zliczające zamówienia.
+      - Napraw błąd w pliku orders.py.
+      - Przygotuj raport postmortem z wczorajszej awarii.
   flowkit-client-meeting-recap:
     should_trigger:
       - Podsumuj to spotkanie na podstawie transkrypcji VTT.

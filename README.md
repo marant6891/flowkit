@@ -94,6 +94,7 @@ Wszystkie skille mają prefiks `flowkit-`. Skill uruchamia się automatycznie, g
 | Skill | Wersja | Opis | Ścieżka |
 |---|---|---|---|
 | **flowkit-client-pt-prd-writer** | `3.2` | Dokument PT/PRD dla klienta wyłącznie na podstawie materiałów, w szablonie klienta (`.docx`, `.dotx`, `.md`) z kompletem jego stylów. Wariant skrócony dla małych zmian (1–3 strony) i pełny. Trzy tryby wyniku: roboczy z oznaczeniami źródeł, **wersja dla klienta** (czysta treść, wątpliwości zebrane w rozdziale końcowym) i dokument końcowy bez dopisków. User stories Given-When-Then, Definition of Done, kontrola pokrycia wymagań testami, diagramy oparte na źródłach, tryb `AUTO`. | [`skills/flowkit-client-pt-prd-writer/`](skills/flowkit-client-pt-prd-writer/) |
+| **flowkit-requirements-workshop** | `1.0` | Interaktywny warsztat wymagań prowadzony krok po kroku: koncepcja, zakres, wymagania biznesowe (role, procesy, reguły, user stories Given-When-Then) i techniczne (integracje, dane, NFR), ryzyka i plan testów, a na końcu docelowy PT/PRD przez `flowkit-client-pt-prd-writer`. Każda faza zatwierdzana przez użytkownika, bez trybu AUTO; stan w pliku warsztatu, który można wznowić. | [`skills/flowkit-requirements-workshop/`](skills/flowkit-requirements-workshop/) |
 | **flowkit-client-meeting-recap** | `1.4` | Z transkrypcji (`.vtt`, `.docx`, `.txt`) dwa osobne pliki: wewnętrzny radar ryzyk z cytatami jako dowodami oraz szkic maila do klienta z decyzjami, zadaniami i właścicielami potwierdzonymi w rozmowie oraz prośbą o korekty w ustalonym oknie. | [`skills/flowkit-client-meeting-recap/`](skills/flowkit-client-meeting-recap/) |
 
 ### Dane i SQL
@@ -148,6 +149,7 @@ Prefiksy są opcjonalne — bez nich orkiestrator sam dobiera działanie i podaj
 |---|---|
 | `ANALYZE:` · `VERIFY:` · `PLAN:` · `SPEC:` | zaczyna od Analyzera, Verifiera, Plannera albo PM |
 | `BA:` · `QA:` · `DEVOPS:` · `DIAG:` · `SQL:` | analityk, testy manualne frontu i audyt OWASP (`QA:`), DevOps, diagnostyka albo skill SQL |
+| `WARSZTAT:` / `WORKSHOP:` | interaktywny warsztat wymagań: od pomysłu przez część biznesową i techniczną do docelowego PT/PRD, z zatwierdzeniem każdej fazy |
 | `DRY:` | pokazuje plan i czeka na potwierdzenie |
 | `LOG:` | zapisuje iteracje w `AGENT_LOG.md` |
 | `SHIP:` | po weryfikacji i zgodzie: gałąź, commit, push, PR |

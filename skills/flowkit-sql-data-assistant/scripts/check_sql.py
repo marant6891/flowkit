@@ -32,6 +32,10 @@ VARIABLES = {
     "mysql": r"\bSET\s+@",
     "oracle": r"\bDECLARE\b",
 }
+AGGREGATION_OR_LIMIT = (
+    r"\b(TOP\s*\(?\s*\d|LIMIT\s+\d|FETCH\s+FIRST|ROWNUM|GROUP\s+BY"
+    r"|(COUNT|COUNT_BIG|SUM|AVG|MIN|MAX|PERCENTILE_CONT|PERCENTILE_DISC)\s*\()"
+)
 FORBIDDEN = (
     (r"\b(DROP|TRUNCATE|ALTER|GRANT|REVOKE|SHUTDOWN|BACKUP|RESTORE)\b", "zmiana struktury lub uprawnień jest zabroniona"),
     (r"\bCREATE\b(?!\s+(LOCAL\s+)?TEMP(ORARY)?\b)(?!\s+TABLE\s+#)", "tworzenie obiektów jest zabronione"),
@@ -96,7 +100,7 @@ def check(sql: str) -> list[str]:
     if not (inserts or updates or deletes):
         if not re.search(r"\bSELECT\b", code, re.IGNORECASE):
             errors.append("skrypt nie zawiera zapytania SELECT")
-        elif not re.search(r"\b(TOP\s*\(?\s*\d|LIMIT\s+\d|FETCH\s+FIRST|ROWNUM|COUNT\s*\(|SUM\s*\(|GROUP\s+BY)", code, re.IGNORECASE):
+        elif not re.search(AGGREGATION_OR_LIMIT, code, re.IGNORECASE):
             errors.append("zestawienie wymaga limitu wierszy albo agregacji")
         return errors
 

@@ -98,7 +98,7 @@ Prefixes are optional shortcuts. Without a prefix, classify the request yourself
 
 | Request is about | Action |
 |---|---|
-| SQL query, database report, data check, INSERT, UPDATE, DELETE | Skill `flowkit-sql-data-assistant` |
+| SQL query, database report, analytical report (KPI, trends, period comparison, ranking, cohorts, pivot), data check, INSERT, UPDATE, DELETE | Skill `flowkit-sql-data-assistant` |
 | Idea, concept or problem without ready materials; guided requirements session from idea to target document; resume a workshop | Skill `flowkit-requirements-workshop` (always interactive) |
 | PT, PRD, change specification for a client | Skill `flowkit-client-pt-prd-writer` |
 | Meeting transcript, recap, client e-mail | Skill `flowkit-client-meeting-recap` |
@@ -149,7 +149,7 @@ Prefixes are optional shortcuts. Without a prefix, classify the request yourself
 | `DIAG:` | invoke Diagnostics for read-only checks of logs, clusters, containers and configuration |
 | `BA:` | invoke Analyst for requirements, process, impact, backlog, test cases or UAT |
 | `QA:` | manual frontend/UI test scenarios (Analyst) and defensive OWASP security audit (Verifier `QA-AUDIT:`) |
-| `SQL:` | use skill `flowkit-sql-data-assistant` for safe queries, reports and data-fix scripts |
+| `SQL:` | use skill `flowkit-sql-data-assistant` for safe queries, reports, analytical reports (`ANALYTICS_REPORT`) and data-fix scripts |
 | `WORKSHOP:` / `WARSZTAT:` | use skill `flowkit-requirements-workshop`: interactive path from idea through business and technical requirements to the target PT/PRD |
 | `SHIP:` | prepare delivery of verified changes: branch, commit, push, PR (see Delivery) |
 | `AUTO:` | run the whole task on recommendations: accept option 1 at every checkpoint (see AUTO mode) |
@@ -179,7 +179,7 @@ Route these requests to the matching skill instead of writing the document ad ho
 | PT, PRD, change specification, impact analysis for a client | `flowkit-client-pt-prd-writer` |
 | Meeting transcript or notes → recap, client e-mail, risk radar | `flowkit-client-meeting-recap` |
 | Incident logs or alerts → postmortem, RCA | `flowkit-devops-incident-postmortem` |
-| SQL queries, database reports, data verification or data-fix scripts | `flowkit-sql-data-assistant` |
+| SQL queries, database and analytical reports, data verification or data-fix scripts | `flowkit-sql-data-assistant` |
 | Reliability review: SLO, alerts, probes, resources, scaling, backup | `flowkit-devops-sre-review` |
 
 Load the skill with the platform's skill mechanism; otherwise read its `SKILL.md` from `.claude/skills/<name>/`, `~/.claude/skills/<name>/`, `.github/skills/<name>/` or `skills/<name>/`, then follow it completely, including its final checklist. Skill not found → say so through `ASK_USER` and offer installation; do not imitate the skill from memory. Running a skill counts as one step per skill stage. `SPEC:` stays with PM for development stories; a client-facing PT/PRD goes to the skill. Run `flowkit-requirements-workshop` yourself and never delegate it to a subagent: subagents cannot ask the user. Its questions and phase gates are user checkpoints: present them with `ASK_USER` and wait, in every mode. Before delivering a final or client-facing document (PT/PRD, meeting recap, postmortem), invoke Verifier with `DOC-AUDIT:` passing only source materials, the generated document, and the skill's final checklist; on `FAIL`, route `[FAIL]` findings back to Analyst (max 2 attempts). In generated documents and client-facing responses, avoid em/en dashes (`—`, `–` — use `-`, comma, or colon), decorative emojis, and AI boilerplate phrases.

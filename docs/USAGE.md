@@ -292,13 +292,33 @@ Oczekiwana liczba rekordów: 37 (z raportu w zgłoszeniu). Skrypt uruchomi teste
 | Tryb | Dostajesz |
 |---|---|
 | `READ_ONLY` | `SELECT` z limitem lub agregacją |
+| `ANALYTICS_REPORT` | karta raportu, słownik miar, zapytanie z CTE i funkcjami okna, instrukcja czytania wyniku i zapytanie kontrolne |
 | `DATA_INVESTIGATION` | zapytania diagnostyczne: liczba rekordów, przykładowe ID, opis zakresu |
 | `DATA_REPAIR` | najpierw diagnoza, potem skrypt w transakcji: kontrola liczby rekordów (przerwanie przy rozbieżności), zachowanie poprzednich wartości, domyślne `ROLLBACK`, skrypt odtworzenia |
 
 Podanie **typu bazy** i **oczekiwanej liczby rekordów** to dwie najważniejsze informacje — bez nich skill zapyta.
 Nieznane triggery i klucze obce są wypisywane jako niewiadome.
 
+### Zestawienia analityczne i raportowe (`ANALYTICS_REPORT`)
+
+Tryb włącza się, gdy określisz potrzebę analityczną: miary, podział, okres, porównanie okresów, ranking, udział,
+kohorty albo tabelę przestawną. Skill najpierw ustala **kartę raportu** (definicje miar, okres, granulacja, data
+biznesowa i strefa czasowa, wykluczenia), a brakujące definicje pokazuje jako `ZAŁOŻENIE`.
+
+```text
+SQL: PostgreSQL 16, schemat materialy/schema.sql. ANALYTICS_REPORT.
+Miara: sprzedaż netto = suma ilosc * cena_netto z pozycji, bez zamówień ANULOWANE.
+Okres: 2026, miesięcznie, strefa Europe/Warsaw. Podział: region.
+Potrzebuję: zmiana m/m, udział regionu w miesiącu, top 3 kategorie w regionie. Odbiorca: zarząd, eksport do arkusza.
+```
+
+Dostajesz: kartę raportu, słownik miar, skrypt (CTE, funkcje okna, kalendarz z pustymi okresami, `NULLIF` przy
+dzieleniu), opis kolumn wyniku, zapytanie kontrolne zgodności sum oraz uwagi o wydajności. Skill nie tworzy
+widoków ani tabel raportowych.
+
 **Wypróbuj:** `SQL: SQL Server, schemat tests/fixtures/sql/sample_schema.sql. Policz klientów w tabeli sprzedaz.klient według statusu (READ_ONLY).`
+
+**Wypróbuj raport:** `SQL: schemat tests/fixtures/sql/sample_sales_schema.sql. Raport sprzedaży netto miesięcznie za 2026 według regionu z porównaniem m/m (ANALYTICS_REPORT).`
 
 ---
 

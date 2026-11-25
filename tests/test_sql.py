@@ -88,6 +88,48 @@ class TestSafetyChecker(unittest.TestCase):
         self.assert_rejected("-- Baza: MySQL\nSELECT a.id FROM a;\n", "limitu")
         self.assertEqual(check_sql.check("-- Baza: Oracle\nSELECT COUNT(*) AS liczba FROM a;\n"), [])
 
+    def test_other_aggregates_count_as_report(self):
+        for function in ("AVG", "MIN", "MAX", "COUNT_BIG"):
+            sql = f"-- Baza: SQL Server\nSELECT {function}(a.kwota) AS wynik FROM dbo.a AS a;\n"
+            self.assertEqual(check_sql.check(sql), [], function)
+
+
+class TestAnalyticsReport(unittest.TestCase):
+    PATTERNS = SKILL / "references" / "analytics-report-patterns.md"
+
+    def blocks(self):
+        return re.findall(r"```sql\n(.*?)```", self.PATTERNS.read_text(encoding="utf-8"), re.S)
+
+    def test_all_analytics_patterns_pass_checker(self):
+        blocks = self.blocks()
+        self.assertGreaterEqual(len(blocks), 9)
+        for block in blocks:
+            self.assertEqual(check_sql.check(block), [], block[:60])
+
+    def test_full_report_example_for_each_database(self):
+        examples = [b for b in self.blocks() if "Raport: sprzedaż netto miesięcznie" in b]
+        self.assertEqual(sorted(re.search(r"-- Baza: (.+)", b).group(1) for b in examples),
+                         ["MySQL", "Oracle", "PostgreSQL", "SQL Server"])
+        for block in examples:
+            for element in ("LAG(", "NULLIF(", "LEFT JOIN", "OVER ()", "ROWS UNBOUNDED PRECEDING"):
+                self.assertIn(element, block)
+
+    def test_oracle_examples_do_not_alias_tables_with_as(self):
+        for block in self.blocks():
+            if "-- Baza: Oracle" in block:
+                self.assertNotRegex(block, r"\b(FROM|JOIN)\s+[\w.]+\s+AS\s+\w+")
+
+    def test_skill_documents_analytics_mode(self):
+        skill = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+        checklist = (SKILL / "checklists" / "sql-safety-checklist.md").read_text(encoding="utf-8")
+        self.assertIn("`ANALYTICS_REPORT`", skill)
+        for link in ("references/analytics-report-patterns.md", "templates/analytics-report-template.md"):
+            self.assertIn(link, skill)
+        self.assertIn("ANALYTICS_REPORT", checklist)
+        template = (SKILL / "templates" / "analytics-report-template.md").read_text(encoding="utf-8")
+        for section in ("## Karta raportu", "## Słownik miar", "## Kontrola spójności", "## Założenia i niewiadome"):
+            self.assertIn(section, template)
+
 
 class TestSqlIntegration(unittest.TestCase):
 

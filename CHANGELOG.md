@@ -18,6 +18,7 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 - **OpenSSF Scorecard:** workflow `scorecard.yml` (push do `main`, co tydzień, zmiana ochrony gałęzi) z wynikami w Code scanning i odznaką w README.
 
 ### Zmieniono
+- `flowkit-sql-data-assistant` 1.2: tryb `ANALYTICS_REPORT` dla zestawień analitycznych i raportowych na żądanie użytkownika — karta raportu, słownik miar, wzorce dla każdej bazy (trend m/m, udział, narastająco, top N, ABC, tabela przestawna, kohorty), zapytanie kontrolne; nowy przypadek ewaluacji `sql-analytics-report`.
 - `flowkit-client-pt-prd-writer` 3.2: izolacja materiałów źródłowych (zasada 10) jest wymogiem, a nie zaleceniem.
 - Hook blokuje agentom edycję katalogu `.git`, plików wrażliwych (`.env*` poza `.env.example`, klucze) i dziennika audytu, także w katalogach z `FLOWKIT_EXTRA_PATHS`; `md-to-docx` nie zapisuje w `.git`.
 - Akcje GitHub w CI przypięte do SHA commita; checkout bez zapisanych poświadczeń (`persist-credentials: false`).

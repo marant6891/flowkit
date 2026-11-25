@@ -101,7 +101,7 @@ Wszystkie skille mają prefiks `flowkit-`. Skill uruchamia się automatycznie, g
 
 | Skill | Wersja | Opis | Ścieżka |
 |---|---|---|---|
-| **flowkit-sql-data-assistant** | `1.1` | Zapytania, zestawienia i skrypty poprawy danych dla PostgreSQL, SQL Server, Oracle, MySQL i MariaDB w trybach `READ_ONLY`, `DATA_INVESTIGATION` i `DATA_REPAIR`: transakcja, kontrola liczby rekordów, domyślne `ROLLBACK`, zachowanie poprzednich wartości i skrypt odtworzenia. Nigdy nie łączy się z bazą. | [`skills/flowkit-sql-data-assistant/`](skills/flowkit-sql-data-assistant/) |
+| **flowkit-sql-data-assistant** | `1.2` | Zapytania, zestawienia analityczne i raportowe oraz skrypty poprawy danych dla PostgreSQL, SQL Server, Oracle, MySQL i MariaDB w trybach `READ_ONLY`, `ANALYTICS_REPORT`, `DATA_INVESTIGATION` i `DATA_REPAIR`: karta raportu z definicjami miar, funkcje okna, porównania okresów, rankingi, kohorty, kontrola spójności raportu; transakcja, kontrola liczby rekordów, domyślne `ROLLBACK`, zachowanie poprzednich wartości i skrypt odtworzenia. Nigdy nie łączy się z bazą. | [`skills/flowkit-sql-data-assistant/`](skills/flowkit-sql-data-assistant/) |
 
 ### DevOps i SRE
 

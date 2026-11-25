@@ -1,6 +1,6 @@
 ---
 name: flowkit-requirements-workshop
-version: "1.0"
+version: "1.1"
 tags: [analyst, requirements, discovery, workshop, interactive, user-stories, prd]
 description: >
   Interaktywny warsztat wymagań prowadzony krok po kroku z użytkownikiem: od
@@ -162,9 +162,13 @@ potwierdzenia. Ustal:
 3. Uruchom `flowkit-client-pt-prd-writer`, przekazując **plik warsztatu jako źródło nadrzędne**, pozostałe
    materiały z rejestru źródeł, szablon i tryb. Identyfikatory wymagań zostają te same; `USR`/`DEC` są dla
    tego skilla źródłami `SRC`. Pytania Etapu 1–2 tamtego skilla są już rozstrzygnięte — przekaż odpowiedzi.
-4. Po dokumencie orkiestrator zleca niezależny audyt `DOC-AUDIT:`. Ustalenia (`FAIL`, `CONTRADICTION-NNN`)
-   wracają do warsztatu: wskaż fazę, której dotyczą, zadaj pytania, zaktualizuj plik i wygeneruj dokument
-   ponownie.
+   **Rekomendacje warsztatu:** przyjęte `REC` są już decyzjami `DEC` i trafiają do treści; odrzucone nie
+   trafiają do dokumentu wcale; nierozstrzygnięte trafiają do sekcji „Rekomendacje” dokumentu tylko za zgodą
+   użytkownika, inaczej jako `OPEN`. W dokumencie PT/PRD `REC-NNN` oznacza wyłącznie taką rekomendację.
+4. Po dokumencie zleć niezależny audyt `DOC-AUDIT:` — robi to orkiestrator; gdy pracujesz bez niego,
+   zaproponuj użytkownikowi polecenie `VERIFY: DOC-AUDIT: <dokument>, źródła: <plik warsztatu i materiały>`.
+   Ustalenia (`FAIL`, `CONTRADICTION-NNN`) wracają do warsztatu: wskaż fazę, której dotyczą, zadaj pytania,
+   zaktualizuj plik i wygeneruj dokument ponownie.
 5. Wersja docelowa powstaje, gdy użytkownik zaakceptuje dokument. Zapisz w pliku warsztatu datę, tryb
    i ścieżkę dokumentu oraz status faz „zatwierdzona”.
 

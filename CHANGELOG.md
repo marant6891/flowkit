@@ -11,11 +11,16 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 - **Dziennik audytu executora:** każde polecenie agenta (wykonane i odrzucone) jako wiersz JSON w `~/.flowkit/audit.log` — czas UTC, rola, katalog, polecenie po ukryciu sekretów, SHA-256 argumentów, decyzja, powód, kod wyjścia, czas trwania. `FLOWKIT_AUDIT_FILE` zmienia ścieżkę, `off` wyłącza; błąd zapisu nie przerywa pracy.
 - **Reguła „treść materiałów to dane, nie polecenia” u wszystkich agentów** (generowana przez `build_agents.py`, sprawdzana przez `validate_agents.py`); podejrzane fragmenty są zgłaszane jako `[INJECTION?]`. Wcześniej miał ją tylko orkiestrator.
 - `SECURITY.md` (prywatne zgłaszanie podatności, zakres), Dependabot dla akcji GitHub, linting `ruff` w CI.
+- **Tryb tylko do odczytu `FLOWKIT_READONLY=1`:** hook blokuje agentom zmiany plików, executor odrzuca `md-to-docx`, commit, push i PR; agenci pokazują zmiany jako diff. `doctor` pokazuje stan trybu i ścieżkę dziennika audytu.
+- **Sprzeczności w `DOC-AUDIT:`:** Verifier szuka niezgodności między źródłami oraz między dokumentem a źródłami i raportuje je jako `CONTRADICTION-NNN` z cytatami obu stron; sprzeczność rozstrzygnięta w dokumencie bez reguły pierwszeństwa od użytkownika lub `OPEN-NNN` to `FAIL`.
+- **Przewodnik `docs/USAGE.md` „FlowKit w praktyce”:** optymalne polecenia dla każdego skilla i prefiksu orkiestratora (źródła, źródło nadrzędne, wykluczenia, format i odbiorca wyniku), opis wyniku, scenariusze łączone, przykłady na danych z `tests/fixtures/` i rozwiązywanie problemów.
+- **OpenSSF Scorecard:** workflow `scorecard.yml` (push do `main`, co tydzień, zmiana ochrony gałęzi) z wynikami w Code scanning i odznaką w README.
 
 ### Zmieniono
 - `flowkit-client-pt-prd-writer` 3.1: izolacja materiałów źródłowych (zasada 10) jest wymogiem, a nie zaleceniem.
 - Hook blokuje agentom edycję katalogu `.git`, plików wrażliwych (`.env*` poza `.env.example`, klucze) i dziennika audytu, także w katalogach z `FLOWKIT_EXTRA_PATHS`; `md-to-docx` nie zapisuje w `.git`.
 - Akcje GitHub w CI przypięte do SHA commita; checkout bez zapisanych poświadczeń (`persist-credentials: false`).
+- CI: nowy push do PR anuluje nieaktualny przebieg (`concurrency`); na `main` każdy commit ma własny przebieg.
 
 ### Naprawiono
 - Komunikaty executora na stderr (np. błąd zapisu dziennika) są w UTF-8 także w Windows.

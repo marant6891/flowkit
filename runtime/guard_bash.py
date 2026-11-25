@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from flowkit_exec import SENSITIVE_PATH, allow_file, audit_file, check  # noqa: E402
+from flowkit_exec import READONLY_ENV, SENSITIVE_PATH, allow_file, audit_file, check, readonly  # noqa: E402
 
 EXECUTOR = Path(__file__).resolve().parent / "flowkit_exec.py"
 ROLES = {
@@ -126,6 +126,10 @@ def main() -> int:
     if name not in ROLES and name not in NO_EXEC:
         return 0
     if data.get("tool_name") in EDIT_TOOLS:
+        if readonly():
+            print(f"FlowKit zablokował zmianę pliku: tryb tylko do odczytu ({READONLY_ENV}). "
+                  "Pokaż proponowaną zmianę jako diff do akceptacji użytkownika.", file=sys.stderr)
+            return 2
         problem = protected_edit(data.get("tool_input") or {})
         if problem:
             print(f"FlowKit zablokował zmianę pliku: {problem}.", file=sys.stderr)

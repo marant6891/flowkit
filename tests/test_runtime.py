@@ -29,6 +29,7 @@ EXEC = fx.__file__.replace("\\", "/")
 # Testy nie piszą do dziennika audytu użytkownika (~/.flowkit/audit.log); podprocesy dziedziczą zmienną.
 _AUDIT_DIR = tempfile.TemporaryDirectory()
 os.environ[fx.AUDIT_FILE_ENV] = str(Path(_AUDIT_DIR.name) / "audit.log")
+os.environ.pop(fx.READONLY_ENV, None)  # tryb ustawiony u użytkownika nie zmienia wyników testów
 
 
 class TestCommandPolicy(unittest.TestCase):
@@ -541,6 +542,37 @@ class TestValidatorAndConsent(unittest.TestCase):
     def test_md_to_docx_does_not_write_into_git_dir(self):
         self.assertIsNotNone(fx.check("analyst", ["md-to-docx", "a.md", ".git/hooks/x.docx"]))
         self.assertIsNone(fx.check("analyst", ["md-to-docx", "a.md", "out/x.docx"]))
+
+
+class TestReadonlyMode(unittest.TestCase):
+
+    def setUp(self):
+        os.environ[fx.READONLY_ENV] = "1"
+        self.addCleanup(os.environ.pop, fx.READONLY_ENV, None)
+
+    def run_guard(self, payload):
+        return subprocess.run([sys.executable, str(ROOT / "runtime" / "guard_bash.py")], input=json.dumps(payload),
+                              capture_output=True, text=True, encoding="utf-8", check=False)
+
+    def test_write_commands_are_rejected_and_reads_stay_allowed(self):
+        for argv in (["md-to-docx", "a.md", "out/a.docx"], ["git", "commit", "-m", "x"],
+                     ["git", "push", "-u", "origin", "feat/x"], ["gh", "pr", "create"]):
+            self.assertIn(fx.READONLY_ENV, fx.check("orchestrator", argv) or "", argv)
+        for argv in (["git", "status"], ["pytest", "-q"], ["read-document", "a.docx"]):
+            self.assertIsNone(fx.check("orchestrator", argv), argv)
+
+    def test_hook_blocks_every_agent_edit_but_not_user_sessions(self):
+        for agent in ("flowkit-implementer", "flowkit-devops", "flowkit-orchestrator"):
+            result = self.run_guard({"agent_type": agent, "tool_name": "Edit", "tool_input": {"file_path": "app.py"}})
+            self.assertEqual(result.returncode, 2, agent)
+            self.assertIn("diff", result.stderr)
+        user = self.run_guard({"tool_name": "Edit", "tool_input": {"file_path": "app.py"}})
+        self.assertEqual(user.returncode, 0)
+
+    def test_disabled_by_default(self):
+        os.environ[fx.READONLY_ENV] = "0"
+        self.assertFalse(fx.readonly())
+        self.assertIsNone(fx.check("orchestrator", ["md-to-docx", "a.md", "out/a.docx"]))
 
 
 class TestAuditLog(unittest.TestCase):

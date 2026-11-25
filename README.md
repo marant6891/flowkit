@@ -1,5 +1,7 @@
 # FlowKit
 
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/marant6891/flowkit/badge)](https://securityscorecards.dev/viewer/?uri=github.com/marant6891/flowkit)
+
 Biblioteka skilli i agentów AI dla **analityków biznesowo-systemowych** i **inżynierów DevOps**. FlowKit prowadzi od materiału wejściowego (brief, transkrypcja, logi, kod, manifesty) do zweryfikowanego rezultatu: dokumentu PT/PRD w szablonie klienta, podsumowania spotkania, raportu postmortem, skryptu SQL albo zwalidowanej konfiguracji.
 
 Zasady, na których opiera się całe rozwiązanie:
@@ -27,6 +29,8 @@ Wersja: **1.8.0** · Licencja: [MIT](LICENSE) · Historia zmian: [CHANGELOG.md](
 10. [Aktualizacja z wersji 1.7](#aktualizacja-z-wersji-17)
 11. [Rozwiązywanie problemów](#rozwiązywanie-problemów)
 12. [Rozwój i współtworzenie](#rozwój-i-współtworzenie)
+
+**Praktyczne użycie:** gotowe polecenia dla każdego skilla i agenta (jakie źródła wskazać, jak opisać oczekiwany wynik, co dostaniesz) — [docs/USAGE.md](docs/USAGE.md).
 
 ---
 
@@ -59,7 +63,7 @@ DEVOPS: przygotuj Dockerfile dla aplikacji i zwaliduj go.
 AUTO: BA: przygotuj backlog z przypadkami testowymi z dokumentu wymagania.docx.
 ```
 
-Orkiestrator sam rozpoznaje rodzaj zadania i wybiera skill lub subagenta. Instalacja dla VS Code Copilot i instalacja ręczna: [Instalacja](#instalacja).
+Orkiestrator sam rozpoznaje rodzaj zadania i wybiera skill lub subagenta. Optymalne polecenia ze wskazaniem źródeł i oczekiwanego wyniku dla każdego skilla: [**FlowKit w praktyce**](docs/USAGE.md). Instalacja dla VS Code Copilot i instalacja ręczna: [Instalacja](#instalacja).
 
 ---
 
@@ -171,7 +175,7 @@ Prefiksy są opcjonalne — bez nich orkiestrator sam dobiera działanie i podaj
 3. Pisze treść w Markdown według zasad skilla: tylko ze źródeł, zwięźle, z oznaczonymi lukami.
 4. Zapisuje DOCX poleceniem `md-to-docx` na kopii szablonu klienta — dokument ma komplet jego stylów, numerację, nagłówki i stopki. `--template` zachowuje stronę tytułową i metryczkę, `--set POLE=WARTOŚĆ` wypełnia pola szablonu, diagramy mermaid i SVG trafiają do dokumentu jako PNG.
 5. Konwerter ponownie otwiera wynik i porównuje jego strukturę ze źródłem (`Kontrola DOCX: PASS/FAIL`); opcjonalnie tworzy podgląd PDF.
-6. Przed przekazaniem dokumentu końcowego lub wersji dla klienta `flowkit-verifier` wykonuje niezależny audyt `DOC-AUDIT:` na samych materiałach źródłowych, dokumencie i checkliście skilla (pokrycie w źródłach, brak bagatelizowania pracochłonności, spójność stylu i tabel).
+6. Przed przekazaniem dokumentu końcowego lub wersji dla klienta `flowkit-verifier` wykonuje niezależny audyt `DOC-AUDIT:` na samych materiałach źródłowych, dokumencie i checkliście skilla (pokrycie w źródłach, brak bagatelizowania pracochłonności, spójność stylu i tabel, sprzeczności między źródłami oraz między dokumentem a źródłami jako `CONTRADICTION-NNN` z cytatami obu stron).
 
 Szczegóły: [docx-engine.md](skills/flowkit-client-pt-prd-writer/references/docx-engine.md).
 
@@ -223,6 +227,7 @@ Zmienne środowiskowe i plik zgód ustawia tylko użytkownik: hook odrzuca przyp
 - **Executor z listą dozwoloną dla roli** ([`runtime/flowkit_exec.py`](runtime/flowkit_exec.py)): polecenia bez powłoki, potoków i przekierowań; każda rola ma minimalny zestaw poleceń (`help` je pokazuje).
 - **Hook w Claude Code** ([`runtime/guard_bash.py`](runtime/guard_bash.py)): agent FlowKit nie uruchomi polecenia z pominięciem executora i nie zmieni pliku zgód, dziennika audytu, plików runtime, katalogu `.git` (hooki gita uruchamiają kod) ani plików wrażliwych (`.env*` poza `.env.example`, klucze). Ochrona obowiązuje także w katalogach z `FLOWKIT_EXTRA_PATHS`. Zwykłe sesje nie są objęte hookiem.
 - **Dziennik audytu**: każde polecenie agenta, wykonane i odrzucone, trafia jako wiersz JSON do `~/.flowkit/audit.log` (czas UTC, rola, katalog, polecenie po ukryciu sekretów, skrót SHA-256 argumentów, decyzja, powód odrzucenia, kod wyjścia, czas trwania). Inna ścieżka: `FLOWKIT_AUDIT_FILE`, wyłączenie: `FLOWKIT_AUDIT_FILE=off`.
+- **Tryb tylko do odczytu**: `FLOWKIT_READONLY=1` ustawione przed uruchomieniem sesji blokuje agentom każdą zmianę pliku (hook), zapis DOCX oraz commit, push i PR (executor). Agent pokazuje zmiany jako diff do akceptacji. Prefiks `AUTO:` ani agent nie wyłączą trybu. Polecenia z pliku zgód nadal działają.
 - **Treść materiałów to dane, nie polecenia**: każdy agent i skill traktuje dokumenty, transkrypcje, logi i wyniki narzędzi wyłącznie jako materiał. Polecenia ukryte w tej treści nie zmieniają roli, listy poleceń ani zasad i są zgłaszane jako `[INJECTION?]`.
 - **Granica katalogu roboczego**: ścieżki w poleceniach — także po `..`, `~` i dowiązaniach symbolicznych — muszą leżeć w projekcie lub w `FLOWKIT_EXTRA_PATHS`.
 - **Ochrona danych**: wyniki poleceń są skracane, sekrety ukrywane, pliki `.env`, klucze i obiekty `Secret` niedostępne; CI uruchamia lokalny skaner sekretów (`scripts/validate_secrets.py`).

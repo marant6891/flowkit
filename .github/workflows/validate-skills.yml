@@ -9,6 +9,11 @@ on:
 permissions:
   contents: read
 
+# PR: nowy push anuluje nieaktualny przebieg. main: grupa per commit, więc każdy commit ma własny wynik.
+concurrency:
+  group: validate-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   validate:
     runs-on: ubuntu-latest

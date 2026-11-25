@@ -204,6 +204,18 @@ INLINE_CODE = {("python", "-c"), ("python3", "-c"), ("py", "-c"), ("node", "-e")
 INTERPRETERS = {"python", "python3", "py", "node", "perl", "ruby", "php", "deno", "bun", "java", "npx"}
 
 
+# --- Tryb tylko do odczytu -----------------------------------------------------------
+# FLOWKIT_READONLY=1 ustawia użytkownik przed uruchomieniem sesji. Agent wtedy nie zmienia plików (hook blokuje
+# Edit/Write), nie zapisuje DOCX i nie wykonuje commit/push/PR. Hook odrzuca przypisania zmiennych w poleceniach
+# agenta, więc trybu nie wyłączy ani agent, ani prefiks AUTO:.
+READONLY_ENV = "FLOWKIT_READONLY"
+WRITE_COMMANDS = DELIVERY + DOCUMENT_WRITE
+
+
+def readonly() -> bool:
+    return os.environ.get(READONLY_ENV, "").strip().lower() in ("1", "true", "yes", "on")
+
+
 def allow_file() -> Path:
     configured = os.environ.get(ALLOW_FILE_ENV, "").strip()
     return Path(configured).expanduser() if configured else Path.home() / ".flowkit" / "allow.json"
@@ -281,6 +293,9 @@ def check(role: str, raw_argv: list[str]) -> str | None:
         return "brak polecenia"
     if argv[0] in SHELLS_AND_RUNNERS:
         return f"uruchamianie przez {argv[0]} jest zabronione"
+    if readonly() and any(matches(argv, prefix) for prefix in WRITE_COMMANDS):
+        return (f"tryb tylko do odczytu ({READONLY_ENV}): {' '.join(argv[:2])} zmienia pliki lub repozytorium. "
+                f"Pokaż zmianę jako diff do akceptacji")
     for token in argv[1:]:
         if token in FORBIDDEN_FLAGS or token.split("=", 1)[0] in FORBIDDEN_FLAGS:
             return f"zabroniona opcja: {token}"
@@ -567,6 +582,9 @@ def run_doctor(role: str) -> int:
     print(f"flowkit-project.md: {'OK' if project_cfg.is_file() else 'BRAK (opcjonalny)'}")
     extra = os.environ.get(EXTRA_PATHS_ENV, "").strip()
     print(f"{EXTRA_PATHS_ENV}: {extra or 'nie ustawiono'}")
+    print(f"{READONLY_ENV}: {'włączony (bez zmian plików, DOCX, commit, push)' if readonly() else 'wyłączony'}")
+    audit_path = audit_file()
+    print(f"Dziennik audytu: {audit_path or 'wyłączony'}")
     allow_path = allow_file()
     allowed, ignored = user_allowed(role)
     print(f"Plik zgód ({allow_path}): {'OK' if allow_path.is_file() else 'BRAK'} "

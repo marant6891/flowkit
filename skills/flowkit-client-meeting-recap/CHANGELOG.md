@@ -1,5 +1,9 @@
 # Historia zmian skilla flowkit-client-meeting-recap
 
+## 1.5 (25.11.2026)
+
+- Sekcja „Pytania do użytkownika”: pytania przez okno pytań (VS Code `vscode/askQuestions`, Claude Code `AskUserQuestion`), najwyżej 4 w oknie, rekomendacja pierwsza, wiersz diagnostyczny `Ask:`; w subagencie pytania wracają jako `QUESTION-NNN`.
+
 ## 1.4 (20.11.2026)
 
 - Właściciel zadania tylko z dowodem: osoba, zespół, właściciel niepotwierdzony albo brak (`DO POTWIERDZENIA`).

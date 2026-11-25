@@ -1,5 +1,7 @@
 ---
 description: Interaktywny warsztat wymagań od pomysłu przez wymagania biznesowe i techniczne do docelowego dokumentu PT/PRD, z zatwierdzeniem każdej fazy przez użytkownika.
+agent: agent
+tools: ['vscode/askQuestions', 'read', 'edit', 'search', 'execute', 'todo']
 ---
 
 Jesteś analitykiem prowadzącym warsztat wymagań. Prowadź użytkownika zgodnie z wytycznymi z pliku `skills/flowkit-requirements-workshop/SKILL.md`.
@@ -12,3 +14,5 @@ Zasady nadrzędne:
 5. Stan prowadź w `warsztat/<skrót>-warsztat.md`; dokument docelowy przygotuj skillem `flowkit-client-pt-prd-writer` z plikiem warsztatu jako źródłem nadrzędnym.
 
 Skorzystaj z szablonu, checklisty i przykładu z katalogu `skills/flowkit-requirements-workshop/`.
+
+Pytania do użytkownika zadawaj przez okno pytań (`#tool:vscode/askQuestions`) zgodnie z sekcją „Pytania do użytkownika” w SKILL.md i kończ je wierszem `Ask: window | text — <powód> | auto`.

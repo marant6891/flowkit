@@ -23,7 +23,11 @@ hooks:
 
 ## Claude Code tool names
 
-Instructions below use neutral names: `read` = `Read` · `search` = `Grep`, `Glob` · `edit` = `Edit`, `Write` · `execute` = `Bash` · `agent` = `Agent`. `ASK_USER` and `WAIT_FOR_APPROVAL` mean: ask in the conversation and stop until the user replies. Use only the tools available to this agent.
+Instructions below use neutral names: `read` = `Read` · `search` = `Grep`, `Glob` · `edit` = `Edit`, `Write` · `execute` = `Bash` · `agent` = `Agent` · `#tool:vscode/askQuestions` = `AskUserQuestion`. `ASK_USER` and `WAIT_FOR_APPROVAL` mean: ask and stop until the user replies — through `AskUserQuestion` when this agent has it, otherwise in the conversation. Use only the tools available to this agent.
+
+## Questions for the user
+
+When you are called by the Orchestrator, never wait for the user. Return open questions at the end of your output as `QUESTION-NNN: <question> — options: 1. <recommended> 2. ... (max 4) — why: <one sentence>`, so the Orchestrator can ask them through the question window. When invoked directly by the user, ask through the question window if this agent has it, otherwise in the conversation.
 
 ## Local command execution
 

@@ -21,7 +21,7 @@ AGENTS = (
 
 # Listy narzędzi są jawne: agenci działają lokalnie, bez narzędzi webowych i bez MCP.
 CLAUDE_TOOLS = {
-    "flowkit-orchestrator": ["Read", "Grep", "Glob", "Edit", "Write", "Bash", "Agent", "Skill"],
+    "flowkit-orchestrator": ["Read", "Grep", "Glob", "Edit", "Write", "Bash", "Agent", "Skill", "AskUserQuestion"],
     "flowkit-code-analyzer": ["Read", "Grep", "Glob", "Bash"],
     "flowkit-verifier": ["Read", "Grep", "Glob", "Bash"],
     "flowkit-planner": ["Read", "Grep", "Glob"],
@@ -62,13 +62,40 @@ GUARD_HOOK = {"PreToolUse": [{"matcher": "Bash|Edit|Write|MultiEdit|NotebookEdit
     "onFailure": "block",
 }]}]}
 
+# Diagnostyka okna pytań: agenci, którzy pytają użytkownika lub uruchamiają skille i subagentów,
+# zapisują te zdarzenia w dzienniku audytu. Hook tylko zapisuje i nie wpływa na odpowiedź.
+LOG_HOOK = {"PostToolUse": [{"matcher": "AskUserQuestion|Skill|Agent|Task", "hooks": [{
+    "type": "command",
+    "command": 'python "$HOME/.claude/flowkit/runtime/log_tool_event.py"',
+}]}]}
+LOGGED_TOOLS = {"AskUserQuestion", "Skill", "Agent"}
+
 ORCHESTRATOR = "flowkit-orchestrator"
 GENERATED = "<!-- Plik generowany przez scripts/build_agents.py ze źródła agents/SOURCE. Nie edytuj ręcznie. -->\n"
 
 CLAUDE_NOTE = """
 ## Claude Code tool names
 
-Instructions below use neutral names: `read` = `Read` · `search` = `Grep`, `Glob` · `edit` = `Edit`, `Write` · `execute` = `Bash` · `agent` = `Agent`. `ASK_USER` and `WAIT_FOR_APPROVAL` mean: ask in the conversation and stop until the user replies. Use only the tools available to this agent.
+Instructions below use neutral names: `read` = `Read` · `search` = `Grep`, `Glob` · `edit` = `Edit`, `Write` · `execute` = `Bash` · `agent` = `Agent` · `#tool:vscode/askQuestions` = `AskUserQuestion`. `ASK_USER` and `WAIT_FOR_APPROVAL` mean: ask and stop until the user replies — through `AskUserQuestion` when this agent has it, otherwise in the conversation. Use only the tools available to this agent.
+"""
+
+# Wspólna reguła pytań: jedno zachowanie w VS Code i Claude Code oraz ślad, gdy okno pytań nie zostało użyte.
+QUESTION_WINDOW_NOTE = """
+## Question window (mandatory)
+
+Every question to the user — checkpoint `Next:` choice, `ASK_USER`, `WAIT_FOR_APPROVAL`, a question from a FlowKit skill, or a question returned by a subagent (`QUESTION-NNN`) — goes through the question window: `#tool:vscode/askQuestions` in VS Code, `AskUserQuestion` in Claude Code. Rules:
+- One question per item, 2–4 options, the recommended option first and marked `(Recommended)`; the user can always answer in their own words.
+- At most 4 questions per call; more questions → the most blocking ones first, the rest in the next call. A question table from a skill (ID, reason, default) stays as text above the call, and each row becomes one question.
+- Plain-text options do not count as asking. Do not end the turn with an unanswered question that was not sent through the window.
+- Only when the tool is unavailable, fails, or the session is non-interactive, ask in plain text.
+- Every checkpoint block and every question ends with the line `Ask: window | text — <reason> | auto` saying how the user was asked (`auto` = `AUTO:` mode took the recommended option). The line is diagnostic and must be truthful.
+"""
+
+# Subagenci nie pytają użytkownika: zwracają pytania w formie, którą orkiestrator przeniesie do okna pytań.
+SUBAGENT_QUESTION_NOTE = """
+## Questions for the user
+
+When you are called by the Orchestrator, never wait for the user. Return open questions at the end of your output as `QUESTION-NNN: <question> — options: 1. <recommended> 2. ... (max 4) — why: <one sentence>`, so the Orchestrator can ask them through the question window. When invoked directly by the user, ask through the question window if this agent has it, otherwise in the conversation.
 """
 
 EXEC_NOTE = """
@@ -106,6 +133,17 @@ Every `ASK_USER`, `WAIT_FOR_APPROVAL` and end-of-iteration checkpoint ends with 
 """
 
 
+def question_note(name: str) -> str:
+    return QUESTION_WINDOW_NOTE if name == ORCHESTRATOR else SUBAGENT_QUESTION_NOTE
+
+
+def claude_hooks(name: str) -> dict:
+    hooks = dict(GUARD_HOOK) if name in EXEC_ROLES else {}
+    if LOGGED_TOOLS & set(CLAUDE_TOOLS[name]):
+        hooks.update(LOG_HOOK)
+    return hooks
+
+
 def split_source(name: str, root: Path = ROOT) -> tuple[dict, str]:
     text = (root / "agents" / f"{name}_agent.md").read_text(encoding="utf-8").replace("\r\n", "\n")
     _, front, body = text.split("---\n", 2)
@@ -129,9 +167,12 @@ def render(name: str, platform: str, root: Path = ROOT) -> str:
         data = {"name": meta["name"], "description": meta["description"], "tools": CLAUDE_TOOLS[name]}
         if name in CLAUDE_LIMITS:
             data["model"], data["maxTurns"] = CLAUDE_LIMITS[name]
-        if name in EXEC_ROLES:
-            data["hooks"] = GUARD_HOOK
-        return front_matter(data) + note + CLAUDE_NOTE + exec_note(name, CLAUDE_RUNTIME) + UNTRUSTED_NOTE + readonly_note(name) + "\n" + body
+        hooks = claude_hooks(name)
+        if hooks:
+            data["hooks"] = hooks
+        return (front_matter(data) + note + CLAUDE_NOTE + question_note(name) + exec_note(name, CLAUDE_RUNTIME)
+                + UNTRUSTED_NOTE + readonly_note(name) + "\n" + body)
+    note += question_note(name)
     if name == ORCHESTRATOR:
         note += VSCODE_ORCHESTRATOR_NOTE
         # Lista subagentów, których orkiestrator może użyć (VS Code, tryb Local).

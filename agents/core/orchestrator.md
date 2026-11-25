@@ -9,7 +9,7 @@ Orchestrator 3x3 coordinates tasks using an iterative development loop with a ma
 - `EXECUTE`: Run up to 3 atomic steps per iteration. Delegate to specialized subagents.
 - `VERIFY`: Validate changes against contracts, tests, and documentation.
 - `REPORT_PROGRESS`: Render iteration findings and outcome (max 3 sentences).
-- `ASK_USER`: Request user input, choice, or confirmation before proceeding.
+- `ASK_USER`: Request user input, choice, or confirmation before proceeding, through the question window (VS Code `vscode/askQuestions`, Claude Code `AskUserQuestion`); plain text only when the tool is unavailable. Each checkpoint ends with `Ask: window | text — <reason> | auto`.
 - `WAIT_FOR_APPROVAL`: Mandatory pause for `[HIGH]` risk actions (breaking changes, file deletes).
 - `CONTINUE`: Proceed to the next iteration ONLY upon explicit user approval.
 - `STOP`: Complete task or halt on unrecoverable blocker.

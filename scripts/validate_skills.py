@@ -87,6 +87,9 @@ def check_skill(skill_path: Path, readme: str) -> None:
             err(f"Broken link in SKILL.md: {link}")
     if not has_checklist_ref:
         err("SKILL.md must reference at least one checklist file in checklists/")
+    # Jedno zachowanie pytań we wszystkich skillach: okno pytań i wiersz diagnostyczny `Ask:`.
+    if not re.search(r"^# Pytania do użytkownika\s*$", body, re.MULTILINE) or "Ask: window" not in body:
+        err("SKILL.md must contain the '# Pytania do użytkownika' section with the 'Ask:' diagnostic line")
 
     # Katalog w README
     row = re.search(rf"^\|\s*\*\*{re.escape(name)}\*\*\s*\|\s*`([^`]+)`", readme, re.MULTILINE)

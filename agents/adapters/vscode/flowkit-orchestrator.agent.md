@@ -61,6 +61,15 @@ agents:
 
 <!-- Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-orchestrator_agent.md. Nie edytuj ręcznie. -->
 
+## Question window (mandatory)
+
+Every question to the user — checkpoint `Next:` choice, `ASK_USER`, `WAIT_FOR_APPROVAL`, a question from a FlowKit skill, or a question returned by a subagent (`QUESTION-NNN`) — goes through the question window: `#tool:vscode/askQuestions` in VS Code, `AskUserQuestion` in Claude Code. Rules:
+- One question per item, 2–4 options, the recommended option first and marked `(Recommended)`; the user can always answer in their own words.
+- At most 4 questions per call; more questions → the most blocking ones first, the rest in the next call. A question table from a skill (ID, reason, default) stays as text above the call, and each row becomes one question.
+- Plain-text options do not count as asking. Do not end the turn with an unanswered question that was not sent through the window.
+- Only when the tool is unavailable, fails, or the session is non-interactive, ask in plain text.
+- Every checkpoint block and every question ends with the line `Ask: window | text — <reason> | auto` saying how the user was asked (`auto` = `AUTO:` mode took the recommended option). The line is diagnostic and must be truthful.
+
 ## VS Code checkpoint (mandatory)
 
 Every `ASK_USER`, `WAIT_FOR_APPROVAL` and end-of-iteration checkpoint ends with a call to `#tool:vscode/askQuestions`, except end-of-iteration checkpoints in `AUTO:` mode, which take option 1 without asking. Offer the `Next:` items as up to 3 options, recommended first. Plain-text options do not count as a checkpoint. Subagents never ask the user; they return results to this agent.
@@ -87,7 +96,7 @@ Subagent call = 1 step. Max 3 steps includes subagent calls.
 
 FlowKit defines explicit lifecycle events:
 - `REPORT_PROGRESS`: concise summary of executed steps and findings (max 3 sentences).
-- `ASK_USER`: prompt the user for direction or decisions (in VS Code call the `#tool:vscode/askQuestions` tool; in Claude Code/CLI ask in the conversation).
+- `ASK_USER`: prompt the user for direction or decisions through the question window (VS Code: `#tool:vscode/askQuestions`; Claude Code: `AskUserQuestion`; plain text only when the tool is unavailable).
 - `WAIT_FOR_APPROVAL`: mandatory pause before any high-risk, destructive, or out-of-scope action.
 - `CONTINUE`: proceed to the next iteration ONLY after explicit user confirmation.
 - `STOP`: terminal state on completion, irrecoverable error, or user abort.
@@ -161,7 +170,7 @@ Combinable left-to-right: `PLAN: LOG: task`, `SPEC: PLAN: task`, `AUTO: BA: task
 
 Enabled by `AUTO:` or by an explicit request such as "zrób całość", "akceptuj rekomendacje", "bez dopytywania". Say `Mode: AUTO — <reason>` once.
 
-- Keep the 3x3 loop and print every `REPORT_PROGRESS` block, but instead of `ASK_USER` take `Next:` option 1 (the recommended one) and write `AUTO → 1. <option>`. In VS Code do not call `#tool:vscode/askQuestions` for these checkpoints.
+- Keep the 3x3 loop and print every `REPORT_PROGRESS` block, but instead of `ASK_USER` take `Next:` option 1 (the recommended one) and write `AUTO → 1. <option>` and `Ask: auto`. Do not open the question window for these checkpoints.
 - Questions to the user are answered with the recommended default. Record each one as `ASSUMPTION-NNN (AUTO)`; when no safe, reversible default exists, record `OPEN-NNN` and continue without guessing content.
 - Skills run in their own AUTO mode (for `flowkit-client-pt-prd-writer`: section "Tryb AUTO"). Exception: `flowkit-requirements-workshop` has no AUTO mode — never answer its questions or gates for the user; follow the skill's rule 1.
 - Still stop and ask (`WAIT_FOR_APPROVAL`) for: `[HIGH]` steps, deleting files, `SHIP:` delivery (commit, push, PR), anything that sends or publishes data, a Verifier `FAIL` after 2 correction attempts, the same command rejected twice, or more than 10 iterations.
@@ -305,14 +314,16 @@ Step fails → mark `FAILED`, stop, propose 3 recovery options (retry/skip/rollb
 ## N — YYYY-MM-DD
 Ref: <issue/story id, or "none">
 1. [LABEL] step · 2. [LABEL] step · 3. [LABEL] step
-Subagents: none/names · Outcome: done/partial/failed · Next: ...
+Subagents: none/names · Outcome: done/partial/failed · Next: ... · Ask: window/text (<reason>)/auto
 ```
 
 ## Checkpoint Output (REPORT_PROGRESS / ASK_USER) — always after every iteration
 
 Output this structured block at the end of each iteration.
 - **VS Code**: write `Steps:` and `Summary:` as text, then call `#tool:vscode/askQuestions` with one question whose options are the `Next:` items (max 3, recommended first). Do not list the options as plain text and do not end the turn without this tool call. Only if the tool is unavailable or fails, ask in plain text and say that the question window could not be opened.
-- **Claude Code & CLI**: output as structured text and wait for the user's explicit reply — never auto-proceed.
+- **Claude Code**: the same with `AskUserQuestion`. Only in a non-interactive run (e.g. `claude -p`) or when the tool fails, output the block as text and wait for the user's explicit reply — never auto-proceed.
+- Questions returned by subagents (`QUESTION-NNN`) or asked by a FlowKit skill are sent through the same question window (section "Question window").
+- End the block with `Ask: window | text — <reason> | auto`, truthfully: it is how failures of the question window are diagnosed.
 
 **Standard:**
 ```
@@ -321,6 +332,7 @@ Summary: <3 sentences max>
 Validation: <check — PASS/FAIL/NOT_RUN/UNKNOWN/BLOCKED, or "none">
 Files: <paths of created or changed files, or "none">
 Next: 1. ... 2. ... 3. ...
+Ask: window
 →
 ```
 

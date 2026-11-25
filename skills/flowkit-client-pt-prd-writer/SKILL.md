@@ -1,6 +1,6 @@
 ---
 name: flowkit-client-pt-prd-writer
-version: "3.2"
+version: "3.3"
 tags: [analyst, prd, pt, requirements, documentation, client, gherkin, dod, diagrams]
 description: >
   Tworzy profesjonalną dokumentację PT/PRD (projekt techniczny, specyfikacja
@@ -81,6 +81,23 @@ a nie kompletność wszystkich sekcji.
 14. **Zwięzłość.** Dokument ma być krótki i konkretny — patrz „Zasady zwięzłości” w Etapie 5.
     Każdą informację zapisuj raz, w jednym miejscu; w innych sekcjach odwołuj się do jej ID.
     Rozwlekłość nie jest rzetelnością: zdanie, które nic nie dodaje, usuń.
+
+# Pytania do użytkownika
+
+Każde pytanie do użytkownika zadawaj przez okno pytań, gdy jest dostępne (VS Code: `#tool:vscode/askQuestions`,
+Claude Code: `AskUserQuestion`):
+
+- jedno pytanie to jedna pozycja z 2–4 wariantami; rekomendowany wariant pierwszy, oznaczony „(rekomendowane)”;
+  użytkownik zawsze może odpowiedzieć własnymi słowami,
+- najwyżej 4 pytania w jednym oknie; więcej pytań: najpierw blokujące, resztę w kolejnym oknie,
+- tabelę pytań (ID, uzasadnienie, propozycja domyślna) pokaż najpierw jako tekst, a każdy jej wiersz zadaj w oknie,
+- warianty wypisane tylko tekstem nie są pytaniem; nie kończ odpowiedzi pytaniem, którego nie było w oknie,
+- tekstem pytaj tylko wtedy, gdy okno jest niedostępne, zawiodło albo sesja nie jest interaktywna,
+- pod pytaniami dopisz wiersz diagnostyczny `Ask: window`, `Ask: text — <powód>` albo `Ask: auto` (pytanie
+  rozstrzygnięte rekomendacją w trybie AUTO); wiersz musi być zgodny z prawdą,
+- gdy skill działa w subagencie wywołanym przez orkiestratora, nie czekaj na użytkownika: zwróć pytania jako
+  `QUESTION-NNN: <pytanie> — options: 1. <rekomendowane> 2. … — why: <jedno zdanie>`.
+
 
 # Etap 0: Ustal szablon i format wyjściowy
 

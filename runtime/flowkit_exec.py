@@ -681,7 +681,6 @@ def audit(role: str, argv: list[str], decision: str, *, reason: str | None = Non
           duration: float | None = None) -> None:
     import datetime
     import hashlib
-    import json
 
     path = audit_file()
     if path is None:
@@ -700,6 +699,16 @@ def audit(role: str, argv: list[str], decision: str, *, reason: str | None = Non
         entry["exit_code"] = exit_code
     if duration is not None:
         entry["duration_s"] = round(duration, 2)
+    write_audit(entry, path)
+
+
+def write_audit(entry: dict, path: Path | None = None) -> None:
+    """Dopisuje wiersz JSON do dziennika audytu. Błąd zapisu tylko ostrzega na stderr."""
+    import json
+
+    path = path or audit_file()
+    if path is None:
+        return
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
         fd = os.open(path, os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o600)

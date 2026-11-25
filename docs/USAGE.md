@@ -385,6 +385,37 @@ Orkiestrator: PM (`US-N`/`AC-N`) → Planner → Implementer → Verifier, itera
 | Word bez stylów szablonu / Markdown zamiast DOCX | uruchom `doctor` — brakuje silnika DOCX (`python-docx` lub Pandoc); instrukcja jest w komunikacie |
 | Dokument za długi | „Wariant skrócony” albo „Zmieść się w 3 stronach” |
 | `[INJECTION?]` pod wynikiem | materiał zawierał polecenia dla asystenta — sprawdź wskazany fragment; agent ich nie wykonał |
+| Pytania raz w oknie, raz zwykłym tekstem | zobacz „Diagnoza okna pytań” poniżej |
+
+### Diagnoza okna pytań
+
+Agenci i skille pytają przez okno pytań (VS Code: `vscode/askQuestions`, Claude Code: `AskUserQuestion`) i każde
+pytanie lub punkt kontrolny kończą wierszem `Ask:`:
+
+| Wiersz | Znaczenie |
+|---|---|
+| `Ask: window` | pytanie trafiło do okna |
+| `Ask: text — <powód>` | okno było niedostępne lub zawiodło; powód mówi dlaczego |
+| `Ask: auto` | tryb `AUTO:` przyjął rekomendację, bez pytania (zamierzone) |
+
+Typowe przyczyny braku okna: tryb `AUTO:` (także zwroty „zrób całość”, „bez dopytywania”), uruchomienie
+nieinteraktywne (`claude -p`), w VS Code tryb czatu bez włączonego narzędzia `askQuestions` (prompty `/flowkit-…`
+same przełączają się na tryb `agent` z tym narzędziem).
+
+**Claude Code:** hook `runtime/log_tool_event.py` zapisuje w dzienniku audytu użycie okna pytań, skilli i
+subagentów FlowKit (bez treści pytań). Raport:
+
+```text
+python ~/.claude/flowkit/runtime/checkpoint_report.py
+python ~/.claude/flowkit/runtime/checkpoint_report.py --transcripts ~/.claude/projects/<projekt> --since 2026-11-01
+```
+
+Raport pokazuje punkty kontrolne zakończone oknem, tekstem (z powodem), w trybie AUTO, tekstem bez wiersza `Ask:`
+oraz niezgodne (`Ask: window` bez wywołania okna). W instalacji jako plugin skrypt leży w katalogu pluginu
+(`runtime/`). Do szczegółów pojedynczej sesji: `claude --debug`.
+
+**VS Code:** polecenie „Developer: Show Chat Debug View” pokazuje, jakie narzędzia dostał model w danym zapytaniu,
+więc od razu widać, czy `vscode/askQuestions` było dostępne.
 
 Pełna lista ustawień: [README — Konfiguracja](../README.md#konfiguracja). Co i jak jest zabezpieczone:
 [README — Bezpieczeństwo](../README.md#bezpieczeństwo-i-ograniczenia).

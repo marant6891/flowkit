@@ -711,6 +711,16 @@ class TestEvalRunner(unittest.TestCase):
         self.assertEqual(parsed["skills"], ["flowkit-client-meeting-recap"])
         self.assertEqual(parsed["answer"], "OK")
         self.assertEqual(parsed["usage"], {"input_tokens": 10, "output_tokens": 5})
+        self.assertFalse(parsed["api_error"])
+
+    def test_api_error_is_infrastructure_not_quality(self):
+        event = json.dumps({"type": "result", "is_error": True, "result": "Credit balance is too low"})
+        original = run_evals.run_process
+        self.addCleanup(setattr, run_evals, "run_process", original)
+        run_evals.run_process = lambda argv, cwd, timeout: ("OK", event, "")
+        outcome = run_evals.execute("x", "sonnet", baseline=False, dry_run=False)
+        self.assertEqual(outcome["status"], "ERROR")
+        self.assertIn("Credit balance is too low", outcome["error"])
 
 
 if __name__ == "__main__":

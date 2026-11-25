@@ -24,6 +24,8 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 - CI: nowy push do PR anuluje nieaktualny przebieg (`concurrency`); na `main` każdy commit ma własny przebieg.
 
 ### Naprawiono
+- `flowkit-requirements-workshop` 1.1: jednoznaczne przekazanie rekomendacji do PT/PRD, audyt bez orkiestratora, warsztat nie trafia do subagenta.
+- `run_evals.py`: błąd API Claude Code (np. „Credit balance is too low”) jest raportowany z treścią jako błąd infrastruktury, a nie jako sam „kod wyjścia 1” lub ocena jakości.
 - Komunikaty executora na stderr (np. błąd zapisu dziennika) są w UTF-8 także w Windows.
 - Polskie znaki w wynikach skryptów Pythona uruchamianych przez executor nie są już zniekształcone w Windows (`PYTHONIOENCODING=utf-8`).
 

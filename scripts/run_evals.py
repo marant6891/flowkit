@@ -43,7 +43,7 @@ INFRASTRUCTURE = ("TIMEOUT", "ERROR", "SKIPPED")
 
 def parse_events(lines: list[str]) -> dict:
     """Wyciąga z wyjścia stream-json użyte skille, odpowiedź i zużycie tokenów."""
-    skills, answer, usage, finished = [], "", {"input_tokens": 0, "output_tokens": 0}, False
+    skills, answer, usage, finished, api_error = [], "", {"input_tokens": 0, "output_tokens": 0}, False, False
     for line in lines:
         try:
             event = json.loads(line)
@@ -55,9 +55,10 @@ def parse_events(lines: list[str]) -> dict:
         if event.get("type") == "result":
             finished = True
             answer = str(event.get("result") or "")
+            api_error = bool(event.get("is_error"))
             for key in usage:
                 usage[key] = int((event.get("usage") or {}).get(key) or 0)
-    return {"skills": skills, "answer": answer, "usage": usage, "finished": finished}
+    return {"skills": skills, "answer": answer, "usage": usage, "finished": finished, "api_error": api_error}
 
 
 def command(prompt: str, model: str, baseline: bool = False) -> list[str]:
@@ -106,7 +107,10 @@ def execute(prompt: str, model: str, baseline: bool, dry_run: bool, timeout: flo
     with tempfile.TemporaryDirectory() as workspace:
         status, stdout, error = run_process(argv, workspace, timeout)
     outcome = parse_events(stdout.splitlines())
-    if status == "OK" and not outcome["finished"]:
+    if outcome["api_error"]:
+        # Błąd API (np. brak środków, limit) to problem infrastruktury, nie jakości odpowiedzi.
+        status, error = "ERROR", f"błąd API Claude Code: {outcome['answer'][:200]}"
+    elif status == "OK" and not outcome["finished"]:
         status, error = "ERROR", "brak zdarzenia result w wyjściu Claude Code"
     return {**outcome, "status": status, "error": error}
 

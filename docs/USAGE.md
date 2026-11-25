@@ -8,14 +8,15 @@ Spis treści:
 
 1. [Zanim zaczniesz](#1-zanim-zaczniesz)
 2. [Budowa dobrego polecenia](#2-budowa-dobrego-polecenia)
-3. [PT/PRD dla klienta](#3-ptprd-dla-klienta--flowkit-client-pt-prd-writer)
-4. [Podsumowanie spotkania](#4-podsumowanie-spotkania--flowkit-client-meeting-recap)
-5. [Postmortem po incydencie](#5-postmortem-po-incydencie--flowkit-devops-incident-postmortem)
-6. [Przegląd SRE](#6-przegląd-sre--flowkit-devops-sre-review)
-7. [SQL i poprawa danych](#7-sql-i-poprawa-danych--flowkit-sql-data-assistant)
-8. [Agenci i prefiksy](#8-agenci-i-prefiksy-orkiestratora)
-9. [Scenariusze łączone](#9-scenariusze-łączone)
-10. [Gdy wynik nie jest taki, jak trzeba](#10-gdy-wynik-nie-jest-taki-jak-trzeba)
+3. [Od pomysłu do dokumentu — warsztat wymagań](#3-od-pomysłu-do-dokumentu--flowkit-requirements-workshop)
+4. [PT/PRD dla klienta](#4-ptprd-dla-klienta--flowkit-client-pt-prd-writer)
+5. [Podsumowanie spotkania](#5-podsumowanie-spotkania--flowkit-client-meeting-recap)
+6. [Postmortem po incydencie](#6-postmortem-po-incydencie--flowkit-devops-incident-postmortem)
+7. [Przegląd SRE](#7-przegląd-sre--flowkit-devops-sre-review)
+8. [SQL i poprawa danych](#8-sql-i-poprawa-danych--flowkit-sql-data-assistant)
+9. [Agenci i prefiksy](#9-agenci-i-prefiksy-orkiestratora)
+10. [Scenariusze łączone](#10-scenariusze-łączone)
+11. [Gdy wynik nie jest taki, jak trzeba](#11-gdy-wynik-nie-jest-taki-jak-trzeba)
 
 ---
 
@@ -80,7 +81,54 @@ celowo tego nie zrobi — brak źródła daje `DO POTWIERDZENIA` i `OPEN-NNN`, a
 
 ---
 
-## 3. PT/PRD dla klienta — `flowkit-client-pt-prd-writer`
+## 3. Od pomysłu do dokumentu — `flowkit-requirements-workshop`
+
+**Kiedy:** masz pomysł, problem albo luźną koncepcję, nie masz kompletnych materiałów i chcesz przejść przez
+wymagania z prowadzeniem — od koncepcji, przez część biznesową i techniczną, aż do docelowego dokumentu PT/PRD.
+Warsztat jest **zawsze interaktywny**: nic nie jest przyjmowane bez Twojej odpowiedzi, a `AUTO:` jest tu wyłączone.
+
+**Minimalne polecenie:**
+
+```text
+WARSZTAT: mam pomysł na aplikację do obsługi zwrotów w sklepie stacjonarnym.
+```
+
+**Optymalne polecenie:**
+
+```text
+WARSZTAT: projekt „Zwroty w sklepie stacjonarnym”, skrót zwroty. Zmiana istniejącej aplikacji POS (repozytorium: src/pos/).
+Materiały: materialy/pomysl-zwroty.md, wynik/recap-2026-11-15-ZWROTY-wewnetrzne.md. Nadrzędny: pomysl-zwroty.md.
+Ja decyduję o biznesie, o technice — Tomasz Zieliński (architekt). Głębokość: pełna.
+Dokument docelowy: PT dla klienta w szablonie szablony/PT-klient.dotx, zapis do wynik/.
+```
+
+**Jak przebiega:**
+
+| Faza | Co ustalacie | Bramka |
+|---|---|---|
+| Start | projekt, materiały, kto decyduje, głębokość (szybka / pełna) | utworzony plik `warsztat/zwroty-warsztat.md` |
+| 0. Koncepcja | problem, cel, dla kogo, miara sukcesu, ograniczenia | wizja w 3–5 zdaniach |
+| 1. Zakres | MVP / później / poza zakresem | tabela zakresu |
+| 2. Biznes | role, procesy, reguły, user stories z kryteriami Given-When-Then | rejestr wymagań biznesowych |
+| 3. Technika | komponenty, integracje, dane, wymagania niefunkcjonalne, wdrożenie | rejestr wymagań technicznych |
+| 4. Ryzyka i plan | ryzyka, otwarte kwestie z właścicielami, plan testów, DoD | pokrycie i lista OPEN |
+| 5. Dokument | szablon, tryb, generowanie PT/PRD, audyt `DOC-AUDIT:`, poprawki | Twoja akceptacja wersji docelowej |
+
+**Jak odpowiadać:** każda runda to najwyżej 5 pytań z wariantami. Wystarczy krótko: „14c, 15 nie wiem — zna to
+Marta z finansów, 16d”. „Nie wiem” jest w porządku — staje się `OPEN-NNN` z osobą, która zna odpowiedź.
+Rekomendacje agenta (`REC-NNN`) są tylko propozycją; decyzją (`DEC-NNN`) stają się po Twojej zgodzie.
+Na końcu fazy dostajesz podsumowanie i odpowiadasz: **zatwierdzam / poprawiam / wróćmy do fazy N**.
+
+**Przerwa i powrót:** stan jest w pliku warsztatu. Następnego dnia napisz `WARSZTAT: wznów warsztat zwroty` —
+agent pokaże, gdzie skończyliście, i zacznie od pierwszej niezatwierdzonej fazy.
+
+**Wynik:** plik warsztatu (rejestr odpowiedzi, decyzji, wymagań, ryzyk i otwartych kwestii z pochodzeniem każdej
+pozycji) oraz dokument PT/PRD przygotowany przez `flowkit-client-pt-prd-writer` z tego pliku jako źródła
+nadrzędnego — roboczy, dla klienta albo końcowy bez dopisków (ten ostatni dopiero bez otwartych kwestii).
+
+---
+
+## 4. PT/PRD dla klienta — `flowkit-client-pt-prd-writer`
 
 **Kiedy:** projekt techniczny, PRD, specyfikacja zmiany, change request, analiza wpływu.
 
@@ -123,7 +171,7 @@ do potwierdzenia.
 
 ---
 
-## 4. Podsumowanie spotkania — `flowkit-client-meeting-recap`
+## 5. Podsumowanie spotkania — `flowkit-client-meeting-recap`
 
 **Kiedy:** transkrypcja (`.vtt` z Teams/Zoom/Meet, `.docx`, `.txt`) lub notatki → notatka i mail do klienta.
 
@@ -162,7 +210,7 @@ Podsumuj spotkanie z tests/fixtures/transcripts/sample_meeting.vtt i przygotuj m
 
 ---
 
-## 5. Postmortem po incydencie — `flowkit-devops-incident-postmortem`
+## 6. Postmortem po incydencie — `flowkit-devops-incident-postmortem`
 
 **Kiedy:** po awarii — logi, alerty, zapis rozmów z kanału incydentowego → raport blameless.
 
@@ -191,7 +239,7 @@ i wpływ są `DO POTWIERDZENIA`, a nie szacunkiem.
 
 ---
 
-## 6. Przegląd SRE — `flowkit-devops-sre-review`
+## 7. Przegląd SRE — `flowkit-devops-sre-review`
 
 **Kiedy:** ocena gotowości produkcyjnej usługi: SLO, alerty, sondy, zasoby, skalowanie, backup. (Do raportu po awarii
 użyj postmortemu, a do pisania nowej konfiguracji — `DEVOPS:`.)
@@ -220,7 +268,7 @@ nie dostaje `PASS`. Bez podanych wymagań SLA trafiają one do „Brak danych”
 
 ---
 
-## 7. SQL i poprawa danych — `flowkit-sql-data-assistant`
+## 8. SQL i poprawa danych — `flowkit-sql-data-assistant`
 
 **Kiedy:** zestawienie, sprawdzenie danych ze zgłoszenia, skrypt poprawy. Skill **nigdy nie łączy się z bazą** —
 przygotowuje skrypt i instrukcję dla osoby, która go uruchomi.
@@ -254,12 +302,13 @@ Nieznane triggery i klucze obce są wypisywane jako niewiadome.
 
 ---
 
-## 8. Agenci i prefiksy orkiestratora
+## 9. Agenci i prefiksy orkiestratora
 
 Prefiks wpisujesz na początku polecenia; można je łączyć (`AUTO: BA: ...`, `SPEC: PLAN: ...`).
 
 | Cel | Polecenie | Wynik |
 |---|---|---|
+| Od pomysłu do dokumentu, krok po kroku | `WARSZTAT: mam pomysł na moduł rezerwacji sal; dokument docelowy: PT dla klienta.` | rundy pytań z wariantami, bramki faz do zatwierdzenia, plik warsztatu, na końcu PT/PRD (bez trybu AUTO) |
 | Wymagania, procesy, backlog, przypadki testowe | `BA: przygotuj backlog z przypadkami testowymi Given-When-Then z materialy/wymagania.docx. Źródło nadrzędne: wymagania.docx.` | tabela wymagań, konflikty, luki, pytania do klienta, rodzaj każdego stwierdzenia (fakt / interpretacja / założenie) |
 | User stories przed implementacją | `SPEC: PLAN: dodaj eksport CSV raportu sprzedaży (src/reports/).` | `US-N` + `AC-N`, potem plan iteracji odwołujący się do nich |
 | Testy UI i audyt bezpieczeństwa aplikacji | `QA: sprawdź formularz rejestracji (src/web/register/) — scenariusze manualne i audyt OWASP.` | scenariusze testów frontu + ustalenia OWASP z `plik:linia` i sposobem naprawy |
@@ -274,7 +323,7 @@ Prefiks wpisujesz na początku polecenia; można je łączyć (`AUTO: BA: ...`, 
 
 ---
 
-## 9. Scenariusze łączone
+## 10. Scenariusze łączone
 
 **Od spotkania do dokumentu dla klienta:**
 
@@ -304,7 +353,7 @@ Orkiestrator: PM (`US-N`/`AC-N`) → Planner → Implementer → Verifier, itera
 
 ---
 
-## 10. Gdy wynik nie jest taki, jak trzeba
+## 11. Gdy wynik nie jest taki, jak trzeba
 
 | Objaw | Co zrobić |
 |---|---|

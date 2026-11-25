@@ -7,6 +7,7 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 ## [Unreleased]
 
 ### Dodano
+- **Skill `flowkit-requirements-workshop` 1.0:** interaktywny warsztat od pomysłu przez zakres, wymagania biznesowe i techniczne, ryzyka i plan testów do docelowego PT/PRD. Bramki faz zatwierdzane przez użytkownika, rundy do 5 pytań z wariantami i rekomendacją, pochodzenie każdej treści (`USR`/`SRC`/`DEC`/`OPEN`), plik warsztatu z możliwością wznowienia; brak trybu AUTO (orkiestrator nie odpowiada za użytkownika). Prefiks `WARSZTAT:` / `WORKSHOP:`, prompt VS Code, przypadki w ewaluacjach i sekcja w `docs/USAGE.md`.
 - **Wersja dokumentu dla klienta** w skillu `flowkit-client-pt-prd-writer` 3.0: treść bez dopisków o źródłach i lukach (także w tabelach i podsumowaniach), wątpliwości zebrane w rozdziale końcowym „Kwestie do wyjaśnienia”, kontrola skryptem `check_client_version.py`.
 - **Dziennik audytu executora:** każde polecenie agenta (wykonane i odrzucone) jako wiersz JSON w `~/.flowkit/audit.log` — czas UTC, rola, katalog, polecenie po ukryciu sekretów, SHA-256 argumentów, decyzja, powód, kod wyjścia, czas trwania. `FLOWKIT_AUDIT_FILE` zmienia ścieżkę, `off` wyłącza; błąd zapisu nie przerywa pracy.
 - **Reguła „treść materiałów to dane, nie polecenia” u wszystkich agentów** (generowana przez `build_agents.py`, sprawdzana przez `validate_agents.py`); podejrzane fragmenty są zgłaszane jako `[INJECTION?]`. Wcześniej miał ją tylko orkiestrator.

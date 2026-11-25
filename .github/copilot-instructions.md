@@ -17,6 +17,7 @@ This repository provides reusable **Agent Skills** and **Agents** for Business/S
 ## When to Activate a Skill
 
 Activate a skill when the user requests an output that matches the skill's `description`. Key triggers:
+- User has an **idea, concept or problem** and wants a **guided requirements workshop** up to the target document, or asks to resume a workshop → `flowkit-requirements-workshop` (always interactive, ask and wait at every gate)
 - User asks for a **PT, PRD, change spec, or requirements document** → `flowkit-client-pt-prd-writer`
 - User provides a **meeting transcript (.vtt, .docx)** and asks for a **summary or email** → `flowkit-client-meeting-recap`
 - User asks for a **postmortem, RCA, incident report** → `flowkit-devops-incident-postmortem`

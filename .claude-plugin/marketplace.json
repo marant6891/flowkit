@@ -8,7 +8,7 @@
     {
       "name": "flowkit",
       "source": "./",
-      "description": "Skille: flowkit-client-pt-prd-writer, flowkit-client-meeting-recap, flowkit-devops-incident-postmortem, flowkit-devops-sre-review, flowkit-sql-data-assistant. Agenci: flowkit-orchestrator (orkiestrator), flowkit-code-analyzer, flowkit-verifier, flowkit-planner, flowkit-implementer, flowkit-devops, flowkit-product-owner, flowkit-diagnostics, flowkit-analyst, flowkit-validator."
+      "description": "Skille: flowkit-client-pt-prd-writer, flowkit-client-meeting-recap, flowkit-devops-incident-postmortem, flowkit-devops-sre-review, flowkit-sql-data-assistant, flowkit-requirements-workshop. Agenci: flowkit-orchestrator (orkiestrator), flowkit-code-analyzer, flowkit-verifier, flowkit-planner, flowkit-implementer, flowkit-devops, flowkit-product-owner, flowkit-diagnostics, flowkit-analyst, flowkit-validator."
     }
   ]
 }

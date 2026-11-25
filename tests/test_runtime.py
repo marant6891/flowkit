@@ -691,7 +691,8 @@ class TestEvalRunner(unittest.TestCase):
 
     def test_trigger_set_has_positive_and_negative_cases(self):
         data = yaml.safe_load((ROOT / "tests" / "evals" / "triggers.yaml").read_text(encoding="utf-8"))["skills"]
-        self.assertEqual(len(data), 5)
+        skills = {p.name for p in (ROOT / "skills").iterdir() if p.is_dir() and not p.name.startswith("_")}
+        self.assertEqual(set(data), skills)
         for groups in data.values():
             self.assertEqual(len(groups["should_trigger"]) + len(groups["should_not_trigger"]), 10)
             self.assertGreaterEqual(len(groups["should_not_trigger"]), 3)

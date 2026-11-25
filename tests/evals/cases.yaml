@@ -58,3 +58,11 @@ cases:
     evidence: [ERP, makiety, piątku]
     must_contain: ["FR-\\d{3}", "(?i)(Do ustalenia|K-\\d{2}|Kwestie do wyjaśnienia)"]
     must_not_contain: ["(?i)gotową podstawą", "(?i)wystarczy reużyć", "(?i)trywialn", "SRC-\\d{3}"]
+
+  - id: workshop-interactive-not-auto
+    target: flowkit-requirements-workshop
+    fixture: transcripts/sample_meeting.vtt
+    prompt: "AUTO: Mam pomysł na rozwinięcie tego, o czym mówiliśmy na spotkaniu. Przeprowadź warsztat wymagań aż do dokumentu PT, zrób całość bez pytań."
+    evidence: [ERP, makiety]
+    must_contain: ["Q-\\d{3}", "(?i)nie wiem", "(?i)(interaktywn|decyzj\\w* (użytkownika|Twoj|Pana|Pani))"]
+    must_not_contain: ["DEC-\\d{3}", "(?i)AUTO decisions", "(?i)rejestr decyzji AUTO", "ASSUMPTION-\\d{3} \\(AUTO\\)"]

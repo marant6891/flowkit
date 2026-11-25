@@ -99,6 +99,7 @@ Prefixes are optional shortcuts. Without a prefix, classify the request yourself
 | Request is about | Action |
 |---|---|
 | SQL query, database report, data check, INSERT, UPDATE, DELETE | Skill `flowkit-sql-data-assistant` |
+| Idea, concept or problem without ready materials; guided requirements session from idea to target document; resume a workshop | Skill `flowkit-requirements-workshop` (always interactive) |
 | PT, PRD, change specification for a client | Skill `flowkit-client-pt-prd-writer` |
 | Meeting transcript, recap, client e-mail | Skill `flowkit-client-meeting-recap` |
 | Finished incident, postmortem, RCA | Skill `flowkit-devops-incident-postmortem` |
@@ -149,6 +150,7 @@ Prefixes are optional shortcuts. Without a prefix, classify the request yourself
 | `BA:` | invoke Analyst for requirements, process, impact, backlog, test cases or UAT |
 | `QA:` | manual frontend/UI test scenarios (Analyst) and defensive OWASP security audit (Verifier `QA-AUDIT:`) |
 | `SQL:` | use skill `flowkit-sql-data-assistant` for safe queries, reports and data-fix scripts |
+| `WORKSHOP:` / `WARSZTAT:` | use skill `flowkit-requirements-workshop`: interactive path from idea through business and technical requirements to the target PT/PRD |
 | `SHIP:` | prepare delivery of verified changes: branch, commit, push, PR (see Delivery) |
 | `AUTO:` | run the whole task on recommendations: accept option 1 at every checkpoint (see AUTO mode) |
 | `FAST:` / `STRICT:` | force the risk mode (see Work modes) |
@@ -161,7 +163,7 @@ Enabled by `AUTO:` or by an explicit request such as "zrób całość", "akceptu
 
 - Keep the 3x3 loop and print every `REPORT_PROGRESS` block, but instead of `ASK_USER` take `Next:` option 1 (the recommended one) and write `AUTO → 1. <option>`. In VS Code do not call `#tool:vscode/askQuestions` for these checkpoints.
 - Questions to the user are answered with the recommended default. Record each one as `ASSUMPTION-NNN (AUTO)`; when no safe, reversible default exists, record `OPEN-NNN` and continue without guessing content.
-- Skills run in their own AUTO mode (for `flowkit-client-pt-prd-writer`: section "Tryb AUTO").
+- Skills run in their own AUTO mode (for `flowkit-client-pt-prd-writer`: section "Tryb AUTO"). Exception: `flowkit-requirements-workshop` has no AUTO mode — never answer its questions or gates for the user; follow the skill's rule 1.
 - Still stop and ask (`WAIT_FOR_APPROVAL`) for: `[HIGH]` steps, deleting files, `SHIP:` delivery (commit, push, PR), anything that sends or publishes data, a Verifier `FAIL` after 2 correction attempts, the same command rejected twice, or more than 10 iterations.
 - Finish with `AUTO decisions:` — a numbered list of every accepted recommendation and assumption, so the user can confirm or reverse them.
 
@@ -173,13 +175,14 @@ Route these requests to the matching skill instead of writing the document ad ho
 
 | Request | Skill |
 |---------|-------|
+| Idea or problem → guided requirements workshop → target PT/PRD (interactive) | `flowkit-requirements-workshop` |
 | PT, PRD, change specification, impact analysis for a client | `flowkit-client-pt-prd-writer` |
 | Meeting transcript or notes → recap, client e-mail, risk radar | `flowkit-client-meeting-recap` |
 | Incident logs or alerts → postmortem, RCA | `flowkit-devops-incident-postmortem` |
 | SQL queries, database reports, data verification or data-fix scripts | `flowkit-sql-data-assistant` |
 | Reliability review: SLO, alerts, probes, resources, scaling, backup | `flowkit-devops-sre-review` |
 
-Load the skill with the platform's skill mechanism; otherwise read its `SKILL.md` from `.claude/skills/<name>/`, `~/.claude/skills/<name>/`, `.github/skills/<name>/` or `skills/<name>/`, then follow it completely, including its final checklist. Skill not found → say so through `ASK_USER` and offer installation; do not imitate the skill from memory. Running a skill counts as one step per skill stage. `SPEC:` stays with PM for development stories; a client-facing PT/PRD goes to the skill. Before delivering a final or client-facing document (PT/PRD, meeting recap, postmortem), invoke Verifier with `DOC-AUDIT:` passing only source materials, the generated document, and the skill's final checklist; on `FAIL`, route `[FAIL]` findings back to Analyst (max 2 attempts). In generated documents and client-facing responses, avoid em/en dashes (`—`, `–` — use `-`, comma, or colon), decorative emojis, and AI boilerplate phrases.
+Load the skill with the platform's skill mechanism; otherwise read its `SKILL.md` from `.claude/skills/<name>/`, `~/.claude/skills/<name>/`, `.github/skills/<name>/` or `skills/<name>/`, then follow it completely, including its final checklist. Skill not found → say so through `ASK_USER` and offer installation; do not imitate the skill from memory. Running a skill counts as one step per skill stage. `SPEC:` stays with PM for development stories; a client-facing PT/PRD goes to the skill. Workshop questions and phase gates of `flowkit-requirements-workshop` are user checkpoints: present them with `ASK_USER` and wait, in every mode. Before delivering a final or client-facing document (PT/PRD, meeting recap, postmortem), invoke Verifier with `DOC-AUDIT:` passing only source materials, the generated document, and the skill's final checklist; on `FAIL`, route `[FAIL]` findings back to Analyst (max 2 attempts). In generated documents and client-facing responses, avoid em/en dashes (`—`, `–` — use `-`, comma, or colon), decorative emojis, and AI boilerplate phrases.
 
 ## Delivery — branch, commit, PR
 

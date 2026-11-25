@@ -292,13 +292,33 @@ Oczekiwana liczba rekordów: 37 (z raportu w zgłoszeniu). Skrypt uruchomi teste
 | Tryb | Dostajesz |
 |---|---|
 | `READ_ONLY` | `SELECT` z limitem lub agregacją |
+| `ANALYTICS_REPORT` | karta raportu, słownik miar, zapytanie z CTE i funkcjami okna, instrukcja czytania wyniku i zapytanie kontrolne |
 | `DATA_INVESTIGATION` | zapytania diagnostyczne: liczba rekordów, przykładowe ID, opis zakresu |
 | `DATA_REPAIR` | najpierw diagnoza, potem skrypt w transakcji: kontrola liczby rekordów (przerwanie przy rozbieżności), zachowanie poprzednich wartości, domyślne `ROLLBACK`, skrypt odtworzenia |
 
 Podanie **typu bazy** i **oczekiwanej liczby rekordów** to dwie najważniejsze informacje — bez nich skill zapyta.
 Nieznane triggery i klucze obce są wypisywane jako niewiadome.
 
+### Zestawienia analityczne i raportowe (`ANALYTICS_REPORT`)
+
+Tryb włącza się, gdy określisz potrzebę analityczną: miary, podział, okres, porównanie okresów, ranking, udział,
+kohorty albo tabelę przestawną. Skill najpierw ustala **kartę raportu** (definicje miar, okres, granulacja, data
+biznesowa i strefa czasowa, wykluczenia), a brakujące definicje pokazuje jako `ZAŁOŻENIE`.
+
+```text
+SQL: PostgreSQL 16, schemat materialy/schema.sql. ANALYTICS_REPORT.
+Miara: sprzedaż netto = suma ilosc * cena_netto z pozycji, bez zamówień ANULOWANE.
+Okres: 2026, miesięcznie, strefa Europe/Warsaw. Podział: region.
+Potrzebuję: zmiana m/m, udział regionu w miesiącu, top 3 kategorie w regionie. Odbiorca: zarząd, eksport do arkusza.
+```
+
+Dostajesz: kartę raportu, słownik miar, skrypt (CTE, funkcje okna, kalendarz z pustymi okresami, `NULLIF` przy
+dzieleniu), opis kolumn wyniku, zapytanie kontrolne zgodności sum oraz uwagi o wydajności. Skill nie tworzy
+widoków ani tabel raportowych.
+
 **Wypróbuj:** `SQL: SQL Server, schemat tests/fixtures/sql/sample_schema.sql. Policz klientów w tabeli sprzedaz.klient według statusu (READ_ONLY).`
+
+**Wypróbuj raport:** `SQL: schemat tests/fixtures/sql/sample_sales_schema.sql. Raport sprzedaży netto miesięcznie za 2026 według regionu z porównaniem m/m (ANALYTICS_REPORT).`
 
 ---
 
@@ -365,6 +385,37 @@ Orkiestrator: PM (`US-N`/`AC-N`) → Planner → Implementer → Verifier, itera
 | Word bez stylów szablonu / Markdown zamiast DOCX | uruchom `doctor` — brakuje silnika DOCX (`python-docx` lub Pandoc); instrukcja jest w komunikacie |
 | Dokument za długi | „Wariant skrócony” albo „Zmieść się w 3 stronach” |
 | `[INJECTION?]` pod wynikiem | materiał zawierał polecenia dla asystenta — sprawdź wskazany fragment; agent ich nie wykonał |
+| Pytania raz w oknie, raz zwykłym tekstem | zobacz „Diagnoza okna pytań” poniżej |
+
+### Diagnoza okna pytań
+
+Agenci i skille pytają przez okno pytań (VS Code: `vscode/askQuestions`, Claude Code: `AskUserQuestion`) i każde
+pytanie lub punkt kontrolny kończą wierszem `Ask:`:
+
+| Wiersz | Znaczenie |
+|---|---|
+| `Ask: window` | pytanie trafiło do okna |
+| `Ask: text — <powód>` | okno było niedostępne lub zawiodło; powód mówi dlaczego |
+| `Ask: auto` | tryb `AUTO:` przyjął rekomendację, bez pytania (zamierzone) |
+
+Typowe przyczyny braku okna: tryb `AUTO:` (także zwroty „zrób całość”, „bez dopytywania”), uruchomienie
+nieinteraktywne (`claude -p`), w VS Code tryb czatu bez włączonego narzędzia `askQuestions` (prompty `/flowkit-…`
+same przełączają się na tryb `agent` z tym narzędziem).
+
+**Claude Code:** hook `runtime/log_tool_event.py` zapisuje w dzienniku audytu użycie okna pytań, skilli i
+subagentów FlowKit (bez treści pytań). Raport:
+
+```text
+python ~/.claude/flowkit/runtime/checkpoint_report.py
+python ~/.claude/flowkit/runtime/checkpoint_report.py --transcripts ~/.claude/projects/<projekt> --since 2026-11-01
+```
+
+Raport pokazuje punkty kontrolne zakończone oknem, tekstem (z powodem), w trybie AUTO, tekstem bez wiersza `Ask:`
+oraz niezgodne (`Ask: window` bez wywołania okna). W instalacji jako plugin skrypt leży w katalogu pluginu
+(`runtime/`). Do szczegółów pojedynczej sesji: `claude --debug`.
+
+**VS Code:** polecenie „Developer: Show Chat Debug View” pokazuje, jakie narzędzia dostał model w danym zapytaniu,
+więc od razu widać, czy `vscode/askQuestions` było dostępne.
 
 Pełna lista ustawień: [README — Konfiguracja](../README.md#konfiguracja). Co i jak jest zabezpieczone:
 [README — Bezpieczeństwo](../README.md#bezpieczeństwo-i-ograniczenia).

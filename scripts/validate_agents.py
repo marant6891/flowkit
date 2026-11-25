@@ -13,14 +13,15 @@ from build_agents import AGENTS, out_of_sync, target  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 
 CLAUDE_TOOLS = {
-    "Read", "Grep", "Glob", "Edit", "Write", "Bash", "Agent", "Skill",
+    "Read", "Grep", "Glob", "Edit", "Write", "Bash", "Agent", "Skill", "AskUserQuestion",
 }
 VSCODE_TOOLS = {"vscode/askQuestions", "execute", "read", "agent", "edit", "search", "todo"}
 
 # Minimalna treść kontraktów z agents/core, która musi trafić do instalowanych adapterów.
 CORE_TERMS = {
     "flowkit-orchestrator": ["REPORT_PROGRESS", "ASK_USER", "WAIT_FOR_APPROVAL", "Correction loop", "Reconciliation",
-                  "Task profiles", "Risk labels", "Error handling", "SHIP:", "Automatic routing", "SQL:", "DOC-AUDIT:", "QA:"],
+                  "Task profiles", "Risk labels", "Error handling", "SHIP:", "Automatic routing", "SQL:", "DOC-AUDIT:", "QA:",
+                  "Ask: window"],
     "flowkit-code-analyzer": ["Scanned:", "Not checked:", "Confidence:", "Assumptions:"],
     "flowkit-verifier": ["Logic", "Contracts", "Tests", "Dependencies", "Security", "Performance",
                            "Consistency", "Docs", "Requirements", "[NOT VERIFIED]", "DOC-AUDIT:", "SKILL-AUDIT:", "QA-AUDIT:",
@@ -96,8 +97,12 @@ def validate(root: Path = ROOT) -> list[str]:
                 errors.append(f"[{path.name}] Missing {platform} adapter")
                 continue
             check_definition(path, name, allowed, errors)
-            if "## Untrusted content" not in path.read_text(encoding="utf-8"):
+            text = path.read_text(encoding="utf-8")
+            if "## Untrusted content" not in text:
                 errors.append(f"[{path.name}] Missing 'Untrusted content' rule (prompt injection)")
+            rule = "## Question window" if name == "flowkit-orchestrator" else "## Questions for the user"
+            if rule not in text:
+                errors.append(f"[{path.name}] Missing '{rule[3:]}' rule (question window)")
         core_name = re.sub(r"^flowkit-", "", name)
         if not (root / "agents" / "core" / f"{core_name}.md").exists():
             errors.append(f"[{core_name}.md] Missing core contract")

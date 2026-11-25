@@ -1,5 +1,9 @@
 # Historia zmian skilla flowkit-requirements-workshop
 
+## 1.2 (25.11.2026)
+
+- Sekcja „Pytania do użytkownika”: pytania przez okno pytań (VS Code `vscode/askQuestions`, Claude Code `AskUserQuestion`), najwyżej 4 w oknie, rekomendacja pierwsza, wiersz diagnostyczny `Ask:`; w subagencie pytania wracają jako `QUESTION-NNN`.
+
 ## 1.1 (25.11.2026)
 
 - Przekazanie do dokumentu: przyjęte `REC` trafiają jako `DEC`, odrzucone pomijane, nierozstrzygnięte tylko za zgodą użytkownika do sekcji „Rekomendacje” (w PT/PRD `REC-NNN` ma jedno znaczenie).

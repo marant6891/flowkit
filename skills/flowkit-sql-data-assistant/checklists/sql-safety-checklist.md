@@ -10,7 +10,7 @@
 - [ ] Wynik nie ujawnia niepotrzebnych danych osobowych.
 
 ## B1. Tryb
-- [ ] Tryb (`READ_ONLY`, `DATA_INVESTIGATION`, `DATA_REPAIR`) jest podany; naprawę poprzedza zapytanie diagnostyczne.
+- [ ] Tryb (`READ_ONLY`, `ANALYTICS_REPORT`, `DATA_INVESTIGATION`, `DATA_REPAIR`) jest podany; naprawę poprzedza zapytanie diagnostyczne.
 
 ## C. Zmiana danych
 - [ ] Wartości są w zmiennych na początku skryptu.
@@ -22,7 +22,18 @@
 - [ ] Poprzednie wartości są zachowane i jest skrypt odtworzenia; `UPDATE` sprawdza poprzednią wartość lub wersję.
 - [ ] Opisano blokady i czas transakcji dla dużych tabel; nieznane triggery, klucze obce i ograniczenia wypisano jako niewiadome.
 
-## D. Odbiorca
+## D. Zestawienie analityczne (`ANALYTICS_REPORT`)
+- [ ] Karta raportu jest kompletna: pytanie biznesowe, okres, granulacja, data biznesowa i strefa czasowa, wymiary, filtry, odbiorca.
+- [ ] Każda miara ma definicję i jednostkę; definicje spoza źródeł są oznaczone jako `ZAŁOŻENIE`.
+- [ ] Okres jest półotwarty i podany w parametrach; w `WHERE` nie ma funkcji na kolumnie daty.
+- [ ] Złączenia nie zwielokrotniają wartości (agregacja szczegółów przed złączeniem, `COUNT(DISTINCT)` tam, gdzie trzeba).
+- [ ] Szereg czasowy ma kalendarz i pokazuje puste okresy; `LAG` i średnie kroczące nie przeskakują okresów.
+- [ ] Każde dzielenie ma `NULLIF(..., 0)`; nie ma dzielenia całkowitego; `ROUND` dostaje właściwy typ.
+- [ ] Funkcje okna, CTE i funkcje dat są dostępne w podanej wersji bazy.
+- [ ] Jest zapytanie kontrolne (rekonsyliacja) i opis wierszy pominiętych przez filtry lub `NULL`.
+- [ ] Wynik zawiera agregaty; dane osobowe tylko wtedy, gdy są niezbędne.
+
+## E. Odbiorca
 - [ ] Instrukcja wyjaśnia prostym językiem, co uzupełnić i jaki wynik jest poprawny.
 - [ ] Opisano, co zrobić przy innym wyniku i kto zatwierdza zmianę.
 - [ ] `check_sql.py` nie zgłasza błędów.

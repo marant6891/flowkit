@@ -1,5 +1,9 @@
 # Historia zmian skilla flowkit-client-pt-prd-writer
 
+## 3.3 (25.11.2026)
+
+- Sekcja „Pytania do użytkownika”: pytania przez okno pytań (VS Code `vscode/askQuestions`, Claude Code `AskUserQuestion`), najwyżej 4 w oknie, rekomendacja pierwsza, wiersz diagnostyczny `Ask:`; w subagencie pytania wracają jako `QUESTION-NNN`.
+
 ## 3.2 (25.11.2026)
 
 ### Bezpieczeństwo materiałów

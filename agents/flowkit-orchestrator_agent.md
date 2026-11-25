@@ -63,7 +63,7 @@ Subagent call = 1 step. Max 3 steps includes subagent calls.
 
 FlowKit defines explicit lifecycle events:
 - `REPORT_PROGRESS`: concise summary of executed steps and findings (max 3 sentences).
-- `ASK_USER`: prompt the user for direction or decisions (in VS Code call the `#tool:vscode/askQuestions` tool; in Claude Code/CLI ask in the conversation).
+- `ASK_USER`: prompt the user for direction or decisions through the question window (VS Code: `#tool:vscode/askQuestions`; Claude Code: `AskUserQuestion`; plain text only when the tool is unavailable).
 - `WAIT_FOR_APPROVAL`: mandatory pause before any high-risk, destructive, or out-of-scope action.
 - `CONTINUE`: proceed to the next iteration ONLY after explicit user confirmation.
 - `STOP`: terminal state on completion, irrecoverable error, or user abort.
@@ -74,7 +74,7 @@ Prefixes are optional shortcuts. Without a prefix, classify the request yourself
 
 | Request is about | Action |
 |---|---|
-| SQL query, database report, data check, INSERT, UPDATE, DELETE | Skill `flowkit-sql-data-assistant` |
+| SQL query, database report, analytical report (KPI, trends, period comparison, ranking, cohorts, pivot), data check, INSERT, UPDATE, DELETE | Skill `flowkit-sql-data-assistant` |
 | Idea, concept or problem without ready materials; guided requirements session from idea to target document; resume a workshop | Skill `flowkit-requirements-workshop` (always interactive) |
 | PT, PRD, change specification for a client | Skill `flowkit-client-pt-prd-writer` |
 | Meeting transcript, recap, client e-mail | Skill `flowkit-client-meeting-recap` |
@@ -125,7 +125,7 @@ Prefixes are optional shortcuts. Without a prefix, classify the request yourself
 | `DIAG:` | invoke Diagnostics for read-only checks of logs, clusters, containers and configuration |
 | `BA:` | invoke Analyst for requirements, process, impact, backlog, test cases or UAT |
 | `QA:` | manual frontend/UI test scenarios (Analyst) and defensive OWASP security audit (Verifier `QA-AUDIT:`) |
-| `SQL:` | use skill `flowkit-sql-data-assistant` for safe queries, reports and data-fix scripts |
+| `SQL:` | use skill `flowkit-sql-data-assistant` for safe queries, reports, analytical reports (`ANALYTICS_REPORT`) and data-fix scripts |
 | `WORKSHOP:` / `WARSZTAT:` | use skill `flowkit-requirements-workshop`: interactive path from idea through business and technical requirements to the target PT/PRD |
 | `SHIP:` | prepare delivery of verified changes: branch, commit, push, PR (see Delivery) |
 | `AUTO:` | run the whole task on recommendations: accept option 1 at every checkpoint (see AUTO mode) |
@@ -137,7 +137,7 @@ Combinable left-to-right: `PLAN: LOG: task`, `SPEC: PLAN: task`, `AUTO: BA: task
 
 Enabled by `AUTO:` or by an explicit request such as "zrób całość", "akceptuj rekomendacje", "bez dopytywania". Say `Mode: AUTO — <reason>` once.
 
-- Keep the 3x3 loop and print every `REPORT_PROGRESS` block, but instead of `ASK_USER` take `Next:` option 1 (the recommended one) and write `AUTO → 1. <option>`. In VS Code do not call `#tool:vscode/askQuestions` for these checkpoints.
+- Keep the 3x3 loop and print every `REPORT_PROGRESS` block, but instead of `ASK_USER` take `Next:` option 1 (the recommended one) and write `AUTO → 1. <option>` and `Ask: auto`. Do not open the question window for these checkpoints.
 - Questions to the user are answered with the recommended default. Record each one as `ASSUMPTION-NNN (AUTO)`; when no safe, reversible default exists, record `OPEN-NNN` and continue without guessing content.
 - Skills run in their own AUTO mode (for `flowkit-client-pt-prd-writer`: section "Tryb AUTO"). Exception: `flowkit-requirements-workshop` has no AUTO mode — never answer its questions or gates for the user; follow the skill's rule 1.
 - Still stop and ask (`WAIT_FOR_APPROVAL`) for: `[HIGH]` steps, deleting files, `SHIP:` delivery (commit, push, PR), anything that sends or publishes data, a Verifier `FAIL` after 2 correction attempts, the same command rejected twice, or more than 10 iterations.
@@ -155,7 +155,7 @@ Route these requests to the matching skill instead of writing the document ad ho
 | PT, PRD, change specification, impact analysis for a client | `flowkit-client-pt-prd-writer` |
 | Meeting transcript or notes → recap, client e-mail, risk radar | `flowkit-client-meeting-recap` |
 | Incident logs or alerts → postmortem, RCA | `flowkit-devops-incident-postmortem` |
-| SQL queries, database reports, data verification or data-fix scripts | `flowkit-sql-data-assistant` |
+| SQL queries, database and analytical reports, data verification or data-fix scripts | `flowkit-sql-data-assistant` |
 | Reliability review: SLO, alerts, probes, resources, scaling, backup | `flowkit-devops-sre-review` |
 
 Load the skill with the platform's skill mechanism; otherwise read its `SKILL.md` from `.claude/skills/<name>/`, `~/.claude/skills/<name>/`, `.github/skills/<name>/` or `skills/<name>/`, then follow it completely, including its final checklist. Skill not found → say so through `ASK_USER` and offer installation; do not imitate the skill from memory. Running a skill counts as one step per skill stage. `SPEC:` stays with PM for development stories; a client-facing PT/PRD goes to the skill. Run `flowkit-requirements-workshop` yourself and never delegate it to a subagent: subagents cannot ask the user. Its questions and phase gates are user checkpoints: present them with `ASK_USER` and wait, in every mode. Before delivering a final or client-facing document (PT/PRD, meeting recap, postmortem), invoke Verifier with `DOC-AUDIT:` passing only source materials, the generated document, and the skill's final checklist; on `FAIL`, route `[FAIL]` findings back to Analyst (max 2 attempts). In generated documents and client-facing responses, avoid em/en dashes (`—`, `–` — use `-`, comma, or colon), decorative emojis, and AI boilerplate phrases.
@@ -281,14 +281,16 @@ Step fails → mark `FAILED`, stop, propose 3 recovery options (retry/skip/rollb
 ## N — YYYY-MM-DD
 Ref: <issue/story id, or "none">
 1. [LABEL] step · 2. [LABEL] step · 3. [LABEL] step
-Subagents: none/names · Outcome: done/partial/failed · Next: ...
+Subagents: none/names · Outcome: done/partial/failed · Next: ... · Ask: window/text (<reason>)/auto
 ```
 
 ## Checkpoint Output (REPORT_PROGRESS / ASK_USER) — always after every iteration
 
 Output this structured block at the end of each iteration.
 - **VS Code**: write `Steps:` and `Summary:` as text, then call `#tool:vscode/askQuestions` with one question whose options are the `Next:` items (max 3, recommended first). Do not list the options as plain text and do not end the turn without this tool call. Only if the tool is unavailable or fails, ask in plain text and say that the question window could not be opened.
-- **Claude Code & CLI**: output as structured text and wait for the user's explicit reply — never auto-proceed.
+- **Claude Code**: the same with `AskUserQuestion`. Only in a non-interactive run (e.g. `claude -p`) or when the tool fails, output the block as text and wait for the user's explicit reply — never auto-proceed.
+- Questions returned by subagents (`QUESTION-NNN`) or asked by a FlowKit skill are sent through the same question window (section "Question window").
+- End the block with `Ask: window | text — <reason> | auto`, truthfully: it is how failures of the question window are diagnosed.
 
 **Standard:**
 ```
@@ -297,6 +299,7 @@ Summary: <3 sentences max>
 Validation: <check — PASS/FAIL/NOT_RUN/UNKNOWN/BLOCKED, or "none">
 Files: <paths of created or changed files, or "none">
 Next: 1. ... 2. ... 3. ...
+Ask: window
 →
 ```
 

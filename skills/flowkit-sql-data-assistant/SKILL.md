@@ -1,13 +1,15 @@
 ---
 name: flowkit-sql-data-assistant
-version: "1.1"
-tags: [sql, database, reporting, data-verification, tester, support, transactions]
+version: "1.2"
+tags: [sql, database, reporting, analytics, data-verification, tester, support, transactions]
 description: >
-  Przygotowuje bezpieczne zapytania SQL, zestawienia i skrypty weryfikacji lub
-  poprawy danych dla PostgreSQL, SQL Server, Oracle, MySQL i MariaDB. Pilnuje typu
-  bazy, zmiennych, transakcji, warunków chroniących przed nadpisaniem oraz prostych
-  instrukcji dla początkującego testera i serwisanta. Użyj, gdy użytkownik prosi o
-  zapytanie SQL, raport lub zestawienie z bazy, sprawdzenie danych ze zgłoszenia,
+  Przygotowuje bezpieczne zapytania SQL, zestawienia analityczne i raportowe oraz
+  skrypty weryfikacji lub poprawy danych dla PostgreSQL, SQL Server, Oracle, MySQL
+  i MariaDB. Pilnuje typu bazy, zmiennych, transakcji, warunków chroniących przed
+  nadpisaniem, definicji miar i kontroli spójności raportu oraz prostych instrukcji
+  dla początkującego testera i serwisanta. Użyj, gdy użytkownik prosi o zapytanie SQL,
+  raport, zestawienie lub analizę danych z bazy (KPI, trendy, porównania okresów,
+  rankingi, udziały, kohorty, tabele przestawne), sprawdzenie danych ze zgłoszenia,
   INSERT, UPDATE, DELETE albo skrypt poprawiający dane.
 ---
 
@@ -21,7 +23,8 @@ Ustal tryb na początku i podaj go w pierwszym zdaniu odpowiedzi:
 
 | Tryb | Kiedy | Co powstaje |
 |---|---|---|
-| `READ_ONLY` | zestawienie, raport, sprawdzenie danych | tylko `SELECT` z limitem lub agregacją |
+| `READ_ONLY` | proste zestawienie, sprawdzenie danych | tylko `SELECT` z limitem lub agregacją |
+| `ANALYTICS_REPORT` | użytkownik określa potrzebę analityczną lub raportową: miary, podziały, okres, trendy, porównania okresów, rankingi, udziały, kohorty, tabela przestawna | karta raportu, słownik miar, `SELECT` z agregacją (CTE, funkcje okna), zapytanie kontrolne; zasada 13 |
 | `DATA_INVESTIGATION` | ustalenie, których rekordów dotyczy problem | `SELECT` diagnostyczne, liczba rekordów, przykładowe identyfikatory, opis zakresu |
 | `DATA_REPAIR` | poprawa danych | skrypt według zasad 4–5 i 10–12; zawsze poprzedzony zapytaniem z `DATA_INVESTIGATION` |
 
@@ -58,21 +61,59 @@ Ustal tryb na początku i podaj go w pierwszym zdaniu odpowiedzi:
     silników: liczba zmienionych wierszy to `@@ROWCOUNT` (SQL Server), `SQL%ROWCOUNT` (Oracle),
     `GET DIAGNOSTICS` (PostgreSQL), `ROW_COUNT()` (MySQL/MariaDB); Oracle niejawnie zatwierdza transakcję przed
     instrukcją DDL; tabele MyISAM w MySQL nie obsługują transakcji.
+13. **Raport analityczny jest zdefiniowany i sprawdzalny.** W `ANALYTICS_REPORT`:
+    - przed SQL ustal kartę raportu: pytanie biznesowe, miary z definicją, wymiary, okres, granulację, datę
+      biznesową i strefę czasową, filtry i wykluczenia, odbiorcę i format; brakującą definicję miary oznacz jako
+      `ZAŁOŻENIE` i pokaż ją użytkownikowi, nie ukrywaj jej w kodzie,
+    - okres półotwarty (`>= od` i `< do`) w parametrach na początku skryptu, bez funkcji na kolumnie daty w `WHERE`,
+    - bez zwielokrotnienia wartości przy złączeniach: agreguj szczegóły w osobnym CTE przed złączeniem,
+    - szereg czasowy z kalendarza i `LEFT JOIN`, żeby puste okresy były widoczne jako `0`,
+    - każde dzielenie przez `NULLIF(mianownik, 0)` i bez dzielenia całkowitego,
+    - funkcje okna i CTE tylko w wersjach, które je obsługują (MySQL 8.0+, MariaDB 10.2+); dla starszych wersji
+      podaj wariant bez nich albo zapytaj o wersję,
+    - do raportu dołącz zapytanie kontrolne (rekonsyliację) oraz liczbę wierszy pominiętych przez filtry i `NULL`,
+    - zwracaj agregaty; dane osobowe tylko gdy są niezbędne do celu raportu,
+    - nie twórz tabel, widoków ani procedur raportowych — to zadanie dla administratora lub zespołu BI.
+
+# Pytania do użytkownika
+
+Każde pytanie do użytkownika zadawaj przez okno pytań, gdy jest dostępne (VS Code: `#tool:vscode/askQuestions`,
+Claude Code: `AskUserQuestion`):
+
+- jedno pytanie to jedna pozycja z 2–4 wariantami; rekomendowany wariant pierwszy, oznaczony „(rekomendowane)”;
+  użytkownik zawsze może odpowiedzieć własnymi słowami,
+- najwyżej 4 pytania w jednym oknie; więcej pytań: najpierw blokujące, resztę w kolejnym oknie,
+- tabelę pytań (ID, uzasadnienie, propozycja domyślna) pokaż najpierw jako tekst, a każdy jej wiersz zadaj w oknie,
+- warianty wypisane tylko tekstem nie są pytaniem; nie kończ odpowiedzi pytaniem, którego nie było w oknie,
+- tekstem pytaj tylko wtedy, gdy okno jest niedostępne, zawiodło albo sesja nie jest interaktywna,
+- pod pytaniami dopisz wiersz diagnostyczny `Ask: window`, `Ask: text — <powód>` albo `Ask: auto` (pytanie
+  rozstrzygnięte rekomendacją w trybie AUTO); wiersz musi być zgodny z prawdą,
+- gdy skill działa w subagencie wywołanym przez orkiestratora, nie czekaj na użytkownika: zwróć pytania jako
+  `QUESTION-NNN: <pytanie> — options: 1. <rekomendowane> 2. … — why: <jedno zdanie>`.
+
 
 # Etapy pracy
 
 ### Etap 1: Ustal kontekst
 Ustal typ bazy, cel, środowisko, numer zgłoszenia oraz tabele i kolumny. Zadaj tylko pytania blokujące, najwyżej 3 naraz.
 
+W `ANALYTICS_REPORT` uzupełnij kartę raportu z [wzoru odpowiedzi analitycznej](./templates/analytics-report-template.md).
+Pytania blokujące to zwykle: definicja głównej miary, okres z granulacją oraz wykluczenia. Resztę przyjmij jako
+jawne założenia (np. granulacja miesięczna, strefa czasowa bazy) i wypisz je w odpowiedzi.
+
 ### Etap 2: Wybierz rodzaj skryptu
 - Zestawienie lub weryfikacja: skorzystaj z [wzorców weryfikacji danych](./references/data-verification-patterns.md).
+- Zestawienie analityczne lub raportowe: skorzystaj z [wzorców analitycznych](./references/analytics-report-patterns.md)
+  (ściągawka różnic między bazami, pełny przykład dla każdej bazy, katalog technik).
 - Zmiana danych: skorzystaj z [bezpiecznych szablonów](./templates/safe-write-templates.md) dla ustalonej bazy.
 
 ### Etap 3: Przygotuj skrypt
 Zapisz go w pliku `.sql`, gdy to możliwe. Nazwy i warunki muszą wynikać ze źródeł.
 
 ### Etap 4: Przygotuj instrukcję
-Oddaj wynik według [wzoru odpowiedzi](./templates/sql-answer-template.md).
+Oddaj wynik według [wzoru odpowiedzi](./templates/sql-answer-template.md), a w `ANALYTICS_REPORT` według
+[wzoru odpowiedzi analitycznej](./templates/analytics-report-template.md): karta raportu, słownik miar, skrypt,
+jak czytać wynik, kontrola spójności, założenia i niewiadome.
 
 ### Etap 5: Weryfikacja przed oddaniem
-Sprawdź plik poleceniem `python "<SKILL_DIR>/scripts/check_sql.py" <plik.sql>`, gdzie `<SKILL_DIR>` to katalog tego pliku (w Claude Code: `${CLAUDE_SKILL_DIR}`). Popraw wszystkie błędy, a następnie przejdź przez [checklistę SQL](./checklists/sql-safety-checklist.md).
+Sprawdź plik poleceniem `python "<SKILL_DIR>/scripts/check_sql.py" <plik.sql>`, gdzie `<SKILL_DIR>` to katalog tego pliku (w Claude Code: `${CLAUDE_SKILL_DIR}`). W `ANALYTICS_REPORT` sprawdź tak samo zapytanie kontrolne. Popraw wszystkie błędy, a następnie przejdź przez [checklistę SQL](./checklists/sql-safety-checklist.md) (w `ANALYTICS_REPORT` także sekcję D).

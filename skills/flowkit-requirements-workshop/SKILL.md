@@ -1,6 +1,6 @@
 ---
 name: flowkit-requirements-workshop
-version: "1.1"
+version: "1.2"
 tags: [analyst, requirements, discovery, workshop, interactive, user-stories, prd]
 description: >
   Interaktywny warsztat wymagań prowadzony krok po kroku z użytkownikiem: od
@@ -75,6 +75,26 @@ i pilnujesz spójności; użytkownik decyduje.
 12. **Identyfikatory trzycyfrowe**, wspólne z dokumentem PT/PRD: `GOAL-001`, `SC-001`, `OOS-001`,
     `ACT-001`, `PROC-001`, `BR-001`, `US-001`, `AC-001`, `FR-001`, `INT-001`, `DATA-001`,
     `NFR-001`, `RISK-001`, `TEST-001`, `Q-001`, `USR-001`, `REC-001`, `DEC-001`, `OPEN-001`.
+
+# Pytania do użytkownika
+
+Każde pytanie do użytkownika zadawaj przez okno pytań, gdy jest dostępne (VS Code: `#tool:vscode/askQuestions`,
+Claude Code: `AskUserQuestion`):
+
+- jedno pytanie to jedna pozycja z 2–4 wariantami; rekomendowany wariant pierwszy, oznaczony „(rekomendowane)”;
+  użytkownik zawsze może odpowiedzieć własnymi słowami,
+- najwyżej 4 pytania w jednym oknie; więcej pytań: najpierw blokujące, resztę w kolejnym oknie,
+- tabelę pytań (ID, uzasadnienie, propozycja domyślna) pokaż najpierw jako tekst, a każdy jej wiersz zadaj w oknie,
+- warianty wypisane tylko tekstem nie są pytaniem; nie kończ odpowiedzi pytaniem, którego nie było w oknie,
+- tekstem pytaj tylko wtedy, gdy okno jest niedostępne, zawiodło albo sesja nie jest interaktywna,
+- pod pytaniami dopisz wiersz diagnostyczny `Ask: window`, `Ask: text — <powód>` albo `Ask: auto` (pytanie
+  rozstrzygnięte rekomendacją w trybie AUTO); wiersz musi być zgodny z prawdą,
+- gdy skill działa w subagencie wywołanym przez orkiestratora, nie czekaj na użytkownika: zwróć pytania jako
+  `QUESTION-NNN: <pytanie> — options: 1. <rekomendowane> 2. … — why: <jedno zdanie>`.
+
+Runda warsztatu ma do 5 pytań: pokaż całą rundę w formacie z sekcji „Format rundy”, a w oknie zadaj
+najpierw 4 pytania, piąte w kolejnym oknie. Ten skill nie ma trybu AUTO, więc `Ask: auto` w nim nie występuje.
+
 
 # Start: ustal ramy albo wznów
 

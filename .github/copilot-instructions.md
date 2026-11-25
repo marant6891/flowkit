@@ -22,7 +22,7 @@ Activate a skill when the user requests an output that matches the skill's `desc
 - User provides a **meeting transcript (.vtt, .docx)** and asks for a **summary or email** → `flowkit-client-meeting-recap`
 - User asks for a **postmortem, RCA, incident report** → `flowkit-devops-incident-postmortem`
 - User asks for a **reliability or SRE review, SLO, alerts, probes, resource limits, scaling or backup** → `flowkit-devops-sre-review`
-- User asks for a **SQL query, database report, data check, INSERT, UPDATE or DELETE** → `flowkit-sql-data-assistant`
+- User asks for a **SQL query, database or analytical report (KPI, trends, period comparison, ranking, cohorts), data check, INSERT, UPDATE or DELETE** → `flowkit-sql-data-assistant`
 
 When activating a skill, read the full `SKILL.md` and all files referenced inside it before generating output.
 

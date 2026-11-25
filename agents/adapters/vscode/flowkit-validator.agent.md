@@ -11,6 +11,10 @@ user-invocable: false
 
 <!-- Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-validator_agent.md. Nie edytuj ręcznie. -->
 
+## Questions for the user
+
+When you are called by the Orchestrator, never wait for the user. Return open questions at the end of your output as `QUESTION-NNN: <question> — options: 1. <recommended> 2. ... (max 4) — why: <one sentence>`, so the Orchestrator can ask them through the question window. When invoked directly by the user, ask through the question window if this agent has it, otherwise in the conversation.
+
 ## Local command execution
 
 Run every command only through the local executor: `python "<runtime>/flowkit_exec.py" --role validator -- <command> [args]`. Do not use pipes, redirects or command chaining. `<runtime>` is `.github/flowkit/runtime` in the workspace. Rejected commands are outside this agent's role: report them instead of working around the rule. List of allowed commands: `help`. Commands the user explicitly allowed in their allow file (shown by `help`) are permitted for this agent: run them yourself through the executor instead of asking the user to run them. When a command is rejected and the user wants it run, tell them the exact line to add to the allow file; never edit that file yourself. Paths must stay inside the workspace (the folder the agent was started in); for materials elsewhere, ask the user to copy them into the project or add the folder to the `FLOWKIT_EXTRA_PATHS` environment variable. Documents: `read-document <file> [--outline] [--lines FROM-TO]`; Word output (roles with document writing): `md-to-docx <input.md> <output.docx> [--template <file> | --reference-doc <file>]`.

@@ -17,7 +17,7 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 - **OpenSSF Scorecard:** workflow `scorecard.yml` (push do `main`, co tydzień, zmiana ochrony gałęzi) z wynikami w Code scanning i odznaką w README.
 
 ### Zmieniono
-- `flowkit-client-pt-prd-writer` 3.1: izolacja materiałów źródłowych (zasada 10) jest wymogiem, a nie zaleceniem.
+- `flowkit-client-pt-prd-writer` 3.2: izolacja materiałów źródłowych (zasada 10) jest wymogiem, a nie zaleceniem.
 - Hook blokuje agentom edycję katalogu `.git`, plików wrażliwych (`.env*` poza `.env.example`, klucze) i dziennika audytu, także w katalogach z `FLOWKIT_EXTRA_PATHS`; `md-to-docx` nie zapisuje w `.git`.
 - Akcje GitHub w CI przypięte do SHA commita; checkout bez zapisanych poświadczeń (`persist-credentials: false`).
 - CI: nowy push do PR anuluje nieaktualny przebieg (`concurrency`); na `main` każdy commit ma własny przebieg.

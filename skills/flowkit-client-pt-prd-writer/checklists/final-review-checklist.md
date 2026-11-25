@@ -47,6 +47,8 @@
 - [ ] Dokument zrozumiały dla osoby nietechnicznej; skróty w słowniku.
 - [ ] Wskazano, kto musi podjąć jakie decyzje.
 - [ ] Długość adekwatna do wielkości zmiany – brak treści „na wypełnienie”.
+- [ ] Brak sformułowań bagatelizujących pracochłonność lub sugerujących „łatwe reużycie” (*„proste”*, *„wystarczy”*, *„gotowa podstawa”*, *„drobna zmiana”*).
+- [ ] Sekcje techniczne są spójne z wybranym profilem stylu (domyślnie **zrównoważonym**: komponenty powiązane z rolą i wpływem na system, bez suchego wyliczania nazw z kodu).
 
 ## E2. Zwięzłość
 - [ ] Objętość mieści się w tabeli z Etapu 5 SKILL.md albo przekroczenie jest uzasadnione.

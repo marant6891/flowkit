@@ -95,6 +95,8 @@ def validate(root: Path = ROOT) -> list[str]:
                 errors.append(f"[{path.name}] Missing {platform} adapter")
                 continue
             check_definition(path, name, allowed, errors)
+            if "## Untrusted content" not in path.read_text(encoding="utf-8"):
+                errors.append(f"[{path.name}] Missing 'Untrusted content' rule (prompt injection)")
         core_name = re.sub(r"^flowkit-", "", name)
         if not (root / "agents" / "core" / f"{core_name}.md").exists():
             errors.append(f"[{core_name}.md] Missing core contract")

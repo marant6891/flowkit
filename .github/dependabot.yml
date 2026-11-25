@@ -1,0 +1,10 @@
+version: 2
+updates:
+  # Akcje GitHub są przypięte do SHA; Dependabot aktualizuje SHA i komentarz z wersją.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns: ["*"]

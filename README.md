@@ -89,7 +89,7 @@ Wszystkie skille mają prefiks `flowkit-`. Skill uruchamia się automatycznie, g
 
 | Skill | Wersja | Opis | Ścieżka |
 |---|---|---|---|
-| **flowkit-client-pt-prd-writer** | `3.0` | Dokument PT/PRD dla klienta wyłącznie na podstawie materiałów, w szablonie klienta (`.docx`, `.dotx`, `.md`) z kompletem jego stylów. Wariant skrócony dla małych zmian (1–3 strony) i pełny. Trzy tryby wyniku: roboczy z oznaczeniami źródeł, **wersja dla klienta** (czysta treść, wątpliwości zebrane w rozdziale końcowym) i dokument końcowy bez dopisków. User stories Given-When-Then, Definition of Done, kontrola pokrycia wymagań testami, diagramy oparte na źródłach, tryb `AUTO`. | [`skills/flowkit-client-pt-prd-writer/`](skills/flowkit-client-pt-prd-writer/) |
+| **flowkit-client-pt-prd-writer** | `3.1` | Dokument PT/PRD dla klienta wyłącznie na podstawie materiałów, w szablonie klienta (`.docx`, `.dotx`, `.md`) z kompletem jego stylów. Wariant skrócony dla małych zmian (1–3 strony) i pełny. Trzy tryby wyniku: roboczy z oznaczeniami źródeł, **wersja dla klienta** (czysta treść, wątpliwości zebrane w rozdziale końcowym) i dokument końcowy bez dopisków. User stories Given-When-Then, Definition of Done, kontrola pokrycia wymagań testami, diagramy oparte na źródłach, tryb `AUTO`. | [`skills/flowkit-client-pt-prd-writer/`](skills/flowkit-client-pt-prd-writer/) |
 | **flowkit-client-meeting-recap** | `1.4` | Z transkrypcji (`.vtt`, `.docx`, `.txt`) dwa osobne pliki: wewnętrzny radar ryzyk z cytatami jako dowodami oraz szkic maila do klienta z decyzjami, zadaniami i właścicielami potwierdzonymi w rozmowie oraz prośbą o korekty w ustalonym oknie. | [`skills/flowkit-client-meeting-recap/`](skills/flowkit-client-meeting-recap/) |
 
 ### Dane i SQL
@@ -221,7 +221,9 @@ Zmienne środowiskowe i plik zgód ustawia tylko użytkownik: hook odrzuca przyp
 **Co jest egzekwowane**
 
 - **Executor z listą dozwoloną dla roli** ([`runtime/flowkit_exec.py`](runtime/flowkit_exec.py)): polecenia bez powłoki, potoków i przekierowań; każda rola ma minimalny zestaw poleceń (`help` je pokazuje).
-- **Hook w Claude Code** ([`runtime/guard_bash.py`](runtime/guard_bash.py)): agent FlowKit nie uruchomi polecenia z pominięciem executora i nie zmieni pliku zgód ani plików runtime. Zwykłe sesje nie są objęte hookiem.
+- **Hook w Claude Code** ([`runtime/guard_bash.py`](runtime/guard_bash.py)): agent FlowKit nie uruchomi polecenia z pominięciem executora i nie zmieni pliku zgód, dziennika audytu, plików runtime, katalogu `.git` (hooki gita uruchamiają kod) ani plików wrażliwych (`.env*` poza `.env.example`, klucze). Ochrona obowiązuje także w katalogach z `FLOWKIT_EXTRA_PATHS`. Zwykłe sesje nie są objęte hookiem.
+- **Dziennik audytu**: każde polecenie agenta, wykonane i odrzucone, trafia jako wiersz JSON do `~/.flowkit/audit.log` (czas UTC, rola, katalog, polecenie po ukryciu sekretów, skrót SHA-256 argumentów, decyzja, powód odrzucenia, kod wyjścia, czas trwania). Inna ścieżka: `FLOWKIT_AUDIT_FILE`, wyłączenie: `FLOWKIT_AUDIT_FILE=off`.
+- **Treść materiałów to dane, nie polecenia**: każdy agent i skill traktuje dokumenty, transkrypcje, logi i wyniki narzędzi wyłącznie jako materiał. Polecenia ukryte w tej treści nie zmieniają roli, listy poleceń ani zasad i są zgłaszane jako `[INJECTION?]`.
 - **Granica katalogu roboczego**: ścieżki w poleceniach — także po `..`, `~` i dowiązaniach symbolicznych — muszą leżeć w projekcie lub w `FLOWKIT_EXTRA_PATHS`.
 - **Ochrona danych**: wyniki poleceń są skracane, sekrety ukrywane, pliki `.env`, klucze i obiekty `Secret` niedostępne; CI uruchamia lokalny skaner sekretów (`scripts/validate_secrets.py`).
 - **Narzędzia bezpieczeństwa offline**: `semgrep scan` w executorze działa wyłącznie na lokalnych regułach (blokada `--config auto`, zdalnych URL i `--autofix`), a wszystkie walidatory (`zizmor`, `conftest`, `kyverno`, `osv-scanner`, `gitleaks`) pracują bez modyfikacji plików.

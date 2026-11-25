@@ -328,6 +328,8 @@ def md_to_docx_problem(args: list[str]) -> str | None:
         return "md-to-docx zapisuje wyłącznie plik .docx"
     if Path(positional[1]).resolve() == Path(positional[0]).resolve():
         return "md-to-docx nie może nadpisać pliku źródłowego"
+    if any(part.lower() == ".git" for part in Path(positional[1]).resolve().parts):
+        return "md-to-docx nie zapisuje w katalogu .git"
     return None
 
 
@@ -641,9 +643,60 @@ def run(argv: list[str], role: str = "orchestrator") -> int:
     return result.returncode
 
 
+# --- Dziennik audytu -----------------------------------------------------------------
+# Każde polecenie agenta (wykonane i odrzucone) trafia jako wiersz JSON do pliku poza projektem
+# (domyślnie ~/.flowkit/audit.log, inna ścieżka: FLOWKIT_AUDIT_FILE, wyłączenie: FLOWKIT_AUDIT_FILE=off).
+# Argumenty są zapisywane po ukryciu sekretów, a skrót SHA-256 pozwala porównać wywołania bez ich treści.
+# Hook blokuje agentom edycję dziennika, a błąd zapisu nie przerywa pracy.
+AUDIT_FILE_ENV = "FLOWKIT_AUDIT_FILE"
+AUDIT_MAX_CHARS = 1000
+
+
+def audit_file() -> Path | None:
+    configured = os.environ.get(AUDIT_FILE_ENV, "").strip()
+    if configured.lower() == "off":
+        return None
+    return Path(configured).expanduser() if configured else Path.home() / ".flowkit" / "audit.log"
+
+
+def audit(role: str, argv: list[str], decision: str, *, reason: str | None = None, exit_code: int | None = None,
+          duration: float | None = None) -> None:
+    import datetime
+    import hashlib
+    import json
+
+    path = audit_file()
+    if path is None:
+        return
+    entry = {
+        "ts": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+        "role": role,
+        "cwd": str(Path.cwd()),
+        "command": redact(" ".join(argv))[:AUDIT_MAX_CHARS],
+        "args_sha256": hashlib.sha256("\0".join(argv).encode("utf-8", "replace")).hexdigest(),
+        "decision": decision,
+    }
+    if reason is not None:
+        entry["reason"] = redact(reason)[:AUDIT_MAX_CHARS]
+    if exit_code is not None:
+        entry["exit_code"] = exit_code
+    if duration is not None:
+        entry["duration_s"] = round(duration, 2)
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        fd = os.open(path, os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o600)
+        with os.fdopen(fd, "a", encoding="utf-8") as handle:
+            handle.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    except OSError as error:
+        print(f"FlowKit: nie zapisano dziennika audytu ({path}): {error}", file=sys.stderr)
+
+
 def main(args: list[str]) -> int:
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    import time
+
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
     if len(args) == 3 and args[0] == "--role" and args[2] == "--" and args[1] in ROLE_COMMANDS:
         return show_help(args[1])
     if len(args) < 4 or args[0] != "--role" or args[2] != "--":
@@ -655,9 +708,13 @@ def main(args: list[str]) -> int:
         argv = ["help"]
     problem = check(role, argv)
     if problem:
+        audit(role, argv, "rejected", reason=problem, exit_code=2)
         print(f"ODRZUCONO: {problem}. Lista dozwolonych poleceń: flowkit_exec.py --role {role} -- help")
         return 2
-    return run(argv, role)
+    started = time.monotonic()
+    code = run(argv, role)
+    audit(role, argv, "allowed", exit_code=code, duration=time.monotonic() - started)
+    return code
 
 
 if __name__ == "__main__":

@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from flowkit_exec import allow_file, check  # noqa: E402
+from flowkit_exec import READONLY_ENV, SENSITIVE_PATH, allow_file, audit_file, check, readonly  # noqa: E402
 
 EXECUTOR = Path(__file__).resolve().parent / "flowkit_exec.py"
 ROLES = {
@@ -40,15 +40,26 @@ EDIT_TOOLS = {"Edit", "Write", "MultiEdit", "NotebookEdit"}
 
 
 def protected_edit(tool_input: dict) -> str | None:
-    """Plik zgód użytkownika i runtime FlowKit zmienia tylko użytkownik."""
+    """Pliki chronione zmienia tylko użytkownik, także gdy leżą w katalogu z FLOWKIT_EXTRA_PATHS.
+
+    Chronione są: plik zgód, dziennik audytu, runtime FlowKit, katalog `.git` (hooki i konfiguracja gita
+    uruchamiają kod) oraz pliki wrażliwe (`.env*` poza `.env.example`, klucze, pliki z sekretami).
+    """
     raw = str(tool_input.get("file_path") or tool_input.get("notebook_path") or "")
     if not raw:
         return None
     target = resolved(raw)
     if target == allow_file().resolve():
         return "plik zgód użytkownika może zmieniać tylko użytkownik"
+    audit_path = audit_file()
+    if audit_path is not None and target == audit_path.resolve():
+        return "dziennik audytu FlowKit może zmieniać tylko użytkownik"
     if EXECUTOR.parent in target.parents:
         return "pliki runtime FlowKit może zmieniać tylko użytkownik"
+    if any(part.lower() == ".git" for part in target.parts):
+        return "katalog .git może zmieniać tylko użytkownik (hooki i konfiguracja gita uruchamiają kod)"
+    if SENSITIVE_PATH.search(str(target)):
+        return f"plik wrażliwy ({target.name}) może zmieniać tylko użytkownik"
     return None
 
 
@@ -115,6 +126,10 @@ def main() -> int:
     if name not in ROLES and name not in NO_EXEC:
         return 0
     if data.get("tool_name") in EDIT_TOOLS:
+        if readonly():
+            print(f"FlowKit zablokował zmianę pliku: tryb tylko do odczytu ({READONLY_ENV}). "
+                  "Pokaż proponowaną zmianę jako diff do akceptacji użytkownika.", file=sys.stderr)
+            return 2
         problem = protected_edit(data.get("tool_input") or {})
         if problem:
             print(f"FlowKit zablokował zmianę pliku: {problem}.", file=sys.stderr)

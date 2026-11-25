@@ -1,0 +1,7 @@
+# Linting Pythona w CI: domyślny zestaw reguł ruff (błędy składni, nieużywane importy, niezdefiniowane nazwy).
+target-version = "py311"
+line-length = 120
+
+[lint]
+# E741 (nazwa zmiennej `l`) to styl, nie błąd; skrypty diagramów używają jej w krótkich wyrażeniach.
+ignore = ["E741"]

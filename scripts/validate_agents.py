@@ -23,7 +23,8 @@ CORE_TERMS = {
                   "Task profiles", "Risk labels", "Error handling", "SHIP:", "Automatic routing", "SQL:", "DOC-AUDIT:", "QA:"],
     "flowkit-code-analyzer": ["Scanned:", "Not checked:", "Confidence:", "Assumptions:"],
     "flowkit-verifier": ["Logic", "Contracts", "Tests", "Dependencies", "Security", "Performance",
-                           "Consistency", "Docs", "Requirements", "[NOT VERIFIED]", "DOC-AUDIT:", "SKILL-AUDIT:", "QA-AUDIT:"],
+                           "Consistency", "Docs", "Requirements", "[NOT VERIFIED]", "DOC-AUDIT:", "SKILL-AUDIT:", "QA-AUDIT:",
+                           "CONTRADICTION-NNN"],
     "flowkit-planner": ["Iter 1:", "Effort:", "Risks:"],
     "flowkit-implementer": ["Self-check", "DONE", "PARTIAL", "BLOCKED"],
     "flowkit-devops": ["Validate:", "Apply:", "REQUIRES APPROVAL"],
@@ -95,6 +96,8 @@ def validate(root: Path = ROOT) -> list[str]:
                 errors.append(f"[{path.name}] Missing {platform} adapter")
                 continue
             check_definition(path, name, allowed, errors)
+            if "## Untrusted content" not in path.read_text(encoding="utf-8"):
+                errors.append(f"[{path.name}] Missing 'Untrusted content' rule (prompt injection)")
         core_name = re.sub(r"^flowkit-", "", name)
         if not (root / "agents" / "core" / f"{core_name}.md").exists():
             errors.append(f"[{core_name}.md] Missing core contract")

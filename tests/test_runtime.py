@@ -26,6 +26,11 @@ import run_evals  # noqa: E402
 
 EXEC = fx.__file__.replace("\\", "/")
 
+# Testy nie piszą do dziennika audytu użytkownika (~/.flowkit/audit.log); podprocesy dziedziczą zmienną.
+_AUDIT_DIR = tempfile.TemporaryDirectory()
+os.environ[fx.AUDIT_FILE_ENV] = str(Path(_AUDIT_DIR.name) / "audit.log")
+os.environ.pop(fx.READONLY_ENV, None)  # tryb ustawiony u użytkownika nie zmienia wyników testów
+
 
 class TestCommandPolicy(unittest.TestCase):
 
@@ -521,6 +526,95 @@ class TestValidatorAndConsent(unittest.TestCase):
         self.assertEqual(allowed.returncode, 0)
         user = self.run_guard({"tool_name": "Write", "tool_input": {"file_path": str(self.allow)}})
         self.assertEqual(user.returncode, 0)
+
+    def test_agents_cannot_edit_git_dir_secrets_or_audit_log(self):
+        protected = (self.dir / ".git" / "hooks" / "pre-commit", self.dir / ".git" / "config", self.dir / ".env",
+                     self.dir / ".env.production", self.dir / "deploy.pem", Path(fx.audit_file()))
+        for path in protected:
+            result = self.run_guard({"agent_type": "flowkit-implementer", "tool_name": "Write",
+                                     "tool_input": {"file_path": str(path)}})
+            self.assertEqual(result.returncode, 2, path)
+        for path in (self.dir / ".env.example", self.dir / ".gitignore", self.dir / ".github" / "ci.yml"):
+            result = self.run_guard({"agent_type": "flowkit-implementer", "tool_name": "Edit",
+                                     "tool_input": {"file_path": str(path)}})
+            self.assertEqual(result.returncode, 0, path)
+
+    def test_md_to_docx_does_not_write_into_git_dir(self):
+        self.assertIsNotNone(fx.check("analyst", ["md-to-docx", "a.md", ".git/hooks/x.docx"]))
+        self.assertIsNone(fx.check("analyst", ["md-to-docx", "a.md", "out/x.docx"]))
+
+
+class TestReadonlyMode(unittest.TestCase):
+
+    def setUp(self):
+        os.environ[fx.READONLY_ENV] = "1"
+        self.addCleanup(os.environ.pop, fx.READONLY_ENV, None)
+
+    def run_guard(self, payload):
+        return subprocess.run([sys.executable, str(ROOT / "runtime" / "guard_bash.py")], input=json.dumps(payload),
+                              capture_output=True, text=True, encoding="utf-8", check=False)
+
+    def test_write_commands_are_rejected_and_reads_stay_allowed(self):
+        for argv in (["md-to-docx", "a.md", "out/a.docx"], ["git", "commit", "-m", "x"],
+                     ["git", "push", "-u", "origin", "feat/x"], ["gh", "pr", "create"]):
+            self.assertIn(fx.READONLY_ENV, fx.check("orchestrator", argv) or "", argv)
+        for argv in (["git", "status"], ["pytest", "-q"], ["read-document", "a.docx"]):
+            self.assertIsNone(fx.check("orchestrator", argv), argv)
+
+    def test_hook_blocks_every_agent_edit_but_not_user_sessions(self):
+        for agent in ("flowkit-implementer", "flowkit-devops", "flowkit-orchestrator"):
+            result = self.run_guard({"agent_type": agent, "tool_name": "Edit", "tool_input": {"file_path": "app.py"}})
+            self.assertEqual(result.returncode, 2, agent)
+            self.assertIn("diff", result.stderr)
+        user = self.run_guard({"tool_name": "Edit", "tool_input": {"file_path": "app.py"}})
+        self.assertEqual(user.returncode, 0)
+
+    def test_disabled_by_default(self):
+        os.environ[fx.READONLY_ENV] = "0"
+        self.assertFalse(fx.readonly())
+        self.assertIsNone(fx.check("orchestrator", ["md-to-docx", "a.md", "out/a.docx"]))
+
+
+class TestAuditLog(unittest.TestCase):
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.dir = Path(self.tmp.name)
+        self.log = self.dir / "audit.log"
+
+    def run_exec(self, *argv, audit=None):
+        env = {**os.environ, fx.AUDIT_FILE_ENV: str(self.log) if audit is None else audit}
+        return subprocess.run([sys.executable, EXEC, "--role", "validator", "--", *argv], capture_output=True,
+                              text=True, encoding="utf-8", check=False, cwd=self.dir, env=env)
+
+    def entries(self):
+        return [json.loads(line) for line in self.log.read_text(encoding="utf-8").splitlines()]
+
+    def test_allowed_and_rejected_commands_are_logged(self):
+        (self.dir / "a.json").write_text("{}", encoding="utf-8")
+        self.run_exec("check-json", "a.json")
+        self.run_exec("terraform", "apply")
+        allowed, rejected = self.entries()
+        self.assertEqual((allowed["role"], allowed["decision"], allowed["exit_code"]), ("validator", "allowed", 0))
+        self.assertEqual(allowed["command"], "check-json a.json")
+        self.assertIn("duration_s", allowed)
+        self.assertEqual(len(allowed["args_sha256"]), 64)
+        self.assertEqual((rejected["decision"], rejected["exit_code"]), ("rejected", 2))
+        self.assertIn("terraform", rejected["reason"])
+
+    def test_secrets_are_redacted_in_log(self):
+        self.run_exec("terraform", "apply", "password=hunter2secret")
+        self.assertNotIn("hunter2secret", self.log.read_text(encoding="utf-8"))
+
+    def test_audit_can_be_disabled_and_write_errors_do_not_break_execution(self):
+        (self.dir / "a.json").write_text("{}", encoding="utf-8")
+        self.assertEqual(self.run_exec("check-json", "a.json", audit="off").returncode, 0)
+        self.assertFalse(self.log.exists())
+        (self.dir / "blocker").write_text("", encoding="utf-8")
+        result = self.run_exec("check-json", "a.json", audit=str(self.dir / "blocker" / "audit.log"))
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("dziennika audytu", result.stderr)
 
 
 class TestRolePermissionContract(unittest.TestCase):

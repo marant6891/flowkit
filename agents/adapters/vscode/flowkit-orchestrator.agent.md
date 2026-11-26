@@ -59,7 +59,7 @@ agents:
 - flowkit-validator
 ---
 
-<!-- Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-orchestrator_agent.md. Nie edytuj ręcznie. -->
+<!-- FlowKit 1.8.0 · Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-orchestrator_agent.md. Nie edytuj ręcznie. -->
 
 ## Question window (mandatory)
 

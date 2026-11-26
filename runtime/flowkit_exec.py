@@ -19,6 +19,8 @@ import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
 
+# Wersja runtime: musi być równa wersji w .claude-plugin/plugin.json (sprawdza validate_manifest.py).
+VERSION = "1.8.0"
 MAX_LINES = 200
 HEAD_LINES = 40
 MAX_LINE_CHARS = 400
@@ -60,7 +62,8 @@ DOCUMENT_WRITE = ("md-to-docx",)
 STATUS_FOOTER = "[kod wyjścia: {code}]"
 BUILTINS = {
     "help": "help — lista poleceń dozwolonych dla roli",
-    "doctor": "doctor — szybki przegląd środowiska FlowKit (Python, DOCX, flowkit-project.md, allow.json, FLOWKIT_EXTRA_PATHS)",
+    "doctor": "doctor — diagnoza FlowKit: instalacja i wersje, plik zgód (składnia, role, pominięte wpisy, uprawnienia), "
+              "dziennik audytu, FLOWKIT_EXTRA_PATHS, narzędzia DOCX; każdy problem z podpowiedzią",
     "read-document": "read-document <plik> [--outline] [--lines OD-DO] — odczyt .docx/.dotx/.xlsx/.pdf/.md/.txt",
     "detect-docx-libs": "detect-docx-libs — biblioteki i narzędzia do pracy z DOCX i diagramami",
     "check-json": "check-json <plik.json> [...] — sprawdza poprawność składni JSON (PASS/FAIL dla każdego pliku)",
@@ -575,22 +578,10 @@ def show_help(role: str) -> int:
 
 
 def run_doctor(role: str) -> int:
-    """Szybka diagnostyka lokalnego środowiska FlowKit."""
-    print(f"FlowKit doctor (rola: {role}, Python: {sys.version.split()[0]})")
-    print(f"Katalog roboczy: {Path.cwd().resolve()}")
-    project_cfg = Path.cwd() / "flowkit-project.md"
-    print(f"flowkit-project.md: {'OK' if project_cfg.is_file() else 'BRAK (opcjonalny)'}")
-    extra = os.environ.get(EXTRA_PATHS_ENV, "").strip()
-    print(f"{EXTRA_PATHS_ENV}: {extra or 'nie ustawiono'}")
-    print(f"{READONLY_ENV}: {'włączony (bez zmian plików, DOCX, commit, push)' if readonly() else 'wyłączony'}")
-    audit_path = audit_file()
-    print(f"Dziennik audytu: {audit_path or 'wyłączony'}")
-    allow_path = allow_file()
-    allowed, ignored = user_allowed(role)
-    print(f"Plik zgód ({allow_path}): {'OK' if allow_path.is_file() else 'BRAK'} "
-          f"(aktywne: {len(allowed)}, pominięte: {len(ignored)})")
-    detect_docx_libs()
-    return 0
+    """Diagnoza środowiska FlowKit (runtime/flowkit_doctor.py) z zgodami liczonymi dla roli agenta."""
+    import flowkit_doctor
+
+    return flowkit_doctor.main(["--role", role])
 
 
 def md_to_docx(args: list[str]) -> int:

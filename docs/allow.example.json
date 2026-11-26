@@ -1,0 +1,15 @@
+{
+  "$schema": "https://raw.githubusercontent.com/marant6891/flowkit/main/docs/allow.schema.json",
+  "commands": {
+    "*": [
+      "make lint"
+    ],
+    "orchestrator": [
+      "dotnet build",
+      "terraform plan"
+    ],
+    "validator": [
+      "checkov -d"
+    ]
+  }
+}

@@ -42,11 +42,16 @@ projekt/
 ```
 
 Materiały spoza projektu skopiuj do `materialy/` albo dopisz ich katalog do zmiennej `FLOWKIT_EXTRA_PATHS`
-przed uruchomieniem sesji. Stan środowiska (Python, biblioteki DOCX, zgody, tryby) sprawdzisz poleceniem:
+przed uruchomieniem sesji. Stan środowiska (instalacja i wersje, plik zgód, dziennik audytu, biblioteki DOCX)
+sprawdzisz poleceniem `/flowkit:doctor` (wtyczka Claude Code), promptem `/flowkit-doctor` (VS Code) albo:
 
 ```bash
-python ~/.claude/flowkit/runtime/flowkit_exec.py --role orchestrator -- doctor
+python ~/.claude/flowkit/runtime/flowkit_doctor.py
 ```
+
+Każdy problem ma podpowiedź „→”. Pusty plik zgód (`~/.flowkit/allow.json`) utworzysz poleceniem
+`python ~/.claude/flowkit/runtime/flowkit_doctor.py init`; polecenia, które agenci mają wykonywać sami, dopisujesz
+do niego ręcznie.
 
 **Chcesz najpierw zobaczyć, co agent zmieni?** Uruchom sesję z `FLOWKIT_READONLY=1`. Agenci nie zmienią wtedy
 żadnego pliku i pokażą zmiany jako diff.
@@ -382,6 +387,7 @@ Orkiestrator: PM (`US-N`/`AC-N`) → Planner → Implementer → Verifier, itera
 | `CONTRADICTION-NNN` w audycie | wskaż źródło nadrzędne: „Przy sprzecznościach wygrywa brief-ksef.docx” |
 | „ścieżka poza katalogiem roboczym” | skopiuj plik do projektu albo dodaj katalog do `FLOWKIT_EXTRA_PATHS` i uruchom sesję ponownie |
 | „polecenie niedozwolone dla roli” | agent poda linię do dopisania w `~/.flowkit/allow.json`; dopisz ją sam, jeśli się zgadzasz |
+| zgoda z `allow.json` nie działa | uruchom `doctor`: pokaże błąd składni z numerem linii, literówkę w nazwie roli albo powód pominięcia wpisu |
 | Word bez stylów szablonu / Markdown zamiast DOCX | uruchom `doctor` — brakuje silnika DOCX (`python-docx` lub Pandoc); instrukcja jest w komunikacie |
 | Dokument za długi | „Wariant skrócony” albo „Zmieść się w 3 stronach” |
 | `[INJECTION?]` pod wynikiem | materiał zawierał polecenia dla asystenta — sprawdź wskazany fragment; agent ich nie wykonał |

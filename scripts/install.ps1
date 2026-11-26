@@ -234,6 +234,8 @@ if ($AgentName) {
         New-Item -ItemType Directory -Force -Path $RuntimeDir | Out-Null
         Copy-Item -Path (Join-Path $RepoRoot "runtime\*") -Destination $RuntimeDir -Recurse -Force -Exclude "__pycache__"
         Write-Host "  ✓ Zainstalowano lokalną warstwę bezpieczeństwa: $RuntimeDir" -ForegroundColor Green
+        Write-Host "  Diagnoza:          python `"$RuntimeDir/flowkit_doctor.py`""
+        Write-Host "  Pusty plik zgód:   python `"$RuntimeDir/flowkit_doctor.py`" init"
     } elseif ($AgentName -eq "all" -and (Test-Path $RuntimeDir)) {
         Remove-Item -Path $RuntimeDir -Recurse -Force
     }

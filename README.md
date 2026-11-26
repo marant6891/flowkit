@@ -81,7 +81,7 @@ Orkiestrator sam rozpoznaje rodzaj zadania i wybiera skill lub subagenta. Optyma
 | `pypdf` | odczyt PDF | `pip install pypdf` |
 | Walidatory DevOps i bezpieczeństwa | agenci Validator i Verifier | `terraform`, `tflint`, `hadolint`, `helm`, `kubeconform`, `conftest`, `kyverno`, `yamllint`, `actionlint`, `zizmor`, `shellcheck`, `semgrep` (reguły lokalne), `osv-scanner`, `gitleaks`, Docker — według potrzeb |
 
-Brak opcjonalnego narzędzia nie przerywa pracy: odpowiednie sprawdzenie dostaje status `NOT_RUN`, a agent podaje polecenie instalacji. Stan środowiska pokazuje `flowkit_exec.py --role analyst -- detect-docx-libs`.
+Brak opcjonalnego narzędzia nie przerywa pracy: odpowiednie sprawdzenie dostaje status `NOT_RUN`, a agent podaje polecenie instalacji. Stan środowiska pokazuje `doctor` (patrz [Diagnoza](#diagnoza-doctor)).
 
 ---
 
@@ -211,11 +211,26 @@ Przykład pliku zgód — wpis to początek polecenia, dla wszystkich ról (`"*"
 }
 ```
 
-Agent wykonuje te polecenia sam, zamiast odsyłać je do czatu. Wpisy otwierające dowolne polecenia (`bash`, `pwsh`, samo `python` lub `node`, `python -c`, `node -e`) są pomijane. Aktywne zgody i listę poleceń roli pokazuje:
+Agent wykonuje te polecenia sam, zamiast odsyłać je do czatu. Wpisy otwierające dowolne polecenia (`bash`, `pwsh`, samo `python` lub `node`, `python -c`, `node -e`) są pomijane. Plik jest opcjonalny. Pusty plik ze wszystkimi rolami tworzy `flowkit_doctor.py init` (nigdy nie nadpisuje istniejącego). Wzór: [`docs/allow.example.json`](docs/allow.example.json), schemat dla edytora z podpowiedziami ról: [`docs/allow.schema.json`](docs/allow.schema.json).
+
+### Diagnoza (`doctor`)
+
+| Instalacja | Polecenie |
+|---|---|
+| wtyczka Claude Code | `/flowkit:doctor` w sesji Claude Code |
+| instalator Claude Code | `python ~/.claude/flowkit/runtime/flowkit_doctor.py` |
+| VS Code | prompt `/flowkit-doctor` albo `python .github/flowkit/runtime/flowkit_doctor.py` |
+
+`doctor` sprawdza:
+- instalację i zgodność wersji runtime, wtyczki i agentów (także starych agentów `agent-3x3*`);
+- Python używany przez hooki (w Windows wykrywa alias Microsoft Store);
+- plik zgód: składnię z numerem linii, nieznane nazwy ról z podpowiedzią, pominięte wpisy z powodem i uprawnienia pliku;
+- zapis dziennika audytu, katalogi z `FLOWKIT_EXTRA_PATHS` i silnik DOCX.
+
+Każdy problem ma podpowiedź „→”. Kod wyjścia 1 oznacza błędy, a `--json` daje wynik do skryptów, `--role <rola>` pokazuje zgody aktywne dla roli. Lista poleceń roli: `flowkit_exec.py --role <rola> -- help`.
 
 ```bash
-python ~/.claude/flowkit/runtime/flowkit_exec.py --role orchestrator -- help
-python ~/.claude/flowkit/runtime/flowkit_exec.py --role orchestrator -- doctor
+python ~/.claude/flowkit/runtime/flowkit_doctor.py init     # pusty plik zgód (uruchamia tylko użytkownik)
 ```
 
 Zmienne środowiskowe i plik zgód ustawia tylko użytkownik: hook odrzuca przypisania zmiennych w poleceniach agentów i blokuje im edycję pliku zgód.
@@ -345,6 +360,9 @@ Pełna lista zmian: [CHANGELOG.md](CHANGELOG.md).
 | `KONTROLA: FAIL` (kod 4) | DOCX zapisany, ale jego struktura nie zgadza się ze źródłem | sprawdź ostrzeżenia (brakujące obrazy, nagłówki spoza stylów szablonu) przed oddaniem dokumentu |
 | diagram mermaid jako blok kodu | brak lokalnego mermaid-cli | `npm install -g @mermaid-js/mermaid-cli` |
 | `FlowKit zablokował zmianę pliku` | agent próbował zmienić plik zgód lub runtime | te pliki zmienia tylko użytkownik |
+| zgoda z `allow.json` nie działa | błąd składni, literówka w nazwie roli albo wpis pominięty (np. `bash`) | uruchom `doctor`: pokaże linię błędu, podpowie nazwę roli i powód pominięcia |
+| `doctor`: „Python dla hooków” — BŁĄD | `python` nie istnieje w PATH albo to alias Microsoft Store | zainstaluj Pythona z python.org z opcją „Add python.exe to PATH” i wyłącz alias w ustawieniach Windows |
+| `doctor`: „Agenci” — UWAGA (inna wersja) | agenci i runtime pochodzą z różnych wersji | zainstaluj ponownie agentów i runtime (`-AgentName all` / `agent all`) |
 | w VS Code na liście agentów są `agent-3x3*` | starzy agenci z wersji 1.7 | usuń `.github/agents/agent-3x3*.agent.md` (patrz [Aktualizacja](#aktualizacja-z-wersji-17)) |
 
 ---

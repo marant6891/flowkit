@@ -40,6 +40,13 @@ def validate_plugin_manifest() -> None:
             found = released.group(1) if released else "none"
             err(f"plugin.json version ({version}) does not match latest CHANGELOG.md entry ({found})")
 
+    # Wersja runtime (doctor porównuje ją z wtyczką i agentami) musi być równa wersji wtyczki.
+    runtime = re.search(r'^VERSION = "([^"]+)"', (ROOT / "runtime" / "flowkit_exec.py").read_text(encoding="utf-8"),
+                        re.MULTILINE)
+    if not runtime or runtime.group(1) != version:
+        err(f"runtime/flowkit_exec.py VERSION ({runtime.group(1) if runtime else 'none'}) "
+            f"does not match plugin.json version ({version})")
+
     # Claude Code akceptuje tu ścieżkę albo listę ścieżek zaczynających się od "./".
     for key, suffix in (("skills", ""), ("agents", ".md")):
         entries = data.get(key, [])

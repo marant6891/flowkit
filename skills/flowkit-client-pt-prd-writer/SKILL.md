@@ -267,9 +267,9 @@ Zasady pisania:
 - Streszczenie zarządcze pisz na końcu, z treści dokumentu, bez nowych faktów.
 - **Struktura i przykłady komunikatów (JSON/XML/kontrakt):** jeśli źródła opisują strukturę komunikatu,
   payload lub schemat żądania/odpowiedzi (JSON, XML itp.), zachowaj w sekcji „Integracje” zwięzły przykład
-  takiego komunikatu oprócz tabeli. Nie usuwaj przykładu struktury w wersji dla klienta — dokument czytają
-  także osoby techniczne po stronie klienta (użyj wyłącznie pól ze źródeł oraz danych fikcyjnych, bez sekretów
-  i dopisków roboczych).
+  takiego komunikatu oprócz tabeli. Nie usuwaj przykładu struktury w wersji dla klienta, ponieważ dokument
+  czytają także osoby techniczne po stronie klienta (użyj wyłącznie pól ze źródeł oraz danych fikcyjnych,
+  bez sekretów i dopisków roboczych).
 - Zobacz [przykłady: źródło vs zmyślenie](./examples/sourced-vs-invented.md).
 
 **Styl sekcji technicznych i zakaz bagatelizowania nakładu** (Analiza wpływu, Architektura, Integracje, Model danych):

@@ -48,8 +48,8 @@ ogólnikowym streszczeniem w 2-3 zdaniach na sekcję. Każda sekcja opisuje konk
 | **Uruchamianie, logi i diagnostyka** | Wymagania z plików projektu, kolejność kroków uruchomienia i migracji, endpointy zdrowia, pola logów służące do korelacji, tabela objawów/kodów błędów → przyczyna w kodzie → działanie. |
 
 Zakaz sekcji-zaślepek: jeśli dany obszar dotyczy rozwiązania, rozwiń go na podstawie kodu do poziomu użytecznego dla
-administratora lub developera; jeśli w kodzie brak informacji (np. wartości środowiskowych), zgłoś lukę (`OPEN-NNN`
-w trybie roboczym / `K-NN` w trybie `client`) albo rozstrzygnij z użytkownikiem przed oddaniem wersji końcowej.
+administratora lub developera. Jeśli w kodzie brak informacji (np. wartości środowiskowych), zgłoś lukę (`OPEN-NNN`
+w trybie roboczym albo `K-NN` w trybie `client`) lub rozstrzygnij z użytkownikiem przed oddaniem wersji końcowej.
 
 ## Jakość opisu opcji
 

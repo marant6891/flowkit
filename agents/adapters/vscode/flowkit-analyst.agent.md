@@ -10,7 +10,7 @@ argument-hint: 'Zadanie analityczne. Np: ''analiza wpływu zmiany'', ''backlog z
 user-invocable: false
 ---
 
-<!-- Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-analyst_agent.md. Nie edytuj ręcznie. -->
+<!-- FlowKit 1.8.0 · Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-analyst_agent.md. Nie edytuj ręcznie. -->
 
 ## Questions for the user
 

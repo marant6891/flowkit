@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/marant6891/flowkit/main/docs/allow.schema.json",
+  "title": "FlowKit — plik zgód (~/.flowkit/allow.json)",
+  "description": "Polecenia spoza listy roli, które użytkownik pozwala agentom FlowKit wykonywać. Wpis to początek polecenia. Agenci nie mogą zmieniać tego pliku.",
+  "type": "object",
+  "required": [
+    "commands"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "commands": {
+      "type": "object",
+      "description": "Klucz \"*\" dotyczy wszystkich ról, pozostałe klucze to role agentów.",
+      "propertyNames": {
+        "enum": [
+          "*",
+          "orchestrator",
+          "analyzer",
+          "verifier",
+          "implementer",
+          "diagnostics",
+          "analyst",
+          "validator"
+        ]
+      },
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[^;&|<>`$\n]+$",
+          "description": "Początek polecenia, np. \"dotnet build\". Bez znaków powłoki; powłoki, samo python/node i kod w wierszu poleceń są pomijane."
+        }
+      }
+    }
+  }
+}

@@ -9,7 +9,7 @@ argument-hint: 'Zadanie DevOps. Np: ''Dockerfile dla Node.js'', ''GitHub Actions
 user-invocable: false
 ---
 
-<!-- Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-devops_agent.md. Nie edytuj ręcznie. -->
+<!-- FlowKit 1.8.0 · Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-devops_agent.md. Nie edytuj ręcznie. -->
 
 ## Questions for the user
 

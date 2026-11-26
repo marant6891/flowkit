@@ -237,6 +237,8 @@ elif [ "$MODE" = "agent" ]; then
         cp -r "$REPO_ROOT/runtime/"* "$RUNTIME_DIR/"
         rm -rf "$RUNTIME_DIR/__pycache__"
         echo "  ✓ Zainstalowano lokalną warstwę bezpieczeństwa: $RUNTIME_DIR"
+        echo "  Diagnoza:          python \"$RUNTIME_DIR/flowkit_doctor.py\""
+        echo "  Pusty plik zgód:   python \"$RUNTIME_DIR/flowkit_doctor.py\" init"
     fi
 fi
 

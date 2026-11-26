@@ -6,6 +6,7 @@ Sprawdzenie bez zapisu:            python scripts/build_agents.py --check
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -71,7 +72,10 @@ LOG_HOOK = {"PostToolUse": [{"matcher": "AskUserQuestion|Skill|Agent|Task", "hoo
 LOGGED_TOOLS = {"AskUserQuestion", "Skill", "Agent"}
 
 ORCHESTRATOR = "flowkit-orchestrator"
-GENERATED = "<!-- Plik generowany przez scripts/build_agents.py ze źródła agents/SOURCE. Nie edytuj ręcznie. -->\n"
+# Wersja w znaczniku pozwala `doctor` wykryć agentów starszych niż zainstalowany runtime.
+VERSION = json.loads((ROOT / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))["version"]
+GENERATED = (f"<!-- FlowKit {VERSION} · Plik generowany przez scripts/build_agents.py ze źródła agents/SOURCE. "
+             "Nie edytuj ręcznie. -->\n")
 
 CLAUDE_NOTE = """
 ## Claude Code tool names

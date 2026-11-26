@@ -9,7 +9,7 @@ argument-hint: 'Objaw lub zakres. Np: ''pod payments restartuje się'', ''zweryf
 user-invocable: false
 ---
 
-<!-- Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-diagnostics_agent.md. Nie edytuj ręcznie. -->
+<!-- FlowKit 1.8.0 · Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-diagnostics_agent.md. Nie edytuj ręcznie. -->
 
 ## Questions for the user
 

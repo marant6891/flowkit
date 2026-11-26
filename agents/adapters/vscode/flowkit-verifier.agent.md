@@ -8,7 +8,7 @@ tools:
 - execute
 ---
 
-<!-- Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-verifier_agent.md. Nie edytuj ręcznie. -->
+<!-- FlowKit 1.8.0 · Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-verifier_agent.md. Nie edytuj ręcznie. -->
 
 ## Questions for the user
 

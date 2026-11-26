@@ -25,7 +25,7 @@ hooks:
       command: python "$HOME/.claude/flowkit/runtime/log_tool_event.py"
 ---
 
-<!-- Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-analyst_agent.md. Nie edytuj ręcznie. -->
+<!-- FlowKit 1.8.0 · Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-analyst_agent.md. Nie edytuj ręcznie. -->
 
 ## Claude Code tool names
 

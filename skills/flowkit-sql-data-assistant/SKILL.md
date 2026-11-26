@@ -1,6 +1,6 @@
 ---
 name: flowkit-sql-data-assistant
-version: "1.2"
+version: "1.3"
 tags: [sql, database, reporting, analytics, data-verification, tester, support, transactions]
 description: >
   Przygotowuje bezpieczne zapytania SQL, zestawienia analityczne i raportowe oraz
@@ -74,6 +74,20 @@ Ustal tryb na początku i podaj go w pierwszym zdaniu odpowiedzi:
     - do raportu dołącz zapytanie kontrolne (rekonsyliację) oraz liczbę wierszy pominiętych przez filtry i `NULL`,
     - zwracaj agregaty; dane osobowe tylko gdy są niezbędne do celu raportu,
     - nie twórz tabel, widoków ani procedur raportowych — to zadanie dla administratora lub zespołu BI.
+14. **Skrypt zmieniający dane jest opakowany** według [szablonów](./templates/safe-write-templates.md):
+    - nagłówek w ramce komentarza: cel, `ZGŁOSZENIE:`, baza i środowisko, autor i data, lista kroków, jak
+      uruchomić i jak zatwierdzić, a pod nim wiersz `-- Baza: <typ>`,
+    - na początku wypisanie serwera i bazy oraz parametr oczekiwanej bazy: inna baza przerywa skrypt,
+    - numerowane kroki w komentarzach `/* KROK n: … */` (parametry, plan zmian, PRZED, kontrola, zmiana, PO,
+      zakończenie) i komunikat z liczbą wierszy po każdej zmianie (`KROK 5: zmieniono wierszy: 3`),
+    - plan zmian w tabeli tymczasowej z poprzednią i nową wartością; zmiana działa tylko według planu,
+    - obsługa błędów, która wycofuje całość: SQL Server `BEGIN TRY … BEGIN CATCH` z `ROLLBACK` i `THROW`,
+      PostgreSQL blok `DO` z `RAISE EXCEPTION`, Oracle sekcja `EXCEPTION` z `ROLLBACK` i `RAISE`; w MySQL
+      kolumny kontrolne `OK` / `PRZERWIJ`,
+    - zakończenie: `ROLLBACK` z komunikatem (serwer, baza), `COMMIT` tylko w komentarzu obok,
+    - sprzątanie tabel tymczasowych i skrypt odtworzenia w komentarzu na końcu.
+    Zestawienia i zapytania diagnostyczne mają lżejsze opakowanie: nagłówek z celem i bazą oraz kroki
+    w komentarzach, bez transakcji.
 
 # Pytania do użytkownika
 
@@ -108,7 +122,9 @@ jawne założenia (np. granulacja miesięczna, strefa czasowa bazy) i wypisz je 
 - Zmiana danych: skorzystaj z [bezpiecznych szablonów](./templates/safe-write-templates.md) dla ustalonej bazy.
 
 ### Etap 3: Przygotuj skrypt
-Zapisz go w pliku `.sql`, gdy to możliwe. Nazwy i warunki muszą wynikać ze źródeł.
+Zapisz go w pliku `.sql`, gdy to możliwe. Nazwy i warunki muszą wynikać ze źródeł. Skrypt zmieniający dane
+opakuj według zasady 14; gdy część wierszy trzeba uzupełnić, a części brakuje, użyj wzoru „Plan zmian” z kolumną
+`Operacja` i osobną kontrolą liczby wierszy dla każdej operacji.
 
 ### Etap 4: Przygotuj instrukcję
 Oddaj wynik według [wzoru odpowiedzi](./templates/sql-answer-template.md), a w `ANALYTICS_REPORT` według

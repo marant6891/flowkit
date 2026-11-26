@@ -14,18 +14,36 @@ sys.path.insert(0, str(ROOT / "runtime"))
 import check_sql  # noqa: E402
 import flowkit_exec as fx  # noqa: E402
 
-SAFE_INSERT = """-- Baza: SQL Server
+SAFE_INSERT = """/* ZGŁOSZENIE: T-1 */
+-- Baza: SQL Server
 SET XACT_ABORT ON;
+DROP TABLE IF EXISTS #Plan;
+BEGIN TRY
+BEGIN TRANSACTION;
+/* KROK 1: parametry */
 DECLARE @Id int = 1;
 DECLARE @Oczekiwane int = 1;
+/* KROK 2: PRZED */
 SELECT t.id FROM dbo.t AS t WHERE t.id = @Id;
-BEGIN TRANSACTION;
+/* KROK 3: INSERT */
 INSERT INTO dbo.t (id) SELECT @Id WHERE NOT EXISTS (SELECT 1 FROM dbo.t AS x WHERE x.id = @Id);
-IF @@ROWCOUNT <> @Oczekiwane BEGIN ROLLBACK TRANSACTION; THROW 50001, 'x', 1; END;
+IF @@ROWCOUNT <> @Oczekiwane THROW 50001, 'x', 1;
+/* KROK 4: PO */
 SELECT t.id FROM dbo.t AS t WHERE t.id = @Id;
 ROLLBACK TRANSACTION;
 -- COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+THROW;
+END CATCH;
+DROP TABLE IF EXISTS #Plan;
 """
+TEMPLATES = SKILL / "templates" / "safe-write-templates.md"
+
+
+def template_blocks():
+    return re.findall(r"```sql\n(.*?)```", TEMPLATES.read_text(encoding="utf-8"), re.S)
 
 
 class TestSafetyChecker(unittest.TestCase):
@@ -37,14 +55,42 @@ class TestSafetyChecker(unittest.TestCase):
     def test_all_templates_pass(self):
         templates = (SKILL / "templates" / "safe-write-templates.md").read_text(encoding="utf-8")
         blocks = re.findall(r"```sql\n(.*?)```", templates, re.S)
-        self.assertEqual(len(blocks), 8)
+        self.assertEqual(len(blocks), 9)
         for block in blocks:
             self.assertEqual(check_sql.check(block), [], block[:40])
 
     def test_each_database_type_is_covered(self):
-        templates = (SKILL / "templates" / "safe-write-templates.md").read_text(encoding="utf-8")
-        for database in ("PostgreSQL", "SQL Server", "Oracle", "MySQL"):
-            self.assertEqual(templates.count(f"-- Baza: {database}"), 2, database)
+        templates = TEMPLATES.read_text(encoding="utf-8")
+        for database, count in (("PostgreSQL", 2), ("SQL Server", 3), ("Oracle", 2), ("MySQL", 2)):
+            self.assertEqual(templates.count(f"-- Baza: {database}"), count, database)
+
+    def test_templates_are_wrapped(self):
+        for block in template_blocks():
+            name = block[:160]
+            self.assertRegex(block, r"^/\* =+\n   SKRYPT:", name)
+            for element in ("ZGŁOSZENIE:", "KROKI:", "ZATWIERDZENIE:", "KROK 1: parametry", "NAZWA_BAZY",
+                            "PRZED", "PO - ", "ODTWORZENIE", "ROLLBACK"):
+                self.assertIn(element, block, f"{element}: {name}")
+            self.assertRegex(block, r"(?m)^\s*--\s*COMMIT", name)
+
+    def test_wrapping_is_required_for_write_scripts(self):
+        self.assert_rejected(SAFE_INSERT.replace("/* ZGŁOSZENIE: T-1 */\n", ""), "ZGŁOSZENIE")
+        self.assert_rejected(re.sub(r"/\* KROK \d: \w+ \*/\n", "", SAFE_INSERT), "KROK")
+        without_try = SAFE_INSERT.replace("BEGIN TRY\n", "").split("END TRY")[0]
+        self.assert_rejected(without_try, "BEGIN TRY")
+        # Zestawienie nie wymaga opakowania zmiany danych.
+        self.assertEqual(check_sql.check("-- Baza: MySQL\nSELECT COUNT(*) AS liczba FROM a;\n"), [])
+
+    def test_only_temporary_tables_can_be_dropped(self):
+        self.assertEqual(check_sql.check(SAFE_INSERT), [])
+        real = SAFE_INSERT.replace("DROP TABLE IF EXISTS #Plan;\nBEGIN TRY", "DROP TABLE IF EXISTS dbo.Plan;\nBEGIN TRY")
+        self.assert_rejected(real, "struktury")
+        self.assert_rejected("-- Baza: MySQL\nDROP TABLE plan_zmian;\nSELECT COUNT(*) AS n FROM a;\n", "struktury")
+
+    def test_mysql_update_with_join_is_checked_as_a_write(self):
+        mysql_update = next(b for b in template_blocks()
+                            if "-- Baza: MySQL" in b and "UPDATE schemat.tabela AS t\nJOIN" in b)
+        self.assert_rejected(mysql_update.replace("ROLLBACK;\n", ""), "ROLLBACK")
 
     def test_safe_script_passes(self):
         self.assertEqual(check_sql.check(SAFE_INSERT), [])
@@ -137,7 +183,8 @@ class TestSqlIntegration(unittest.TestCase):
         script = "C:/x/flowkit-sql-data-assistant/scripts/check_sql.py"
         self.assertIsNone(fx.check("orchestrator", ["python", script, "a.sql"]))
         self.assertIsNone(fx.check("analyst", ["python", script, "a.sql"]))
-        self.assertIsNotNone(fx.check("verifier", ["python", script, "a.sql"]))
+        self.assertIsNone(fx.check("verifier", ["python", script, "a.sql"]))  # kontrola w audycie, tylko odczyt
+        self.assertIsNotNone(fx.check("validator", ["python", script, "a.sql"]))
         for client in ("psql", "sqlcmd", "sqlplus", "mysql", "mariadb", "sqlite3"):
             for role in fx.ROLE_COMMANDS:
                 self.assertIsNotNone(fx.check(role, [client, "-c", "select 1"]), f"{role}: {client}")

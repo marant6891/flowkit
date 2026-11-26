@@ -73,7 +73,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-AVAILABLE_SKILLS=("flowkit-client-pt-prd-writer" "flowkit-client-meeting-recap" "flowkit-devops-incident-postmortem" "flowkit-sql-data-assistant" "flowkit-devops-sre-review" "flowkit-requirements-workshop")
+AVAILABLE_SKILLS=("flowkit-client-pt-prd-writer" "flowkit-client-meeting-recap" "flowkit-devops-incident-postmortem" "flowkit-sql-data-assistant" "flowkit-devops-sre-review" "flowkit-requirements-workshop" "flowkit-client-message-editor" "flowkit-client-solution-docs-writer")
 AVAILABLE_AGENTS=("flowkit-orchestrator" "flowkit-code-analyzer" "flowkit-verifier" "flowkit-planner" "flowkit-implementer" "flowkit-devops" "flowkit-product-owner" "flowkit-diagnostics" "flowkit-analyst" "flowkit-validator")
 
 if [ -z "$MODE" ] && [ "$SET_DEFAULT_AGENT" = false ]; then

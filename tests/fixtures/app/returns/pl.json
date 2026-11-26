@@ -1,0 +1,19 @@
+{
+  "menu.orders": "Zamówienia",
+  "menu.my_orders": "Moje zamówienia",
+  "returns.button.new": "Zgłoś zwrot",
+  "returns.field.reason": "Powód zwrotu",
+  "returns.reason.damaged": "Uszkodzony",
+  "returns.reason.not_as_described": "Niezgodny z opisem",
+  "returns.reason.other": "Inny",
+  "returns.field.comment": "Komentarz",
+  "returns.field.photos": "Zdjęcia",
+  "returns.button.submit": "Wyślij zgłoszenie",
+  "returns.created": "Zgłoszenie zwrotu zostało wysłane",
+  "returns.status.pending_approval": "Oczekuje na akceptację",
+  "returns.error.not_delivered": "Zwrot można zgłosić tylko dla dostarczonego zamówienia",
+  "returns.error.too_late": "Minął termin zwrotu",
+  "returns.error.reason_required": "Wybierz powód zwrotu",
+  "returns.error.comment_too_long": "Komentarz może mieć najwyżej 500 znaków",
+  "returns.error.photos": "Możesz dodać najwyżej 3 zdjęcia, każde do 5 MB"
+}

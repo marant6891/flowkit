@@ -207,23 +207,88 @@ def check_installation() -> list[Check]:
     else:
         checks.append(Check(section, OK, "Python dla hooków", f"{path} ({version})"))
 
-    found = []
-    for directory in agent_dirs():
-        for agent in sorted(directory.glob("flowkit-*.md")) if directory.is_dir() else []:
-            marker = AGENT_MARKER.search(agent.read_text(encoding="utf-8", errors="replace")[:2000])
-            found.append((agent, marker.group(1) if marker else None))
-        for legacy in sorted(directory.glob("agent-3x3*.md")) if directory.is_dir() else []:
-            checks.append(Check(section, WARN, "Starzy agenci", f"{legacy} (wersja 1.7)", "usuń ten plik"))
-    stale = [str(agent) for agent, version in found if version != fx.VERSION]
-    if found and stale:
-        checks.append(Check(section, WARN, "Agenci", f"inna wersja niż runtime {fx.VERSION}: {', '.join(stale[:3])}"
-                            + (" …" if len(stale) > 3 else ""), "zainstaluj ponownie agentów i runtime"))
-    elif found:
-        checks.append(Check(section, OK, "Agenci", f"{len(found)} plików agentów w wersji {fx.VERSION}"))
+    return checks + check_agents() + check_manual_runtime()
+
+
+def reinstall_hint(directory: Path) -> str:
+    """Polecenie ponownej instalacji agentów i runtime dla katalogu, w którym leżą agenci."""
+    vscode = directory.parent.name == ".github"
+    script = r"<repozytorium FlowKit>\scripts\install.ps1" if os.name == "nt" else "<repozytorium FlowKit>/scripts/install.sh"
+    if os.name == "nt":
+        command = f"{script} -AgentName all -Platform {'vscode' if vscode else 'claude'} -Force"
     else:
+        command = f"{script} agent all --platform {'vscode' if vscode else 'claude'} --force"
+    return command + (f" (uruchom w katalogu projektu {directory.parent.parent})" if vscode else "")
+
+
+def agent_tools(text: str) -> list[str]:
+    match = re.match(r"^---\r?\n(.*?)\r?\n---", text, re.DOTALL)
+    if not match:
+        return []
+    tools = re.search(r"^tools:\s*\n((?:\s*-\s*.+\n?)+)", match.group(1), re.MULTILINE)
+    return re.findall(r"-\s*([^\s#]+)", tools.group(1)) if tools else []
+
+
+def plugin_installed() -> bool:
+    registry = Path.home() / ".claude" / "plugins" / "installed_plugins.json"
+    try:
+        return "flowkit@" in registry.read_text(encoding="utf-8")
+    except OSError:
+        return False
+
+
+def check_agents() -> list[Check]:
+    """Wersja zainstalowanych agentów, narzędzie okna pytań orkiestratora i podwójna instalacja."""
+    section = "Instalacja"
+    checks: list[Check] = []
+    found = 0
+    for directory in agent_dirs():
+        if not directory.is_dir():
+            continue
+        stale = []
+        for agent in sorted(directory.glob("flowkit-*.md")):
+            found += 1
+            text = agent.read_text(encoding="utf-8", errors="replace")
+            marker = AGENT_MARKER.search(text[:2000])
+            version = marker.group(1) if marker else "starsza niż 1.8.0"
+            if version != fx.VERSION:
+                stale.append(f"{agent.name} ({version})")
+            if agent.name.startswith("flowkit-orchestrator"):
+                tool = "vscode/askQuestions" if agent.name.endswith(".agent.md") else "AskUserQuestion"
+                if tool not in agent_tools(text):
+                    checks.append(Check(section, ERROR, "Okno pytań", f"{agent}: orkiestrator nie ma narzędzia {tool}, "
+                                        "więc pyta zwykłym tekstem (`Ask: text`)", reinstall_hint(directory)))
+        if stale:
+            checks.append(Check(section, WARN, "Agenci", f"{directory}: inna wersja niż runtime {fx.VERSION}: "
+                                + ", ".join(stale[:4]) + (" …" if len(stale) > 4 else ""), reinstall_hint(directory)))
+        for legacy in sorted(directory.glob("agent-3x3*.md")):
+            checks.append(Check(section, WARN, "Starzy agenci", f"{legacy} (wersja 1.7)", "usuń ten plik"))
+    home_agents = Path.home() / ".claude" / "agents"
+    if plugin_installed() and any(home_agents.glob("flowkit-*.md")):
+        checks.append(Check(section, WARN, "Podwójna instalacja", "jest wtyczka FlowKit i agenci z instalatora w "
+                            f"{home_agents}; `claude --agent flowkit-orchestrator` uruchamia agenta z instalatora, a "
+                            "`flowkit:flowkit-orchestrator` — z wtyczki", "zostaw jedną instalację: usuń pliki "
+                            f"flowkit-*.md z {home_agents} albo odinstaluj wtyczkę"))
+    if not found:
         checks.append(Check(section, INFO, "Agenci", "brak plików agentów w ~/.claude/agents, .claude/agents i "
                             ".github/agents (przy instalacji jako wtyczka to prawidłowe)"))
+    elif not any(c.name in ("Agenci", "Okno pytań") for c in checks):
+        checks.append(Check(section, OK, "Agenci", f"{found} plików agentów w wersji {fx.VERSION}"))
     return checks
+
+
+def check_manual_runtime() -> list[Check]:
+    """Agenci z instalatora używają runtime z ~/.claude/flowkit/runtime — może być starszy niż ten."""
+    manual = Path.home() / ".claude" / "flowkit" / "runtime"
+    if manual.resolve() == RUNTIME_DIR or not (manual / "flowkit_exec.py").exists():
+        return []
+    match = re.search(r'^VERSION = "([^"]+)"', (manual / "flowkit_exec.py").read_text(encoding="utf-8", errors="replace"),
+                      re.MULTILINE)
+    version = match.group(1) if match else "starsza niż 1.8.0"
+    if version == fx.VERSION:
+        return [Check("Instalacja", OK, "Runtime instalatora", f"{manual} ({version})")]
+    return [Check("Instalacja", WARN, "Runtime instalatora", f"{manual}: wersja {version}, a ten runtime {fx.VERSION}; "
+                  "agenci z instalatora używają starszych zasad (np. listy poleceń ról)", reinstall_hint(manual.parent.parent / "agents"))]
 
 
 # --- Bezpieczeństwo i konfiguracja ----------------------------------------------------

@@ -213,6 +213,55 @@ Hasła, tokeny, PESEL i podobne dane są zastępowane `[UKRYTO]` — pod wynikie
 Podsumuj spotkanie z tests/fixtures/transcripts/sample_meeting.vtt i przygotuj mail do klienta.
 ```
 
+### Redakcja maila lub wiadomości — `flowkit-client-message-editor`
+
+**Kiedy:** masz szkic maila lub wiadomości (Teams, Slack) do klienta i chcesz go poprawić przed wysłaniem.
+Skill nie dodaje faktów: braki oznacza `[DO UZUPEŁNIENIA: …]`. Niczego nie wysyła.
+
+| Tryb | Kiedy | Dostajesz |
+|---|---|---|
+| `ZWYKŁY` | zwykła korespondencja | krótką, uprzejmą wiadomość z jedną prośbą i terminem |
+| `DUPOKRYTKA` | zmiana zakresu lub terminu, czekanie na klienta, decyzja wbrew rekomendacji, ustalenia ustne | potwierdzenie na piśmie: ponumerowane fakty z datami, decyzje i kto je podjął, zakres, ryzyka, zależności od klienta, prośba o potwierdzenie do daty |
+
+```text
+Popraw tego maila do klienta, tryb dupokrytka, odpowiedź potrzebna do 05.12:
+<wklejony szkic>
+```
+
+Wynik: wersja do wysłania, lista zmian, lista `[DO UZUPEŁNIENIA]` i uwagi tylko dla Ciebie (usunięte emocje,
+uwagi wewnętrzne, ryzykowne zobowiązania). Bez podanego trybu skill sam go rozpozna i zapyta tylko wtedy, gdy
+treść wskazuje na `DUPOKRYTKA`. Wiadomość na komunikator: dopisz „na Teams” albo „na Slacka”.
+
+**Wypróbuj:** `Popraw tego maila (tests/fixtures/messages/draft_scope_change.txt) w trybie dupokrytka.`
+
+### Dokumentacja rozwiązania i help — `flowkit-client-solution-docs-writer`
+
+**Kiedy:** rozwiązanie już działa i potrzebujesz pomocy dla użytkownika końcowego (help, podręcznik, szybki
+start, FAQ), instrukcji administratora albo dokumentacji technicznej. Różnica względem PT/PRD: opisujesz to,
+co **jest w kodzie**, a nie planowaną zmianę.
+
+Skill zaczyna od briefu w oknie pytań: **typ dokumentu**, **odbiorca** (rola i poziom wiedzy), **kod
+rozwiązania** (repozytorium, moduł, wersja) i **szablon Word**. Potem pyta o zakres funkcji, zrzuty ekranu,
+tryb wyniku i język, pokazuje plan dokumentu do akceptacji i dopiero wtedy pisze.
+
+| Typ dokumentu | Odbiorca | Dostajesz |
+|---|---|---|
+| Pomoc / podręcznik | użytkownik biznesowy lub kluczowy | tematy-zadania krok po kroku, nazwy z interfejsu, komunikaty i co z nimi zrobić, bez języka kodu |
+| Instrukcja administratora | dział IT klienta | wymagania, instalacja, ustawienia (bez sekretów), role, zadania cykliczne, logi |
+| Dokumentacja techniczna | zespół developerski klienta | architektura, moduły, API, model danych, budowanie i testy |
+
+**Polecenie optymalne:**
+
+```text
+Przygotuj help dla klienta sklepu (użytkownik biznesowy) do modułu zwrotów z kodu src/returns
+(tag v2.4), w szablonie C:\szablony\pomoc.dotx, wersja dla klienta, ze znacznikami na zrzuty.
+```
+
+Wynik: `.docx` w stylach szablonu, wynik `check_user_docs.py`, lista pominiętych funkcji (inna rola, flaga,
+nieukończone), kwestie do wyjaśnienia i lista brakujących zrzutów.
+
+**Wypróbuj:** `Przygotuj pomoc dla klienta do modułu zwrotów z kodu tests/fixtures/app/returns, szablon zapasowy.`
+
 ---
 
 ## 6. Postmortem po incydencie — `flowkit-devops-incident-postmortem`

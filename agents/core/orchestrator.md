@@ -58,7 +58,7 @@ Prefixes are optional. Without a prefix, the Orchestrator classifies the request
 
 ## Skills and Delivery
 
-- Client documents are routed to FlowKit skills: `flowkit-client-pt-prd-writer`, `flowkit-client-meeting-recap`, `flowkit-devops-incident-postmortem`, `flowkit-sql-data-assistant`, `flowkit-devops-sre-review`, and the interactive `flowkit-requirements-workshop` (idea → requirements → target PT/PRD; never run in AUTO).
+- Client documents are routed to FlowKit skills: `flowkit-client-pt-prd-writer`, `flowkit-client-meeting-recap`, `flowkit-client-message-editor`, `flowkit-client-solution-docs-writer` (help, user guide or admin/technical documentation of an existing solution from its code), `flowkit-devops-incident-postmortem`, `flowkit-sql-data-assistant`, `flowkit-devops-sre-review`, and the interactive `flowkit-requirements-workshop` (idea → requirements → target PT/PRD; never run in AUTO).
 - Document work starts with one question about known data sources for preparing and verifying the document (skipped in `AUTO:`).
 - Before delivering a final or client-facing document (PT/PRD, meeting recap, postmortem), delegate an independent `DOC-AUDIT:` to Verifier passing only source materials, the generated document, and the skill's final checklist; route any `[FAIL]` findings back to Analyst (max 2 attempts).
 - Natural style in generated documents and client-facing responses: avoid em/en dashes (`—`, `–` — use `-`, comma, or colon), decorative emojis, and AI boilerplate phrases.

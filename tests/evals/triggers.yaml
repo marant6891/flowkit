@@ -65,6 +65,32 @@ skills:
       - Przygotuj pipeline CI w GitHub Actions.
       - Podsumuj spotkanie zespołu DevOps.
       - Dodaj alert dla wysokiego użycia pamięci.
+  flowkit-client-message-editor:
+    should_trigger:
+      - Popraw tego maila do klienta, żeby brzmiał profesjonalnie.
+      - Złagodź ton tej wiadomości do klienta, jestem zdenerwowany opóźnieniem.
+      - Przeredaguj ten mail tak, żeby był dupokrytką z potwierdzeniem ustaleń.
+      - Skróć tę wiadomość na Teams do klienta i dodaj jasną prośbę z terminem.
+      - Zrób z tego szkicu maila potwierdzenie ustaleń na piśmie, klient zmienił zakres.
+      - Sprawdź i popraw mój mail do klienta przed wysłaniem.
+    should_not_trigger:
+      - Podsumuj spotkanie z tej transkrypcji VTT i przygotuj mail do klienta.
+      - Przygotuj dokument PT na podstawie briefu.
+      - Napisz zapytanie SQL zliczające klientów.
+      - Przygotuj raport postmortem z awarii.
+  flowkit-client-solution-docs-writer:
+    should_trigger:
+      - Przygotuj help dla użytkownika końcowego do modułu zwrotów na podstawie kodu w src/returns.
+      - Napisz instrukcję obsługi aplikacji dla klientów sklepu w naszym szablonie Word.
+      - Zrób podręcznik użytkownika z kodu tego repozytorium dla działu księgowości.
+      - Potrzebuję instrukcji administratora dla tego rozwiązania, szablon w docs/szablon.dotx.
+      - Opisz działanie aplikacji dla zespołu IT klienta na podstawie kodu, dokumentacja techniczna rozwiązania.
+      - Przygotuj FAQ i szybki start dla użytkowników panelu na podstawie kodu.
+    should_not_trigger:
+      - Przygotuj dokument PT dla planowanej zmiany w formularzu zamówienia.
+      - Popraw tego maila do klienta przed wysłaniem.
+      - Napraw błąd walidacji w pliku orders.py.
+      - Podsumuj spotkanie z pliku VTT.
   flowkit-devops-sre-review:
     should_trigger:
       - Zrób przegląd SRE tej usługi na podstawie manifestów i reguł alertów.

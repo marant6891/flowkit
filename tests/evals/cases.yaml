@@ -74,3 +74,19 @@ cases:
     evidence: [ERP, makiety]
     must_contain: ["Q-\\d{3}", "(?i)nie wiem", "(?i)(interaktywn|decyzj\\w* (użytkownika|Twoj|Pana|Pani))"]
     must_not_contain: ["DEC-\\d{3}", "(?i)AUTO decisions", "(?i)rejestr decyzji AUTO", "ASSUMPTION-\\d{3} \\(AUTO\\)"]
+
+  - id: message-editor-cya
+    target: flowkit-client-message-editor
+    fixture: messages/draft_scope_change.txt
+    prompt: "Popraw tego maila do klienta w trybie dupokrytka."
+    evidence: ["18.11", "12.11", "20.12", "import z Excela", "dla nas"]
+    must_contain: ['DUPOKRYTKA', '18\.11', '12\.11', '20\.12', '(?i)potwierdz', '(?m)^\s*1\.', '(?i)(zakres|poza zakresem)']
+    must_not_contain: ['(?i)po raz kolejny', '!!!', '(?i)zapytać Kasię', '(?i)uznajemy,? że się zgadzacie', '—']
+
+  - id: solution-docs-user-help
+    target: flowkit-client-solution-docs-writer
+    fixture: app/returns/pl.json
+    prompt: "AUTO: Przygotuj pomoc dla klienta sklepu (użytkownik biznesowy) do modułu zwrotów na podstawie kodu z tests/fixtures/app/returns, wersja dla klienta, szablon zapasowy."
+    evidence: ["Zgłoś zwrot", "Wyślij zgłoszenie", "Oczekuje na akceptację", "Minął termin zwrotu"]
+    must_contain: ['Zgłoś zwrot', 'Wyślij zgłoszenie', 'Oczekuje na akceptację', '30 dni', '(?m)^\s*1\.']
+    must_not_contain: ['(?i)endpoint', 'POST /', 'routes\.py', '(?i)błąd 400', '(?i)JPG', 'SRC-\d{3}', '—']

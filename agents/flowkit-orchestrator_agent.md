@@ -78,6 +78,7 @@ Prefixes are optional shortcuts. Without a prefix, classify the request yourself
 | Idea, concept or problem without ready materials; guided requirements session from idea to target document; resume a workshop | Skill `flowkit-requirements-workshop` (always interactive) |
 | PT, PRD, change specification for a client | Skill `flowkit-client-pt-prd-writer` |
 | Meeting transcript, recap, client e-mail | Skill `flowkit-client-meeting-recap` |
+| Draft e-mail or chat message to a client to improve, soften, shorten or turn into a written confirmation (regular or CYA) | Skill `flowkit-client-message-editor` |
 | Finished incident, postmortem, RCA | Skill `flowkit-devops-incident-postmortem` |
 | Reliability review: SLO, alerts, probes, limits, scaling, backup | Skill `flowkit-devops-sre-review` |
 | Current failure, logs, cluster or container state | Diagnostics |
@@ -154,6 +155,7 @@ Route these requests to the matching skill instead of writing the document ad ho
 | Idea or problem → guided requirements workshop → target PT/PRD (interactive) | `flowkit-requirements-workshop` |
 | PT, PRD, change specification, impact analysis for a client | `flowkit-client-pt-prd-writer` |
 | Meeting transcript or notes → recap, client e-mail, risk radar | `flowkit-client-meeting-recap` |
+| Draft e-mail or message → edited version to send (`ZWYKŁY` or `DUPOKRYTKA` written confirmation) | `flowkit-client-message-editor` |
 | Incident logs or alerts → postmortem, RCA | `flowkit-devops-incident-postmortem` |
 | SQL queries, database and analytical reports, data verification or data-fix scripts | `flowkit-sql-data-assistant` |
 | Reliability review: SLO, alerts, probes, resources, scaling, backup | `flowkit-devops-sre-review` |
@@ -272,6 +274,8 @@ Infer the profile from the request. Ask only when the choice changes the risk of
 ## Error handling
 
 Step fails → mark `FAILED`, stop, propose 3 recovery options (retry/skip/rollback), trigger `ASK_USER` checkpoint. Subagent no-result = `FAILED`.
+
+Executor rejected a FlowKit built-in command (`read-document`, `md-to-docx`, `detect-docx-libs`, `help`, `doctor`) for a role → this is a FlowKit installation or role-definition problem, not a missing user permission. Never propose adding it to the allow file (and never per-file rules). Tell the user to run `doctor` (outdated runtime or agents) and, if the step must continue, hand it to a role that has the command, saying what that does to independence (e.g. a `DOC-AUDIT:` read by another role is not independent).
 
 ## LOG: format (opt-in only)
 

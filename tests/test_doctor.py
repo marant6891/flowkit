@@ -5,6 +5,7 @@ import contextlib
 import io
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -166,6 +167,70 @@ class TestDoctorReport(TempHome):
         with mock.patch.object(doctor, "hook_python", return_value=(None, None)):
             checks = doctor.check_installation()
         self.assertIn(("Python dla hooków", doctor.ERROR), {(c.name, c.status) for c in checks})
+
+
+class TestRolesMatchAgentInstructions(unittest.TestCase):
+
+    def test_verifier_reads_documents_and_runs_only_readonly_checks(self):
+        self.assertIsNone(fx.check("verifier", ["read-document", "dokument.docx", "--outline"]))
+        script = "skills/flowkit-client-pt-prd-writer/scripts/{}"
+        for name in ("check_client_version.py", "check_status_labels.py", "validate_diagram.py"):
+            self.assertIsNone(fx.check("verifier", ["python", script.format(name), "a.docx"]), name)
+        for name in ("insert_diagrams.py", "generate_diagram.py", "export_diagram.py"):
+            self.assertIsNotNone(fx.check("verifier", ["python", script.format(name), "a.docx"]), name)
+        self.assertIsNotNone(fx.check("verifier", ["md-to-docx", "a.md", "b.docx"]))
+
+    def test_builtin_commands_named_in_agent_instructions_are_allowed_for_its_role(self):
+        for agent, role in build_agents.EXEC_ROLES.items():
+            text = (ROOT / "agents" / f"{agent}_agent.md").read_text(encoding="utf-8")
+            for command in fx.BUILTINS:
+                if re.search(rf"`{re.escape(command)}\b", text):
+                    self.assertIn(command, fx.ROLE_COMMANDS[role], f"{agent} uses {command}")
+
+    def test_rejection_hints_never_suggest_per_file_or_builtin_allow_rules(self):
+        builtin = fx.check("validator", ["read-document", "dokument.docx"])
+        self.assertIn("nie dopisuj go do pliku zgód", builtin)
+        self.assertNotIn('dopisz "read-document', builtin)
+        tool = fx.check("orchestrator", ["mvn", "src/app.java"])
+        self.assertIn('dopisz "mvn"', tool)
+        self.assertIn('dopisz "dotnet build"', fx.check("orchestrator", ["dotnet", "build", "x.sln"]))
+
+
+class TestInstalledAgents(TempHome):
+
+    def home(self):
+        return mock.patch.object(Path, "home", return_value=self.dir)
+
+    def test_orchestrator_without_question_tool_is_an_error(self):
+        agents = self.dir / ".claude" / "agents"
+        agents.mkdir(parents=True)
+        (agents / "flowkit-orchestrator.md").write_text(
+            f"---\nname: flowkit-orchestrator\ntools:\n- Read\n- Agent\n---\n<!-- FlowKit {fx.VERSION} · x -->\n",
+            encoding="utf-8")
+        with mock.patch.object(doctor, "agent_dirs", return_value=[agents]), self.home():
+            checks = doctor.check_agents()
+        error = next(c for c in checks if c.name == "Okno pytań")
+        self.assertEqual(error.status, doctor.ERROR)
+        self.assertIn("-AgentName all" if os.name == "nt" else "agent all", error.fix)
+
+    def test_stale_installer_runtime_and_double_install_are_reported(self):
+        runtime = self.dir / ".claude" / "flowkit" / "runtime"
+        runtime.mkdir(parents=True)
+        (runtime / "flowkit_exec.py").write_text('"""stary runtime bez wersji"""\n', encoding="utf-8")
+        agents = self.dir / ".claude" / "agents"
+        agents.mkdir(parents=True)
+        (agents / "flowkit-analyst.md").write_text("---\ntools:\n- Read\n---\n", encoding="utf-8")
+        plugins = self.dir / ".claude" / "plugins"
+        plugins.mkdir(parents=True)
+        (plugins / "installed_plugins.json").write_text('{"plugins": {"flowkit@flowkit": []}}', encoding="utf-8")
+        with mock.patch.object(doctor, "agent_dirs", return_value=[agents]), self.home():
+            checks = doctor.check_agents() + doctor.check_manual_runtime()
+        found = {(c.name, c.status) for c in checks}
+        self.assertIn(("Runtime instalatora", doctor.WARN), found)
+        self.assertIn(("Podwójna instalacja", doctor.WARN), found)
+        self.assertIn(("Agenci", doctor.WARN), found)
+        stale = next(c for c in checks if c.name == "Agenci")
+        self.assertIn("starsza niż 1.8.0", stale.detail)
 
 
 class TestVersionAndFiles(unittest.TestCase):

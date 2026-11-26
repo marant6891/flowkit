@@ -76,18 +76,29 @@ ROLE_COMMANDS = {
     # Orkiestrator uruchamia testy i kontrole statyczne w ścieżce szybkiej („make the change, run its check”).
     "orchestrator": HELP + GIT_READ + SEARCH + STATIC + TESTS + DELIVERY + DOCUMENTS + DOCUMENT_WRITE,
     "analyzer": HELP + GIT_READ + SEARCH + STATIC + SECURITY_STATIC,
-    "verifier": HELP + GIT_READ + SEARCH + STATIC + SECURITY_STATIC + TESTS,
+    # Verifier czyta dokumenty i źródła w niezależnym audycie DOC-AUDIT (bez zapisu DOCX).
+    "verifier": HELP + GIT_READ + SEARCH + STATIC + SECURITY_STATIC + TESTS + DOCUMENTS,
     "implementer": HELP + STATIC + TESTS + DOCUMENTS + DOCUMENT_WRITE,
     "diagnostics": HELP + GIT_READ + SEARCH + DIAGNOSTICS + DOCUMENTS,
     "analyst": HELP + GIT_READ + SEARCH + DOCUMENTS + DOCUMENT_WRITE,
     "validator": HELP + GIT_READ + SEARCH + VALIDATION,
 }
-SKILL_SCRIPT_ROLES = {"orchestrator", "analyst"}
 SKILL_SCRIPTS = {
     "flowkit-client-pt-prd-writer": {"generate_diagram.py", "export_diagram.py", "validate_diagram.py", "insert_diagrams.py",
                              "check_status_labels.py", "check_client_version.py"},
     "flowkit-sql-data-assistant": {"check_sql.py"},
+    "flowkit-client-message-editor": {"check_message.py"},
+    "flowkit-client-solution-docs-writer": {"check_user_docs.py"},
 }
+# Skrypty kontrolne, które tylko czytają pliki: Verifier uruchamia je w audycie, ale nie generuje ani nie wstawia diagramów.
+READONLY_SKILL_SCRIPTS = {
+    "flowkit-client-pt-prd-writer": {"validate_diagram.py", "check_status_labels.py", "check_client_version.py"},
+    "flowkit-sql-data-assistant": {"check_sql.py"},
+    "flowkit-client-message-editor": {"check_message.py"},
+    "flowkit-client-solution-docs-writer": {"check_user_docs.py"},
+}
+ROLE_SKILL_SCRIPTS = {"orchestrator": SKILL_SCRIPTS, "analyst": SKILL_SCRIPTS, "verifier": READONLY_SKILL_SCRIPTS}
+SKILL_SCRIPT_ROLES = set(ROLE_SKILL_SCRIPTS)
 
 FORBIDDEN_FLAGS = {"--fix", "--autofix", "--write", "--output-file", "--report-path", "--apply", "--update",
                    "-exec", "-execdir", "-ok", "-okdir", "-delete", "-fprint", "-fprintf",
@@ -125,12 +136,12 @@ def matches(argv: list[str], prefix: str) -> bool:
                                           and len(argv) > 2 and argv[2].startswith("-Dtest="))
 
 
-def is_skill_script(argv: list[str]) -> bool:
+def is_skill_script(argv: list[str], scripts: dict[str, set[str]] = SKILL_SCRIPTS) -> bool:
     if len(argv) < 2 or argv[0] not in PYTHON_NAMES:
         return False
     parts = argv[1].replace("\\", "/").split("/")
     return (len(parts) >= 3 and ".." not in parts and parts[-2] == "scripts"
-            and parts[-1] in SKILL_SCRIPTS.get(parts[-3], set()))
+            and parts[-1] in scripts.get(parts[-3], set()))
 
 
 def delivery_problem(argv: list[str]) -> str | None:
@@ -265,8 +276,15 @@ def user_allowed(role: str) -> tuple[list[str], list[str]]:
     return allowed, ignored
 
 
+SUBCOMMAND = re.compile(r"^[a-z][a-z0-9-]*$")
+
+
 def allow_hint(role: str, argv: list[str]) -> str:
-    prefix = " ".join(argv[:2]) if len(argv) > 1 and not argv[1].startswith("-") else argv[0]
+    if argv[0] in BUILTINS:
+        return (" To polecenie wbudowane FlowKit: nie dopisuj go do pliku zgód. Jeśli ta rola powinna je mieć, "
+                "sprawdź instalację poleceniem doctor (możliwy stary runtime).")
+    # Druga część wpisu tylko wtedy, gdy to podpolecenie (np. "dotnet build"), nigdy ścieżka pliku.
+    prefix = " ".join(argv[:2]) if len(argv) > 1 and SUBCOMMAND.match(argv[1]) else argv[0]
     if allow_entry_problem(prefix):
         return ""
     return (f" Jeśli chcesz, aby agent wykonywał to polecenie, dopisz \"{prefix}\" do listy \"{role}\" "
@@ -304,7 +322,7 @@ def check(role: str, raw_argv: list[str]) -> str | None:
             return f"zabroniona opcja: {token}"
         if SENSITIVE_PATH.search(token):
             return f"dostęp do pliku wrażliwego jest zabroniony: {token}"
-    skill_script = role in SKILL_SCRIPT_ROLES and is_skill_script(argv)
+    skill_script = role in ROLE_SKILL_SCRIPTS and is_skill_script(argv, ROLE_SKILL_SCRIPTS[role])
     problem = path_problem(argv, {1} if skill_script else set())
     if problem:
         return problem
@@ -565,8 +583,8 @@ def show_help(role: str) -> int:
             print(f"  {BUILTINS[prefix]}")
     print("Dozwolone polecenia (prefiksy):")
     print("  " + " · ".join(p for p in ROLE_COMMANDS[role] if p not in BUILTINS))
-    if role in SKILL_SCRIPT_ROLES:
-        for skill, scripts in sorted(SKILL_SCRIPTS.items()):
+    if role in ROLE_SKILL_SCRIPTS:
+        for skill, scripts in sorted(ROLE_SKILL_SCRIPTS[role].items()):
             print(f"  python <katalog skilla>/{skill}/scripts/<{'|'.join(sorted(scripts))}>")
     allowed, ignored = user_allowed(role)
     print(f"Zgody użytkownika ({allow_file()}):")

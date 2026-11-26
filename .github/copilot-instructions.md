@@ -20,6 +20,8 @@ Activate a skill when the user requests an output that matches the skill's `desc
 - User has an **idea, concept or problem** and wants a **guided requirements workshop** up to the target document, or asks to resume a workshop → `flowkit-requirements-workshop` (always interactive, ask and wait at every gate)
 - User asks for a **PT, PRD, change spec, or requirements document** → `flowkit-client-pt-prd-writer`
 - User provides a **meeting transcript (.vtt, .docx)** and asks for a **summary or email** → `flowkit-client-meeting-recap`
+- User asks for **documentation of an existing solution** — **end-user help, user guide, manual, quick start, FAQ, admin guide or technical documentation** — based on its **source code**, for a given audience and Word template → `flowkit-client-solution-docs-writer`
+- User pastes a **draft e-mail or chat message to a client** and asks to **improve, soften, shorten or turn it into a written confirmation ("dupokrytka")** → `flowkit-client-message-editor`
 - User asks for a **postmortem, RCA, incident report** → `flowkit-devops-incident-postmortem`
 - User asks for a **reliability or SRE review, SLO, alerts, probes, resource limits, scaling or backup** → `flowkit-devops-sre-review`
 - User asks for a **SQL query, database or analytical report (KPI, trends, period comparison, ranking, cohorts), data check, INSERT, UPDATE or DELETE** → `flowkit-sql-data-assistant`

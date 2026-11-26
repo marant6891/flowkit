@@ -50,6 +50,7 @@ WORKING_MARKERS = (
     (re.compile(r"\bBrak danych\b|\bNie analizowano\b", re.I), "dopisek roboczy"),
     (re.compile(r"\bTBD\b|\bTODO\b|\bFIXME\b"), "znacznik roboczy"),
     (re.compile(r"\[ZRZUT:[^\]]*\]", re.I), "znacznik brakującego zrzutu ekranu"),
+    (re.compile(r"\[\[DIAGRAM:[^\]]*\]\]", re.I), "niezastąpiony znacznik diagramu"),
     (re.compile(rf"[\w./\\-]+\.{CODE_EXT}:\d+"), "odwołanie plik:linia"),
     (re.compile(r"\[(?:WPISZ[^\]]*|[A-ZĄĆĘŁŃÓŚŹŻ][A-ZĄĆĘŁŃÓŚŹŻ /_-]{2,}|\.\.\.|DD\.MM\.RRRR)\](?!\()"), "placeholder szablonu"),
     (re.compile(r"<!--"), "komentarz"),
@@ -80,15 +81,18 @@ MAX_STEP_WORDS = 30
 
 class Block:
     def __init__(self, where: str, text: str, heading: int = 0, cells: list[str] | None = None,
-                 step: bool = False, code: bool = False) -> None:
+                 step: bool = False, code: bool = False, mermaid: bool = False) -> None:
         self.where, self.text, self.heading = where, text, heading
-        self.cells, self.step, self.code = cells or [], step, code
+        self.cells, self.step, self.code, self.mermaid = cells or [], step, code, mermaid
 
 
 def markdown_blocks(path: Path) -> list[Block]:
     blocks, fenced = [], False
     for number, line in enumerate(path.read_text(encoding="utf-8-sig").splitlines(), 1):
-        if line.lstrip().startswith("```"):
+        stripped_left = line.lstrip()
+        if stripped_left.startswith("```"):
+            if not fenced and stripped_left[3:].strip().casefold() == "mermaid":
+                blocks.append(Block(f"wiersz {number}", stripped_left, code=True, mermaid=True))
             fenced = not fenced
             continue
         if not line.strip():
@@ -218,6 +222,8 @@ def check_blocks(blocks: list[Block], audience: str = "user", mode: str = "draft
                 working_level = 0
             if mode == "draft" and any(w in block.text.casefold() for w in WORKING_HEADINGS):
                 working_level = block.heading
+        if block.mermaid and mode in ("client", "final"):
+            errors.append(f"{block.where}: surowy blok mermaid w dokumencie dla klienta — wygeneruj i osadź rysunek przez silnik diagramów")
         if block.code or working_level:
             continue
         text = SOURCE_NOTE.sub("", block.text) if mode == "draft" else block.text
@@ -256,6 +262,23 @@ def check_blocks(blocks: list[Block], audience: str = "user", mode: str = "draft
             words = len(re.sub(r"^\s*\d+[.)]\s*", "", text).split())
             if words > MAX_STEP_WORDS:
                 warnings.append(f"{block.where}: krok ma {words} słów — podziel na kroki (jedna czynność na krok)")
+
+    # Ostrzegaj przed powierzchownymi sekcjami-zaślepkami (## bez podsekcji, tabel i z < 15 słowami).
+    for idx, block in enumerate(body):
+        if block.heading != 2:
+            continue
+        if any(w in block.text.casefold() for w in WORKING_HEADINGS + QUESTION_HEADINGS):
+            continue
+        sec_blocks: list[Block] = []
+        for nxt in body[idx + 1:]:
+            if 0 < nxt.heading <= 2:
+                break
+            sec_blocks.append(nxt)
+        if any(b.heading > 2 or b.cells or b.code for b in sec_blocks):
+            continue
+        sec_words = sum(len(b.text.split()) for b in sec_blocks)
+        if 0 < sec_words < 15:
+            warnings.append(f"{block.where}: sekcja „{block.text}” ma tylko {sec_words} słów — rozwiń treść z kodu albo pomiń")
 
     defined = set()
     for block in questions:

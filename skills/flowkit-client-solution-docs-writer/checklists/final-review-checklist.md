@@ -37,9 +37,10 @@
 
 ## F. Wersja dla klienta i końcowa
 
-- [ ] Brak `SRC-NNN`, `plik:linia`, `OPEN`, `ASSUMPTION`, `DO POTWIERDZENIA`, placeholderów i komentarzy.
+- [ ] Brak `SRC-NNN`, `plik:linia`, `OPEN`, `ASSUMPTION`, `DO POTWIERDZENIA`, placeholderów, komentarzy, surowych bloków ```` ```mermaid ```` oraz niezastąpionych znaczników `[[DIAGRAM:...]]`.
 - [ ] Wersja dla klienta: każde K-NN z treści ma punkt w „Kwestiach do wyjaśnienia”.
 - [ ] Końcowa: każda luka rozstrzygnięta przez użytkownika; brak sekcji spoza szablonu.
+- [ ] Brak powierzchownych sekcji-wstępów: w dokumentacji technicznej/admin zawarto konkretne kontrakty API, pełne tabele konfiguracji (z wartością domyślną i skutkiem zmiany), przepływy end-to-end oraz model danych wynikający z kodu.
 - [ ] Rejestr pochodzenia zapisany poza dokumentem.
 - [ ] `check_user_docs.py` z właściwymi `--audience` i `--mode`: `PASS`.
 

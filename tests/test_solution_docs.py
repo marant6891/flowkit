@@ -74,6 +74,19 @@ class TestCheckUserDocs(unittest.TestCase):
         errors, _ = run(CLIENT_DOC.split("## 2.")[0], mode="final")
         self.assertTrue(any("K-01" in e for e in errors))
 
+    def test_client_and_final_reject_raw_mermaid_and_diagram_marker(self):
+        doc = "# Pomoc\n\n## 1. Przepływ\n\n[[DIAGRAM:D-01]]\n\n```mermaid\nflowchart LR\n  A --> B\n```\n"
+        for mode in ("client", "final"):
+            errors, _ = run(doc, audience="tech", mode=mode)
+            joined = " | ".join(errors)
+            self.assertIn("znacznik diagramu", joined)
+            self.assertIn("surowy blok mermaid", joined)
+
+    def test_stub_section_triggers_warning(self):
+        doc = "# Dokumentacja\n\n## 1. Wprowadzenie\n\nDokument opisuje integrację.\n"
+        _, warnings = run(doc, audience="tech", mode="final")
+        self.assertTrue(any("ma tylko" in w for w in warnings))
+
     def test_secrets_are_errors_for_every_audience(self):
         for audience in ("user", "admin", "tech"):
             self.assertTrue(run("Ustaw `Db:Password=Sup3rTajne` w konfiguracji.", audience)[0], audience)

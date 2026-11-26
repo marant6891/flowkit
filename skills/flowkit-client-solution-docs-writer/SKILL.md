@@ -1,6 +1,6 @@
 ---
 name: flowkit-client-solution-docs-writer
-version: "1.3"
+version: "1.4"
 tags: [documentation, user-guide, help, manual, admin-guide, technical-docs, client, docx, code]
 description: >
   Tworzy dokumentację gotowego rozwiązania na podstawie jego kodu źródłowego:
@@ -35,16 +35,18 @@ Word** klienta. W odróżnieniu od PT/PRD dokument opisuje to, co **już działa
    endpointów, tabel, wyjątków ani kodów HTTP. Nazwy elementów interfejsu (przyciski, menu, pola, komunikaty)
    przepisuj **dokładnie** z kodu lub plików tłumaczeń, w języku dokumentu, i wyróżniaj pogrubieniem.
    Poziom techniczny dobiera [profil odbiorcy](./references/audience-profiles.md).
-4. **Pełny obraz modułu, a w nim zadania.** Każdy moduł opisujesz w stałej
-   [strukturze rozdziału](./references/help-structure.md):
-   - do czego służy i najważniejsze pojęcia,
-   - układ ekranu (rysunek z ponumerowaną legendą),
-   - **wszystkie opcje i przyciski**,
-   - zadania krok po kroku według [wzorców tematów](./templates/topic-patterns.md),
-   - słownik kolumn i pól, statusy, kolory i ikony, uprawnienia, problemy.
-
-   Same kroki bez opisu opcji nie są pomocą: użytkownik musi wiedzieć, co widzi na ekranie i co
-   znaczy każda informacja.
+4. **Pełny obraz modułu lub integracji.**
+   - **Pomoc dla użytkownika (`--audience user`):** każdy moduł opisujesz w stałej
+     [strukturze rozdziału](./references/help-structure.md). Zawiera ona przeznaczenie i pojęcia, układ ekranu
+     (rysunek z ponumerowaną legendą), **wszystkie opcje i przyciski**, zadania krok po kroku według
+     [wzorców tematów](./templates/topic-patterns.md), słownik kolumn, statusy, uprawnienia oraz problemy.
+     Same kroki bez opisu opcji nie są pomocą.
+   - **Dokumentacja administratora i techniczna (`--audience admin|tech`):** stosuj wymaganą głębię z sekcji
+     „Dokumentacja rozwiązania” w [strukturze dokumentacji](./references/help-structure.md). Opisz konkretne
+     kontrakty API (metoda, ścieżka, nagłówki, pola, kody błędów), mapowanie komunikatów i przepływy end-to-end
+     (korelacja, ponowienia, callbacki). Uwzględnij model danych z migracji i encji oraz pełne tabele
+     konfiguracji (klucz, znaczenie, typ, wartość domyślna, skutek zmiany). Nie zostawiaj ogólnikowych,
+     krótkich wstępów zamiast konkretów z kodu.
 5. **Szablon Word użytkownika ma pierwszeństwo.** Zachowaj strukturę, numerację, style, stronę tytułową,
    metryczkę, nagłówki i stopki szablonu; wynik oddaj jako `.docx` przez `md-to-docx` (Etap 5). Szablony
    z katalogu `templates/` są zapasowe.
@@ -64,9 +66,10 @@ Word** klienta. W odróżnieniu od PT/PRD dokument opisuje to, co **już działa
    formułek (*„Niniejszy dokument…”*, *„Należy zauważyć, że…”*, *„W tej sekcji opisano…”*). Zwracaj się do
    odbiorcy w drugiej osobie albo bezosobowo, jednolicie w całym dokumencie (zgodnie z szablonem).
 10. **Prosty język.** Pisz według standardu FlowKit `<runtime>/procedures/plain-language.md`: zdania do 20 słów (EN:
-    25), forma osobowa i strona czynna, czasowniki zamiast „dokonać zmiany”, bez korpomowy i kalk. W pomocy dla
-    użytkownika (`--audience user`) zamiast „komponent” pisz „część”, „element”. `check_user_docs.py` sprawdza te
-    reguły; w trybach `client` i `final` reguły FAIL są błędami.
+    25), forma osobowa i strona czynna, czasowniki zamiast „dokonać zmiany”, bez korpomowy i kalk. Zdania mają być
+    naturalne i treściwe: nie rozbijaj opisu na sztuczne, 4-5 słowowe równoważniki („Dokument opisuje X. X oznacza Y.”).
+    W pomocy dla użytkownika (`--audience user`) zamiast „komponent” pisz „część”, „element”. `check_user_docs.py`
+    sprawdza te reguły; w trybach `client` i `final` reguły FAIL są błędami.
 11. **Kompletność: katalog opcji.** Każdy element modułu widoczny dla odbiorcy ma pozycję `OPT-NNN`
     w katalogu opcji (Etap 1): przycisk, ikona, pole, filtr, kolumna, zakładka, polecenie menu, status, kolor,
     ustawienie. Element jest opisany w dokumencie albo świadomie pominięty z powodem (rola, flaga, nieukończony,
@@ -215,11 +218,14 @@ pominięcia opcji z katalogu: krótszy opis, ale każda pozycja obecna.
    (wzór i typy: [zasady diagramów w pomocy](./references/help-diagrams.md)). Każdy węzeł wynika z kodu
    (`source: SRC-NNN`) i nazywa element tak, jak w dokumencie; niewiadome trafiają do `remarks`.
 2. W Markdown wstaw znacznik `[[DIAGRAM:D-NN]]` w osobnym akapicie tam, gdzie rysunek ma się znaleźć.
+   **Nigdy nie zostawiaj surowych bloków ```` ```mermaid ```` w dokumencie dla klienta ani końcowym**: rysunki
+   muszą zostać wygenerowane i osadzone jako obrazy przez silnik diagramów.
 3. Wygeneruj, wyeksportuj i osadź rysunki po zapisie DOCX (Etap 5) skryptami silnika z katalogu skilla
    `flowkit-client-pt-prd-writer` (`generate_diagram.py`, `export_diagram.py`, `insert_diagrams.py`), a potem
    sprawdź je `validate_diagram.py` z `--document`: każda etykieta węzła musi być dosłownym fragmentem tekstu
    dokumentu. Dla dokumentu bez dopisków uruchamiaj skrypty silnika z `--mode final` (uwagi do rysunku nie
-   trafiają pod grafikę). Gdy silnik jest niedostępny, oddaj modele YAML i powiedz, że rysunków nie osadzono.
+   trafiają pod grafikę). Gdy silnik jest niedostępny, usuń znaczniki `[[DIAGRAM:D-NN]]` z wersji dla klienta/końcowej,
+   oddaj modele YAML osobno i powiedz, że rysunków nie osadzono.
 4. Układ ekranu z ponumerowaną legendą możesz zastąpić zrzutem ekranu od użytkownika z tymi samymi numerami.
 
 # Etap 4: Wersje dokumentu

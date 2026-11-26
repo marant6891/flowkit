@@ -59,7 +59,7 @@
 - [ ] Żadna tabela nie ma mniej niż 3 wierszy, chyba że narzuca ją szablon użytkownika.
 - [ ] Każdy scenariusz Given-When-Then opisuje odrębne zachowanie; DoD nie zawiera ogólnych formułek.
 
-## G. Wersja dla klienta (tylko gdy użytkownik o nią poprosił)
+## G. Wersja dla klienta (domyślna; pomijaj tylko w trybie roboczym lub końcowym)
 - [ ] Treść, tabele, streszczenie i podsumowania nie zawierają oznaczeń źródeł, identyfikatorów roboczych, „DO POTWIERDZENIA”, „Brak danych”, interpretacji ani kolumn „Źródło”.
 - [ ] Brakujące informacje w treści to wyłącznie odwołania „Do ustalenia (K-NN)”; streszczenie i podsumowania nie mają odwołań.
 - [ ] Ostatni rozdział „Kwestie do wyjaśnienia” zawiera każdą kwestię K-NN (i założenia Z-NN) w języku klienta, bez wewnętrznych obaw i identyfikatorów.

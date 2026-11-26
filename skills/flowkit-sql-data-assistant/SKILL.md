@@ -1,6 +1,6 @@
 ---
 name: flowkit-sql-data-assistant
-version: "1.2"
+version: "1.4"
 tags: [sql, database, reporting, analytics, data-verification, tester, support, transactions]
 description: >
   Przygotowuje bezpieczne zapytania SQL, zestawienia analityczne i raportowe oraz
@@ -26,7 +26,7 @@ Ustal tryb na początku i podaj go w pierwszym zdaniu odpowiedzi:
 | `READ_ONLY` | proste zestawienie, sprawdzenie danych | tylko `SELECT` z limitem lub agregacją |
 | `ANALYTICS_REPORT` | użytkownik określa potrzebę analityczną lub raportową: miary, podziały, okres, trendy, porównania okresów, rankingi, udziały, kohorty, tabela przestawna | karta raportu, słownik miar, `SELECT` z agregacją (CTE, funkcje okna), zapytanie kontrolne; zasada 13 |
 | `DATA_INVESTIGATION` | ustalenie, których rekordów dotyczy problem | `SELECT` diagnostyczne, liczba rekordów, przykładowe identyfikatory, opis zakresu |
-| `DATA_REPAIR` | poprawa danych | skrypt według zasad 4–5 i 10–12; zawsze poprzedzony zapytaniem z `DATA_INVESTIGATION` |
+| `DATA_REPAIR` | poprawa danych | skrypt według zasad 4-5 i 10-12; zawsze poprzedzony zapytaniem z `DATA_INVESTIGATION` |
 
 # Zasady nadrzędne (obowiązują zawsze)
 
@@ -62,8 +62,8 @@ Ustal tryb na początku i podaj go w pierwszym zdaniu odpowiedzi:
     `GET DIAGNOSTICS` (PostgreSQL), `ROW_COUNT()` (MySQL/MariaDB); Oracle niejawnie zatwierdza transakcję przed
     instrukcją DDL; tabele MyISAM w MySQL nie obsługują transakcji.
 13. **Raport analityczny jest zdefiniowany i sprawdzalny.** W `ANALYTICS_REPORT`:
-    - przed SQL ustal kartę raportu: pytanie biznesowe, miary z definicją, wymiary, okres, granulację, datę
-      biznesową i strefę czasową, filtry i wykluczenia, odbiorcę i format; brakującą definicję miary oznacz jako
+    - przed SQL ustal kartę raportu. Karta ma: pytanie biznesowe, miary z definicją, wymiary, okres, granulację,
+      datę biznesową i strefę czasową, filtry i wykluczenia, odbiorcę i format. Brakującą definicję miary oznacz jako
       `ZAŁOŻENIE` i pokaż ją użytkownikowi, nie ukrywaj jej w kodzie,
     - okres półotwarty (`>= od` i `< do`) w parametrach na początku skryptu, bez funkcji na kolumnie daty w `WHERE`,
     - bez zwielokrotnienia wartości przy złączeniach: agreguj szczegóły w osobnym CTE przed złączeniem,
@@ -73,14 +73,31 @@ Ustal tryb na początku i podaj go w pierwszym zdaniu odpowiedzi:
       podaj wariant bez nich albo zapytaj o wersję,
     - do raportu dołącz zapytanie kontrolne (rekonsyliację) oraz liczbę wierszy pominiętych przez filtry i `NULL`,
     - zwracaj agregaty; dane osobowe tylko gdy są niezbędne do celu raportu,
-    - nie twórz tabel, widoków ani procedur raportowych — to zadanie dla administratora lub zespołu BI.
+    - nie twórz tabel, widoków ani procedur raportowych - to zadanie dla administratora lub zespołu BI.
+14. **Skrypt zmieniający dane jest opakowany** według [szablonów](./templates/safe-write-templates.md):
+    - nagłówek w ramce komentarza: cel, `ZGŁOSZENIE:`, baza i środowisko, autor i data, lista kroków, jak
+      uruchomić i jak zatwierdzić, a pod nim wiersz `-- Baza: <typ>`,
+    - na początku wypisanie serwera i bazy oraz parametr oczekiwanej bazy: inna baza przerywa skrypt,
+    - numerowane kroki w komentarzach `/* KROK n: … */` (parametry, plan zmian, PRZED, kontrola, zmiana, PO,
+      zakończenie) i komunikat z liczbą wierszy po każdej zmianie (`KROK 5: zmieniono wierszy: 3`),
+    - plan zmian w tabeli tymczasowej z poprzednią i nową wartością; zmiana działa tylko według planu,
+    - obsługa błędów, która wycofuje całość: SQL Server `BEGIN TRY … BEGIN CATCH` z `ROLLBACK` i `THROW`,
+      PostgreSQL blok `DO` z `RAISE EXCEPTION`, Oracle sekcja `EXCEPTION` z `ROLLBACK` i `RAISE`; w MySQL
+      kolumny kontrolne `OK` / `PRZERWIJ`,
+    - zakończenie: `ROLLBACK` z komunikatem (serwer, baza), `COMMIT` tylko w komentarzu obok,
+    - sprzątanie tabel tymczasowych i skrypt odtworzenia w komentarzu na końcu.
+    Zestawienia i zapytania diagnostyczne mają lżejsze opakowanie: nagłówek z celem i bazą oraz kroki
+    w komentarzach, bez transakcji.
+15. **Prosty język w opisach.** Objaśnienia, podsumowania wyników i instrukcje dla użytkownika pisz według standardu
+    FlowKit `<runtime>/procedures/plain-language.md`: najważniejsze na początku (co zapytanie zmienia albo
+    pokazuje), zdania do 20 słów (EN: 25), bez korpomowy. Kod SQL i komentarze w kodzie nie podlegają tym regułom.
 
 # Pytania do użytkownika
 
 Każde pytanie do użytkownika zadawaj przez okno pytań, gdy jest dostępne (VS Code: `#tool:vscode/askQuestions`,
 Claude Code: `AskUserQuestion`):
 
-- jedno pytanie to jedna pozycja z 2–4 wariantami; rekomendowany wariant pierwszy, oznaczony „(rekomendowane)”;
+- jedno pytanie to jedna pozycja z 2-4 wariantami; rekomendowany wariant pierwszy, oznaczony „(rekomendowane)”;
   użytkownik zawsze może odpowiedzieć własnymi słowami,
 - najwyżej 4 pytania w jednym oknie; więcej pytań: najpierw blokujące, resztę w kolejnym oknie,
 - tabelę pytań (ID, uzasadnienie, propozycja domyślna) pokaż najpierw jako tekst, a każdy jej wiersz zadaj w oknie,
@@ -108,7 +125,9 @@ jawne założenia (np. granulacja miesięczna, strefa czasowa bazy) i wypisz je 
 - Zmiana danych: skorzystaj z [bezpiecznych szablonów](./templates/safe-write-templates.md) dla ustalonej bazy.
 
 ### Etap 3: Przygotuj skrypt
-Zapisz go w pliku `.sql`, gdy to możliwe. Nazwy i warunki muszą wynikać ze źródeł.
+Zapisz go w pliku `.sql`, gdy to możliwe. Nazwy i warunki muszą wynikać ze źródeł. Skrypt zmieniający dane
+opakuj według zasady 14; gdy część wierszy trzeba uzupełnić, a części brakuje, użyj wzoru „Plan zmian” z kolumną
+`Operacja` i osobną kontrolą liczby wierszy dla każdej operacji.
 
 ### Etap 4: Przygotuj instrukcję
 Oddaj wynik według [wzoru odpowiedzi](./templates/sql-answer-template.md), a w `ANALYTICS_REPORT` według
@@ -116,4 +135,4 @@ Oddaj wynik według [wzoru odpowiedzi](./templates/sql-answer-template.md), a w 
 jak czytać wynik, kontrola spójności, założenia i niewiadome.
 
 ### Etap 5: Weryfikacja przed oddaniem
-Sprawdź plik poleceniem `python "<SKILL_DIR>/scripts/check_sql.py" <plik.sql>`, gdzie `<SKILL_DIR>` to katalog tego pliku (w Claude Code: `${CLAUDE_SKILL_DIR}`). W `ANALYTICS_REPORT` sprawdź tak samo zapytanie kontrolne. Popraw wszystkie błędy, a następnie przejdź przez [checklistę SQL](./checklists/sql-safety-checklist.md) (w `ANALYTICS_REPORT` także sekcję D).
+Sprawdź plik poleceniem `python "<SKILL_DIR>/scripts/check_sql.py" <plik.sql>`, gdzie `<SKILL_DIR>` to katalog tego pliku (w Claude Code: `${CLAUDE_SKILL_DIR}`). W `ANALYTICS_REPORT` sprawdź tak samo zapytanie kontrolne. Popraw wszystkie błędy, a następnie przejdź przez [checklistę SQL](./checklists/sql-safety-checklist.md) (w `ANALYTICS_REPORT` także sekcję D). Gdy oddajesz opis lub raport w pliku `.md`, sprawdź go poleceniem `python "<runtime>/flowkit_exec.py" --role <rola> -- plain-check <plik.md>`.

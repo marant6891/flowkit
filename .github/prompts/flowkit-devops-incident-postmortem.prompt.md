@@ -12,6 +12,7 @@ Zasady nadrzędne:
 3. Czego nie ma w materiałach (role, wpływ, przyczyny, komunikaty, właściciele, tickety, terminy), oznaczaj `DO POTWIERDZENIA` — nie uzupełniaj przykładami.
 4. Każda przyczyna źródłowa ma co najmniej jedno działanie `PREVENT`.
 5. Szablon użytkownika ma pierwszeństwo nad szablonem zapasowym.
+6. Prosty język (PL i EN) według `runtime/procedures/plain-language.md` (po instalacji: `.github/flowkit/runtime/procedures/`): najważniejsze na początku, zdania do 20 słów, czasowniki zamiast „dokonać zmiany”, bez korpomowy i kalk; przed oddaniem `plain-check`.
 
 Skorzystaj z checklisty, szablonu i przykładu znajdujących się w katalogu `skills/flowkit-devops-incident-postmortem/`.
 

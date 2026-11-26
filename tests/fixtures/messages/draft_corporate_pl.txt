@@ -1,0 +1,8 @@
+Dzień dobry Pani Anno,
+
+w dniu dzisiejszym dokonaliśmy analizy zgłoszenia dotyczącego eksportu raportów. To, co blokuje dalsze prace, to brak dostępu do środowiska testowego, o który prosiliśmy 14.11. To drugi raz, gdy termin przesuwa się z tego powodu.
+
+Na ten moment proponujemy zaparkować temat nowych filtrów i zaadresować go na spotkaniu 3.12. Niniejszym prosimy o dostęp do środowiska testowego, celem weryfikacji poprawki, w oparciu o którą dowieziemy eksport do 10.12.
+
+Pozdrawiam
+Marek

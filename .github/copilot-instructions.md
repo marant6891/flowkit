@@ -20,6 +20,8 @@ Activate a skill when the user requests an output that matches the skill's `desc
 - User has an **idea, concept or problem** and wants a **guided requirements workshop** up to the target document, or asks to resume a workshop → `flowkit-requirements-workshop` (always interactive, ask and wait at every gate)
 - User asks for a **PT, PRD, change spec, or requirements document** → `flowkit-client-pt-prd-writer`
 - User provides a **meeting transcript (.vtt, .docx)** and asks for a **summary or email** → `flowkit-client-meeting-recap`
+- User asks for **documentation of an existing solution** — **end-user help, user guide, manual, quick start, FAQ, admin guide or technical documentation** — based on its **source code**, for a given audience and Word template → `flowkit-client-solution-docs-writer`
+- User pastes a **draft e-mail or chat message to a client** and asks to **improve, soften, shorten or turn it into a written confirmation ("dupokrytka")** → `flowkit-client-message-editor`
 - User asks for a **postmortem, RCA, incident report** → `flowkit-devops-incident-postmortem`
 - User asks for a **reliability or SRE review, SLO, alerts, probes, resource limits, scaling or backup** → `flowkit-devops-sre-review`
 - User asks for a **SQL query, database or analytical report (KPI, trends, period comparison, ranking, cohorts), data check, INSERT, UPDATE or DELETE** → `flowkit-sql-data-assistant`
@@ -40,6 +42,7 @@ See [`agents/flowkit-orchestrator_agent.md`](../agents/flowkit-orchestrator_agen
 - **No direct push to `main`:** All changes must be developed on feature branches (`feat/*`, `fix/*`, `docs/*`) and merged into `main` exclusively through Pull Requests after CI validation passes.
 - **No hallucination:** Every fact in output must come from user-provided materials. Missing data → mark as `DO POTWIERDZENIA` (w skillach z rejestrem tematów także `OPEN-NNN`), or `Brak danych`.
 - **User's template takes priority** over the skill's fallback template.
+- **Plain language (PL and EN):** client-facing text follows [`runtime/procedures/plain-language.md`](../runtime/procedures/plain-language.md): key point first, short sentences (PL ≤ 20 words, EN ≤ 25), verbs instead of nominalizations (*„zmienić”*, not *„dokonać zmiany”*), no corporate jargon or syntactic calques, no Polish-English false friends. Check with `python runtime/plain_language.py <file>` (`--strict` for final versions).
 - **No sensitive data in commits:** No client names, credentials, tokens, or production hostnames.
 - **Always validate before PR:** Run `python scripts/validate_skills.py` to ensure all skills meet structure and frontmatter requirements.
 

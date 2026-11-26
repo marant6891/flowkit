@@ -51,7 +51,7 @@ Jan Kowalski: Proszę, żebyście przygotowali specyfikację do piątku.
 Anna Nowak: Możemy to zrobić do czwartku, jeśli dostaniemy dane dostępowe.
 ```
 
-**Instrukcja:** Analogiczna do Zoom — brak numerów sekwencji, mówca wbudowany w treść.
+**Instrukcja:** Analogiczna do Zoom - brak numerów sekwencji, mówca wbudowany w treść.
 
 ---
 
@@ -68,5 +68,5 @@ Plik Word zawiera transkrypcję w tabeli lub jako ciągły tekst z nagłówkami 
 - Usuń powtórzenia ASR (automatyczne rozpoznawanie mowy): frazy identyczne lub niemal identyczne w sąsiednich wierszach tego samego mówcy.
 - Usuń dźwięki nieartykułowane transkrybowane jako słowa: `yyy`, `eee`, `mhm`, `okej okej`.
 - Usuń komunikaty techniczne: `[Cisza]`, `[Muzyka]`, `[Niewyraźnie]`.
-- Zachowaj pełne zdania merytoryczne nawet jeśli zawierają potoczny język — nie przeformułowuj treści, tylko ją ekstrahujesz.
+- Zachowaj pełne zdania merytoryczne nawet jeśli zawierają potoczny język - nie przeformułowuj treści, tylko ją ekstrahujesz.
 

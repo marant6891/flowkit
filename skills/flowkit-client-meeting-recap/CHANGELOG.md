@@ -1,5 +1,10 @@
 # Historia zmian skilla flowkit-client-meeting-recap
 
+## 1.6 (26.11.2026)
+
+- Prosty język PL i EN według standardu FlowKit (`runtime/procedures/plain-language.md`): Część B i mail do klienta. Nowa zasada
+  nadrzędna, sekcja checklisty i kontrola poleceniem `plain-check` przed oddaniem.
+
 ## 1.5 (25.11.2026)
 
 - Sekcja „Pytania do użytkownika”: pytania przez okno pytań (VS Code `vscode/askQuestions`, Claude Code `AskUserQuestion`), najwyżej 4 w oknie, rekomendacja pierwsza, wiersz diagnostyczny `Ask:`; w subagencie pytania wracają jako `QUESTION-NNN`.

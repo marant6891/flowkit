@@ -1,0 +1,8 @@
+Hello Mr. Smith,
+
+I hope this email finds you well. In the attachment I send the actual version of the release plan. According to me, basing on the test results from 21.11, we can deliver the export module on 9.12.
+
+Eventually we can add the PDF format later. Going forward, we would like to leverage your test environment, so please give us access prior to 2.12. Let's circle back next week.
+
+Best regards
+Jan

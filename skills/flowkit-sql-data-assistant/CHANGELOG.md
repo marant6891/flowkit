@@ -1,5 +1,17 @@
 # Historia zmian skilla flowkit-sql-data-assistant
 
+## 1.4 (26.11.2026)
+
+- Prosty język PL i EN według standardu FlowKit (`runtime/procedures/plain-language.md`): objaśnienia i podsumowania (bez kodu SQL). Nowa zasada
+  nadrzędna, sekcja checklisty i kontrola poleceniem `plain-check` przed oddaniem.
+
+## 1.3 (26.11.2026)
+
+- Opakowanie skryptów zmieniających dane (zasada 14): nagłówek w ramce z `ZGŁOSZENIE:`, wypisanie serwera i bazy z kontrolą oczekiwanej bazy, numerowane kroki `KROK n` z komunikatami liczby wierszy, plan zmian w tabeli tymczasowej (kopia poprzednich wartości), obsługa błędów wycofująca całość, `ROLLBACK` z komunikatem i gotowym `COMMIT` w komentarzu, sprzątanie i skrypt odtworzenia.
+- Nowe szablony dla SQL Server, PostgreSQL, Oracle i MySQL/MariaDB oraz wzór „Plan zmian” (uzupełnienie i dodanie w jednym skrypcie z osobną kontrolą każdej operacji).
+- `check_sql.py`: wymaga nagłówka z `ZGŁOSZENIE:` i co najmniej trzech kroków `KROK n` w skryptach zmieniających dane, w SQL Server bloku `BEGIN TRY … BEGIN CATCH` z `ROLLBACK`; dopuszcza usuwanie tabel tymczasowych (`#plan`, `TEMPORARY`); wykrywa `UPDATE … JOIN … SET` (MySQL).
+- Wzór odpowiedzi: tabela „Co pokaże skrypt krok po kroku” dla testera.
+
 ## 1.2 (25.11.2026)
 
 - Tryb `ANALYTICS_REPORT` uruchamiany, gdy użytkownik określi potrzebę analityczną lub raportową: karta raportu, słownik miar, kontrola spójności (zasada 13).

@@ -29,3 +29,11 @@ Przed wysłaniem e-maila do klienta zweryfikuj poniższe punkty:
 - [ ] Czy z tekstu usunięto żargon techniczny i wewnętrzny slang zespołu?
 - [ ] Czy usunięto wzmianki o problemach z łączem, spóźnieniach czy nieformalnych dygresjach?
 - [ ] Czy temat wiadomości zawiera datę i nazwę projektu?
+
+## Prosty język (`<runtime>/procedures/plain-language.md`)
+- [ ] Najważniejsze na początku: decyzje, zadania z właścicielami i terminy.
+- [ ] Zdania do 20 słów (EN: 25); czasowniki zamiast rzeczowników („wdrożyć”, nie „dokonać wdrożenia”).
+- [ ] Bez korpomowy i kalk („zaparkować”, „zaadresować”, „na ten moment”, „To, co…, to…”, „To drugi raz, gdy…”); w EN bez fałszywych przyjaciół (*actual*, *eventually*).
+- [ ] Szyk naturalny: to, co znane, na początku zdania, a nowe na końcu; strona czynna, gdy wiadomo, kto działa.
+- [ ] Skróty rozwinięte przy pierwszym użyciu, chyba że są w słowniku projektu.
+- [ ] `plain-check` na Części B z `--strict` nie zgłasza błędów; ostrzeżenia poprawione albo uzasadnione.

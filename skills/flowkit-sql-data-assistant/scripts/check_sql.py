@@ -88,14 +88,17 @@ def check(sql: str) -> list[str]:
     dialect = DIALECTS.get(re.sub(r"\s+\d.*$", "", header.group(1)).casefold()) if header else None
     if dialect is None:
         errors.append("brak wiersza '-- Baza: <typ>' z obsługiwanym typem bazy")
-    # ON COMMIT DROP dotyczy wyłącznie tabeli tymczasowej z parametrami.
+    # ON COMMIT DROP i usuwanie tabel tymczasowych (#plan w SQL Server, TEMPORARY w MySQL) nie zmieniają struktury bazy.
     code = re.sub(r"\bON\s+COMMIT\s+(DROP|DELETE\s+ROWS|PRESERVE\s+ROWS)\b", " ", mask(sql), flags=re.IGNORECASE)
+    code = re.sub(r"\bDROP\s+(TABLE\s+(IF\s+EXISTS\s+)?#\w+|TEMPORARY\s+TABLE\s+(IF\s+EXISTS\s+)?\w+)", " ", code,
+                  flags=re.IGNORECASE)
     for pattern, message in FORBIDDEN:
         if re.search(pattern, code, re.IGNORECASE):
             errors.append(message)
 
     inserts = statements(code, r"\bINSERT\s+INTO\b")
-    updates = statements(code, r"\bUPDATE\s+[\w.\"`\[\]#]+(\s+(AS\s+)?\w+)?\s+SET\b")
+    # UPDATE z aliasem, z FROM (SQL Server) albo z JOIN przed SET (MySQL).
+    updates = statements(code, r"\bUPDATE\s+[\w.\"`\[\]#]+[^;]*?\bSET\b")
     deletes = statements(code, r"\bDELETE\s+(FROM\s+)?[\w.\"`\[\]#]+")
     if not (inserts or updates or deletes):
         if not re.search(r"\bSELECT\b", code, re.IGNORECASE):
@@ -123,6 +126,14 @@ def check(sql: str) -> list[str]:
             errors.append("wartości muszą być podane w zmiennych")
         if dialect == "sqlserver" and not re.search(r"\bSET\s+XACT_ABORT\s+ON\b", code, re.IGNORECASE):
             errors.append("SQL Server wymaga SET XACT_ABORT ON")
+        if dialect == "sqlserver" and not re.search(r"\bBEGIN\s+TRY\b.*\bBEGIN\s+CATCH\b.*\bROLLBACK\b", code,
+                                                    re.IGNORECASE | re.DOTALL):
+            errors.append("SQL Server: opakuj zmianę w BEGIN TRY … BEGIN CATCH z ROLLBACK")
+    # Opakowanie (zasada 14): nagłówek ze zgłoszeniem i opisane kroki w komentarzach.
+    if not re.search(r"ZG[ŁL]OSZENIE\s*:", sql, re.IGNORECASE):
+        errors.append("skrypt zmieniający dane wymaga nagłówka z wierszem 'ZGŁOSZENIE: <numer>'")
+    if len(set(re.findall(r"\bKROK\s+(\d+)", sql, re.IGNORECASE))) < 3:
+        errors.append("skrypt zmieniający dane wymaga opisanych kroków w komentarzach (/* KROK n: ... */)")
     without_changes = code
     for statement in inserts:
         without_changes = without_changes.replace(statement, " ")

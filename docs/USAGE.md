@@ -1,4 +1,4 @@
-# FlowKit w praktyce — gotowe polecenia
+# FlowKit w praktyce: gotowe polecenia
 
 Ten przewodnik pokazuje, **jak sformułować polecenie**, żeby FlowKit od razu dał użyteczny wynik: jakie źródła wskazać,
 co doprecyzować i czego się spodziewać na końcu. Każdy skill ma polecenie minimalne (działa, ale skill dopyta) i
@@ -8,12 +8,12 @@ Spis treści:
 
 1. [Zanim zaczniesz](#1-zanim-zaczniesz)
 2. [Budowa dobrego polecenia](#2-budowa-dobrego-polecenia)
-3. [Od pomysłu do dokumentu — warsztat wymagań](#3-od-pomysłu-do-dokumentu--flowkit-requirements-workshop)
-4. [PT/PRD dla klienta](#4-ptprd-dla-klienta--flowkit-client-pt-prd-writer)
-5. [Podsumowanie spotkania](#5-podsumowanie-spotkania--flowkit-client-meeting-recap)
-6. [Postmortem po incydencie](#6-postmortem-po-incydencie--flowkit-devops-incident-postmortem)
-7. [Przegląd SRE](#7-przegląd-sre--flowkit-devops-sre-review)
-8. [SQL i poprawa danych](#8-sql-i-poprawa-danych--flowkit-sql-data-assistant)
+3. [Od pomysłu do dokumentu - warsztat wymagań](#3-od-pomysłu-do-dokumentu-flowkit-requirements-workshop)
+4. [PT/PRD dla klienta](#4-ptprd-dla-klienta-flowkit-client-pt-prd-writer)
+5. [Podsumowanie spotkania](#5-podsumowanie-spotkania-flowkit-client-meeting-recap)
+6. [Postmortem po incydencie](#6-postmortem-po-incydencie-flowkit-devops-incident-postmortem)
+7. [Przegląd SRE](#7-przegląd-sre-flowkit-devops-sre-review)
+8. [SQL i poprawa danych](#8-sql-i-poprawa-danych-flowkit-sql-data-assistant)
 9. [Agenci i prefiksy](#9-agenci-i-prefiksy-orkiestratora)
 10. [Scenariusze łączone](#10-scenariusze-łączone)
 11. [Gdy wynik nie jest taki, jak trzeba](#11-gdy-wynik-nie-jest-taki-jak-trzeba)
@@ -22,7 +22,7 @@ Spis treści:
 
 ## 1. Zanim zaczniesz
 
-**Uruchom orkiestrator w katalogu projektu** — on dobiera skill lub agenta i pilnuje weryfikacji:
+**Uruchom orkiestrator w katalogu projektu** - on dobiera skill lub agenta i pilnuje weryfikacji:
 
 ```bash
 claude --agent flowkit:flowkit-orchestrator
@@ -82,14 +82,14 @@ Wynik: <format, szablon, odbiorca, ścieżka zapisu>.
 ```
 
 Czego **nie** pisać: „uzupełnij brakujące sekcje typowymi treściami”, „wymyśl przykładowe wymagania”. FlowKit
-celowo tego nie zrobi — brak źródła daje `DO POTWIERDZENIA` i `OPEN-NNN`, a nie treść.
+celowo tego nie zrobi - brak źródła daje `DO POTWIERDZENIA` i `OPEN-NNN`, a nie treść.
 
 ---
 
-## 3. Od pomysłu do dokumentu — `flowkit-requirements-workshop`
+## 3. Od pomysłu do dokumentu: `flowkit-requirements-workshop`
 
 **Kiedy:** masz pomysł, problem albo luźną koncepcję, nie masz kompletnych materiałów i chcesz przejść przez
-wymagania z prowadzeniem — od koncepcji, przez część biznesową i techniczną, aż do docelowego dokumentu PT/PRD.
+wymagania z prowadzeniem - od koncepcji, przez część biznesową i techniczną, aż do docelowego dokumentu PT/PRD.
 Warsztat jest **zawsze interaktywny**: nic nie jest przyjmowane bez Twojej odpowiedzi, a `AUTO:` jest tu wyłączone.
 
 **Minimalne polecenie:**
@@ -112,28 +112,29 @@ Dokument docelowy: PT dla klienta w szablonie szablony/PT-klient.dotx, zapis do 
 | Faza | Co ustalacie | Bramka |
 |---|---|---|
 | Start | projekt, materiały, kto decyduje, głębokość (szybka / pełna) | utworzony plik `warsztat/zwroty-warsztat.md` |
-| 0. Koncepcja | problem, cel, dla kogo, miara sukcesu, ograniczenia | wizja w 3–5 zdaniach |
+| 0. Koncepcja | problem, cel, dla kogo, miara sukcesu, ograniczenia | wizja w 3-5 zdaniach |
 | 1. Zakres | MVP / później / poza zakresem | tabela zakresu |
 | 2. Biznes | role, procesy, reguły, user stories z kryteriami Given-When-Then | rejestr wymagań biznesowych |
 | 3. Technika | komponenty, integracje, dane, wymagania niefunkcjonalne, wdrożenie | rejestr wymagań technicznych |
 | 4. Ryzyka i plan | ryzyka, otwarte kwestie z właścicielami, plan testów, DoD | pokrycie i lista OPEN |
 | 5. Dokument | szablon, tryb, generowanie PT/PRD, audyt `DOC-AUDIT:`, poprawki | Twoja akceptacja wersji docelowej |
 
-**Jak odpowiadać:** każda runda to najwyżej 5 pytań z wariantami. Wystarczy krótko: „14c, 15 nie wiem — zna to
-Marta z finansów, 16d”. „Nie wiem” jest w porządku — staje się `OPEN-NNN` z osobą, która zna odpowiedź.
+**Jak odpowiadać:** każda runda to najwyżej 5 pytań z wariantami. Wystarczy krótko: „14c, 15 nie wiem - zna to
+Marta z finansów, 16d”. „Nie wiem” jest w porządku - staje się `OPEN-NNN` z osobą, która zna odpowiedź.
 Rekomendacje agenta (`REC-NNN`) są tylko propozycją; decyzją (`DEC-NNN`) stają się po Twojej zgodzie.
 Na końcu fazy dostajesz podsumowanie i odpowiadasz: **zatwierdzam / poprawiam / wróćmy do fazy N**.
 
-**Przerwa i powrót:** stan jest w pliku warsztatu. Następnego dnia napisz `WARSZTAT: wznów warsztat zwroty` —
+**Przerwa i powrót:** stan jest w pliku warsztatu. Następnego dnia napisz `WARSZTAT: wznów warsztat zwroty` -
 agent pokaże, gdzie skończyliście, i zacznie od pierwszej niezatwierdzonej fazy.
 
-**Wynik:** plik warsztatu (rejestr odpowiedzi, decyzji, wymagań, ryzyk i otwartych kwestii z pochodzeniem każdej
-pozycji) oraz dokument PT/PRD przygotowany przez `flowkit-client-pt-prd-writer` z tego pliku jako źródła
-nadrzędnego — roboczy, dla klienta albo końcowy bez dopisków (ten ostatni dopiero bez otwartych kwestii).
+**Wynik:** plik warsztatu i dokument PT/PRD. Plik warsztatu to rejestr odpowiedzi, decyzji, wymagań, ryzyk
+i otwartych kwestii z pochodzeniem każdej pozycji. Dokument przygotowuje `flowkit-client-pt-prd-writer`, a plik
+warsztatu jest dla niego źródłem nadrzędnym. Wersje: robocza, dla klienta albo końcowa bez dopisków (końcowa
+dopiero bez otwartych kwestii).
 
 ---
 
-## 4. PT/PRD dla klienta — `flowkit-client-pt-prd-writer`
+## 4. PT/PRD dla klienta: `flowkit-client-pt-prd-writer`
 
 **Kiedy:** projekt techniczny, PRD, specyfikacja zmiany, change request, analiza wpływu.
 
@@ -154,7 +155,7 @@ Szablon: szablony/PT-klient.dotx. Wynik: wersja dla klienta, zapis do wynik/PT-K
 Wariant pełny, z diagramem przepływu i sekwencji integracji.
 ```
 
-**Tryby wyniku** — wskaż wprost, inaczej powstaje wersja robocza:
+**Tryby wyniku** - wskaż wprost, inaczej powstaje wersja robocza:
 
 | Napisz | Dostajesz |
 |---|---|
@@ -165,18 +166,18 @@ Wariant pełny, z diagramem przepływu i sekwencji integracji.
 **Przebieg i wynik:**
 
 1. Skill pyta jednym blokiem o źródła (jeśli ich nie podałeś), źródło nadrzędne i wykluczenia.
-2. Przed pisaniem pokazuje, jak rozumie zmianę, wariant (skrócony 1–3 strony albo pełny), plan sekcji i diagramów
-   oraz pytania. **Tu poprawiasz zakres** — to najtańszy moment.
+2. Przed pisaniem pokazuje, jak rozumie zmianę, wariant (skrócony 1-3 strony albo pełny), plan sekcji i diagramów
+   oraz pytania. **Tu poprawiasz zakres** - to najtańszy moment.
 3. Oddaje `.docx` w stylach szablonu (nagłówki, stopki, numeracja, tabele) albo `.md`, gdy szablonu nie ma.
-4. Pod wynikiem: lista luk pokrycia (wymagania bez testów), przyjęte założenia i — po orkiestratorze — wynik
+4. Pod wynikiem: lista luk pokrycia (wymagania bez testów), przyjęte założenia i - po orkiestratorze - wynik
    niezależnego audytu `DOC-AUDIT:` (źródła, sprzeczności `CONTRADICTION-NNN`, styl).
 
-**Wariant bez pytań:** `AUTO: Przygotuj PT ...` — skill przyjmuje rekomendacje i oddaje na końcu rejestr decyzji AUTO
+**Wariant bez pytań:** `AUTO: Przygotuj PT ...` - skill przyjmuje rekomendacje i oddaje na końcu rejestr decyzji AUTO
 do potwierdzenia.
 
 ---
 
-## 5. Podsumowanie spotkania — `flowkit-client-meeting-recap`
+## 5. Podsumowanie spotkania: `flowkit-client-meeting-recap`
 
 **Kiedy:** transkrypcja (`.vtt` z Teams/Zoom/Meet, `.docx`, `.txt`) lub notatki → notatka i mail do klienta.
 
@@ -198,14 +199,14 @@ Wzór maila: szablony/mail-podsumowanie.md. Zapisz wynik w wynik/.
 Podanie **daty spotkania** pozwala zamienić „do środy” na datę. Podanie **ról uczestników** zapobiega wpisom
 `DO POTWIERDZENIA` w polu „Klient / Nasz zespół”.
 
-**Wynik — zawsze dwa osobne pliki:**
+**Wynik - zawsze dwa osobne pliki:**
 
 | Plik | Dla kogo | Zawartość |
 |---|---|---|
-| `recap-2026-11-15-KSEF-wewnetrzne.md` | zespół | radar ryzyk: nastroje, scope creep, blokady — każdy wpis z cytatem i znacznikiem czasu |
+| `recap-2026-11-15-KSEF-wewnetrzne.md` | zespół | radar ryzyk: nastroje, scope creep, blokady - każdy wpis z cytatem i znacznikiem czasu |
 | `recap-2026-11-15-KSEF-klient.md` | klient | decyzje, zadania z właścicielem tylko z dowodem, terminy, prośba o korekty w oknie |
 
-Hasła, tokeny, PESEL i podobne dane są zastępowane `[UKRYTO]` — pod wynikiem dostajesz ich liczbę.
+Hasła, tokeny, PESEL i podobne dane są zastępowane `[UKRYTO]` - pod wynikiem dostajesz ich liczbę.
 
 **Wypróbuj na danych testowych:**
 
@@ -213,11 +214,60 @@ Hasła, tokeny, PESEL i podobne dane są zastępowane `[UKRYTO]` — pod wynikie
 Podsumuj spotkanie z tests/fixtures/transcripts/sample_meeting.vtt i przygotuj mail do klienta.
 ```
 
+### Redakcja maila lub wiadomości: `flowkit-client-message-editor`
+
+**Kiedy:** masz szkic maila lub wiadomości (Teams, Slack) do klienta i chcesz go poprawić przed wysłaniem.
+Skill nie dodaje faktów: braki oznacza `[DO UZUPEŁNIENIA: …]`. Niczego nie wysyła.
+
+| Tryb | Kiedy | Dostajesz |
+|---|---|---|
+| `ZWYKŁY` | zwykła korespondencja | krótką, uprzejmą wiadomość z jedną prośbą i terminem |
+| `DUPOKRYTKA` | zmiana zakresu lub terminu, czekanie na klienta, decyzja wbrew rekomendacji, ustalenia ustne | potwierdzenie na piśmie: ponumerowane fakty z datami, decyzje i kto je podjął, zakres, ryzyka, zależności od klienta, prośba o potwierdzenie do daty |
+
+```text
+Popraw tego maila do klienta, tryb dupokrytka, odpowiedź potrzebna do 05.12:
+<wklejony szkic>
+```
+
+Wynik: wersja do wysłania, lista zmian, lista `[DO UZUPEŁNIENIA]` i uwagi tylko dla Ciebie (usunięte emocje,
+uwagi wewnętrzne, ryzykowne zobowiązania). Bez podanego trybu skill sam go rozpozna i zapyta tylko wtedy, gdy
+treść wskazuje na `DUPOKRYTKA`. Wiadomość na komunikator: dopisz „na Teams” albo „na Slacka”.
+
+**Wypróbuj:** `Popraw tego maila (tests/fixtures/messages/draft_scope_change.txt) w trybie dupokrytka.`
+
+### Dokumentacja rozwiązania i help: `flowkit-client-solution-docs-writer`
+
+**Kiedy:** rozwiązanie już działa i potrzebujesz pomocy dla użytkownika końcowego (help, podręcznik, szybki
+start, FAQ), instrukcji administratora albo dokumentacji technicznej. Różnica względem PT/PRD: opisujesz to,
+co **jest w kodzie**, a nie planowaną zmianę.
+
+Skill zaczyna od briefu w oknie pytań: **typ dokumentu**, **odbiorca** (rola i poziom wiedzy), **kod
+rozwiązania** (repozytorium, moduł, wersja) i **szablon Word**. Potem pyta o zakres funkcji, zrzuty ekranu,
+tryb wyniku i język, pokazuje plan dokumentu do akceptacji i dopiero wtedy pisze.
+
+| Typ dokumentu | Odbiorca | Dostajesz |
+|---|---|---|
+| Pomoc / podręcznik | użytkownik biznesowy lub kluczowy | tematy-zadania krok po kroku, nazwy z interfejsu, komunikaty i co z nimi zrobić, bez języka kodu |
+| Instrukcja administratora | dział IT klienta | wymagania, instalacja, ustawienia (bez sekretów), role, zadania cykliczne, logi |
+| Dokumentacja techniczna | zespół developerski klienta | architektura, moduły, API, model danych, budowanie i testy |
+
+**Polecenie optymalne:**
+
+```text
+Przygotuj help dla klienta sklepu (użytkownik biznesowy) do modułu zwrotów z kodu src/returns
+(tag v2.4), w szablonie C:\szablony\pomoc.dotx, wersja dla klienta, ze znacznikami na zrzuty.
+```
+
+Wynik: `.docx` w stylach szablonu, wynik `check_user_docs.py`, lista pominiętych funkcji (inna rola, flaga,
+nieukończone), kwestie do wyjaśnienia i lista brakujących zrzutów.
+
+**Wypróbuj:** `Przygotuj pomoc dla klienta do modułu zwrotów z kodu tests/fixtures/app/returns, szablon zapasowy.`
+
 ---
 
-## 6. Postmortem po incydencie — `flowkit-devops-incident-postmortem`
+## 6. Postmortem po incydencie: `flowkit-devops-incident-postmortem`
 
-**Kiedy:** po awarii — logi, alerty, zapis rozmów z kanału incydentowego → raport blameless.
+**Kiedy:** po awarii - logi, alerty, zapis rozmów z kanału incydentowego → raport blameless.
 
 **Minimalne polecenie:**
 
@@ -235,19 +285,19 @@ Wpływ znany z raportu biznesowego: materialy/incydent/wplyw.xlsx. SLA: 99,9% mi
 Szablon: szablony/postmortem.docx. Zapis: wynik/postmortem-INC-2291.docx.
 ```
 
-**Wynik:** raport w szablonie (lub zapasowym): klasyfikacja SEV, oś czasu T0–T4 z TTD/TTR wyliczonymi ze znaczników
-w logach, łańcuch przyczyn (Trigger, Amplifier, luki wykrycia i procesu, 5 Whys), komunikacja i Status Page oraz
-działania naprawcze PREVENT/DETECT/MITIGATE z właścicielem i terminem. Język bez obwiniania osób; brakujące czasy
+**Wynik:** raport w szablonie (lub zapasowym). Zawiera klasyfikację SEV, oś czasu T0-T4 z TTD/TTR wyliczonymi ze
+znaczników w logach i łańcuch przyczyn (Trigger, Amplifier, luki wykrycia i procesu, 5 Whys). Do tego komunikacja,
+Status Page i działania naprawcze PREVENT/DETECT/MITIGATE z właścicielem i terminem. Język bez obwiniania osób; brakujące czasy
 i wpływ są `DO POTWIERDZENIA`, a nie szacunkiem.
 
 **Wypróbuj:** `Przygotuj postmortem na podstawie tests/fixtures/incident-scenarios/sample_incident.log.`
 
 ---
 
-## 7. Przegląd SRE — `flowkit-devops-sre-review`
+## 7. Przegląd SRE: `flowkit-devops-sre-review`
 
 **Kiedy:** ocena gotowości produkcyjnej usługi: SLO, alerty, sondy, zasoby, skalowanie, backup. (Do raportu po awarii
-użyj postmortemu, a do pisania nowej konfiguracji — `DEVOPS:`.)
+użyj postmortemu, a do pisania nowej konfiguracji - `DEVOPS:`.)
 
 **Minimalne polecenie:**
 
@@ -273,9 +323,9 @@ nie dostaje `PASS`. Bez podanych wymagań SLA trafiają one do „Brak danych”
 
 ---
 
-## 8. SQL i poprawa danych — `flowkit-sql-data-assistant`
+## 8. SQL i poprawa danych: `flowkit-sql-data-assistant`
 
-**Kiedy:** zestawienie, sprawdzenie danych ze zgłoszenia, skrypt poprawy. Skill **nigdy nie łączy się z bazą** —
+**Kiedy:** zestawienie, sprawdzenie danych ze zgłoszenia, skrypt poprawy. Skill **nigdy nie łączy się z bazą** -
 przygotowuje skrypt i instrukcję dla osoby, która go uruchomi.
 
 **Minimalne polecenie:**
@@ -301,7 +351,7 @@ Oczekiwana liczba rekordów: 37 (z raportu w zgłoszeniu). Skrypt uruchomi teste
 | `DATA_INVESTIGATION` | zapytania diagnostyczne: liczba rekordów, przykładowe ID, opis zakresu |
 | `DATA_REPAIR` | najpierw diagnoza, potem skrypt w transakcji: kontrola liczby rekordów (przerwanie przy rozbieżności), zachowanie poprzednich wartości, domyślne `ROLLBACK`, skrypt odtworzenia |
 
-Podanie **typu bazy** i **oczekiwanej liczby rekordów** to dwie najważniejsze informacje — bez nich skill zapyta.
+Podanie **typu bazy** i **oczekiwanej liczby rekordów** to dwie najważniejsze informacje - bez nich skill zapyta.
 Nieznane triggery i klucze obce są wypisywane jako niewiadome.
 
 ### Zestawienia analityczne i raportowe (`ANALYTICS_REPORT`)
@@ -342,7 +392,7 @@ Prefiks wpisujesz na początku polecenia; można je łączyć (`AUTO: BA: ...`, 
 | Konfiguracja DevOps | `DEVOPS: przygotuj Dockerfile i workflow CI dla aplikacji z src/api/ i zwaliduj je.` | pliki + walidacja (`hadolint`, `actionlint`) przez Validatora, wdrożenie tylko za zgodą |
 | Diagnoza bez zmian | `DIAG: dlaczego pody payments-api restartują się? Namespace prod.` | odczyt logów i stanu (tylko odczyt), prawdopodobna przyczyna, kroki wymagające zgody |
 | Najpierw plan | `DRY: zmień limit pamięci w k8s/payments/deployment.yaml na 1Gi.` | plan do 3 kroków, czeka na potwierdzenie |
-| Dostarczenie | `SHIP: przygotuj PR ze zweryfikowanych zmian.` | gałąź, commit, push, PR — po weryfikacji i Twojej zgodzie |
+| Dostarczenie | `SHIP: przygotuj PR ze zweryfikowanych zmian.` | gałąź, commit, push, PR - po weryfikacji i Twojej zgodzie |
 | Całość bez pytań | `AUTO: ...` | praca na rekomendacjach + lista przyjętych decyzji do potwierdzenia |
 | Produkcja, migracje, uprawnienia | `STRICT: ...` | zgoda przed każdym ryzykownym krokiem, weryfikacja po każdej zmianie, plan wycofania |
 
@@ -383,14 +433,16 @@ Orkiestrator: PM (`US-N`/`AC-N`) → Planner → Implementer → Verifier, itera
 | Objaw | Co zrobić |
 |---|---|
 | Dużo `OPEN-NNN` / `DO POTWIERDZENIA` | to luki w źródłach, nie błąd. Dodaj materiał albo odpowiedz na pytania i poproś: „Uzupełnij OPEN-003 i OPEN-007 na podstawie odpowiedzi: …” |
-| Skill dopisał coś, czego nie ma w źródłach | „Wskaż źródło dla FR-004” — zdanie bez źródła zostanie usunięte albo zamienione na OPEN |
+| Skill dopisał coś, czego nie ma w źródłach | „Wskaż źródło dla FR-004” - zdanie bez źródła zostanie usunięte albo zamienione na OPEN |
 | `CONTRADICTION-NNN` w audycie | wskaż źródło nadrzędne: „Przy sprzecznościach wygrywa brief-ksef.docx” |
 | „ścieżka poza katalogiem roboczym” | skopiuj plik do projektu albo dodaj katalog do `FLOWKIT_EXTRA_PATHS` i uruchom sesję ponownie |
 | „polecenie niedozwolone dla roli” | agent poda linię do dopisania w `~/.flowkit/allow.json`; dopisz ją sam, jeśli się zgadzasz |
 | zgoda z `allow.json` nie działa | uruchom `doctor`: pokaże błąd składni z numerem linii, literówkę w nazwie roli albo powód pominięcia wpisu |
-| Word bez stylów szablonu / Markdown zamiast DOCX | uruchom `doctor` — brakuje silnika DOCX (`python-docx` lub Pandoc); instrukcja jest w komunikacie |
+| Word bez stylów szablonu / Markdown zamiast DOCX | uruchom `doctor` - brakuje silnika DOCX (`python-docx` lub Pandoc); instrukcja jest w komunikacie |
 | Dokument za długi | „Wariant skrócony” albo „Zmieść się w 3 stronach” |
-| `[INJECTION?]` pod wynikiem | materiał zawierał polecenia dla asystenta — sprawdź wskazany fragment; agent ich nie wykonał |
+| `[INJECTION?]` pod wynikiem | materiał zawierał polecenia dla asystenta - sprawdź wskazany fragment; agent ich nie wykonał |
+| Tekst brzmi sztucznie, ma korpomowę lub kalki | „Popraw prostym językiem” albo uruchom `plain-check wynik.md` i poproś o poprawę zgłoszonych miejsc |
+| `plain-check` zgłasza skrót lub termin projektu | dopisz go do `flowkit-project.md` (sekcja `Słownik` albo `termin = znaczenie`) |
 | Pytania raz w oknie, raz zwykłym tekstem | zobacz „Diagnoza okna pytań” poniżej |
 
 ### Diagnoza okna pytań
@@ -423,5 +475,5 @@ oraz niezgodne (`Ask: window` bez wywołania okna). W instalacji jako plugin skr
 **VS Code:** polecenie „Developer: Show Chat Debug View” pokazuje, jakie narzędzia dostał model w danym zapytaniu,
 więc od razu widać, czy `vscode/askQuestions` było dostępne.
 
-Pełna lista ustawień: [README — Konfiguracja](../README.md#konfiguracja). Co i jak jest zabezpieczone:
-[README — Bezpieczeństwo](../README.md#bezpieczeństwo-i-ograniczenia).
+Pełna lista ustawień: [README - Konfiguracja](../README.md#konfiguracja). Co i jak jest zabezpieczone:
+[README - Bezpieczeństwo](../README.md#bezpieczeństwo-i-ograniczenia).

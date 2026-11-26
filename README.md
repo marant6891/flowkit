@@ -30,7 +30,9 @@ Wersja: **1.8.0** · Licencja: [MIT](LICENSE) · Historia zmian: [CHANGELOG.md](
 11. [Rozwiązywanie problemów](#rozwiązywanie-problemów)
 12. [Rozwój i współtworzenie](#rozwój-i-współtworzenie)
 
-**Praktyczne użycie:** gotowe polecenia dla każdego skilla i agenta (jakie źródła wskazać, jak opisać oczekiwany wynik, co dostaniesz) — [docs/USAGE.md](docs/USAGE.md).
+**Praktyczne użycie:** gotowe polecenia dla każdego skilla i agenta (jakie źródła wskazać, jak opisać oczekiwany wynik, co dostaniesz) - [docs/USAGE.md](docs/USAGE.md).
+
+**Prosty język (PL i EN):** wszystkie skille i agenci piszą według jednego standardu - [runtime/procedures/plain-language.md](runtime/procedures/plain-language.md).
 
 ---
 
@@ -46,7 +48,7 @@ claude plugin marketplace add marant6891/flowkit
 claude plugin install flowkit@flowkit
 ```
 
-Uruchom głównego agenta — orkiestrator — w katalogu projektu. W instalacji przez wtyczkę jego nazwa ma prefiks wtyczki:
+Uruchom głównego agenta - orkiestrator - w katalogu projektu. W instalacji przez wtyczkę jego nazwa ma prefiks wtyczki:
 
 ```bash
 claude --agent flowkit:flowkit-orchestrator
@@ -79,7 +81,7 @@ Orkiestrator sam rozpoznaje rodzaj zadania i wybiera skill lub subagenta. Optyma
 | Playwright lub CairoSVG | konwersja SVG → PNG | `pip install playwright` + `playwright install chromium` |
 | LibreOffice | opcjonalny podgląd PDF (`--pdf`) | pakiet systemowy |
 | `pypdf` | odczyt PDF | `pip install pypdf` |
-| Walidatory DevOps i bezpieczeństwa | agenci Validator i Verifier | `terraform`, `tflint`, `hadolint`, `helm`, `kubeconform`, `conftest`, `kyverno`, `yamllint`, `actionlint`, `zizmor`, `shellcheck`, `semgrep` (reguły lokalne), `osv-scanner`, `gitleaks`, Docker — według potrzeb |
+| Walidatory DevOps i bezpieczeństwa | agenci Validator i Verifier | `terraform`, `tflint`, `hadolint`, `helm`, `kubeconform`, `conftest`, `kyverno`, `yamllint`, `actionlint`, `zizmor`, `shellcheck`, `semgrep` (reguły lokalne), `osv-scanner`, `gitleaks`, Docker - według potrzeb |
 
 Brak opcjonalnego narzędzia nie przerywa pracy: odpowiednie sprawdzenie dostaje status `NOT_RUN`, a agent podaje polecenie instalacji. Stan środowiska pokazuje `doctor` (patrz [Diagnoza](#diagnoza-doctor)).
 
@@ -93,24 +95,26 @@ Wszystkie skille mają prefiks `flowkit-`. Skill uruchamia się automatycznie, g
 
 | Skill | Wersja | Opis | Ścieżka |
 |---|---|---|---|
-| **flowkit-client-pt-prd-writer** | `3.3` | Dokument PT/PRD dla klienta wyłącznie na podstawie materiałów, w szablonie klienta (`.docx`, `.dotx`, `.md`) z kompletem jego stylów. Wariant skrócony dla małych zmian (1–3 strony) i pełny. Trzy tryby wyniku: roboczy z oznaczeniami źródeł, **wersja dla klienta** (czysta treść, wątpliwości zebrane w rozdziale końcowym) i dokument końcowy bez dopisków. User stories Given-When-Then, Definition of Done, kontrola pokrycia wymagań testami, diagramy oparte na źródłach, tryb `AUTO`. | [`skills/flowkit-client-pt-prd-writer/`](skills/flowkit-client-pt-prd-writer/) |
-| **flowkit-requirements-workshop** | `1.2` | Interaktywny warsztat wymagań prowadzony krok po kroku: koncepcja, zakres, wymagania biznesowe (role, procesy, reguły, user stories Given-When-Then) i techniczne (integracje, dane, NFR), ryzyka i plan testów, a na końcu docelowy PT/PRD przez `flowkit-client-pt-prd-writer`. Każda faza zatwierdzana przez użytkownika, bez trybu AUTO; stan w pliku warsztatu, który można wznowić. | [`skills/flowkit-requirements-workshop/`](skills/flowkit-requirements-workshop/) |
-| **flowkit-client-meeting-recap** | `1.5` | Z transkrypcji (`.vtt`, `.docx`, `.txt`) dwa osobne pliki: wewnętrzny radar ryzyk z cytatami jako dowodami oraz szkic maila do klienta z decyzjami, zadaniami i właścicielami potwierdzonymi w rozmowie oraz prośbą o korekty w ustalonym oknie. | [`skills/flowkit-client-meeting-recap/`](skills/flowkit-client-meeting-recap/) |
+| **flowkit-client-pt-prd-writer** | `3.4` | Dokument PT/PRD dla klienta wyłącznie na podstawie materiałów, w szablonie klienta (`.docx`, `.dotx`, `.md`) z kompletem jego stylów. Wariant skrócony dla małych zmian (1-3 strony) i pełny. Trzy tryby wyniku: roboczy z oznaczeniami źródeł, **wersja dla klienta** (czysta treść, wątpliwości zebrane w rozdziale końcowym) i dokument końcowy bez dopisków. User stories Given-When-Then, Definition of Done, kontrola pokrycia wymagań testami, diagramy oparte na źródłach, tryb `AUTO`. | [`skills/flowkit-client-pt-prd-writer/`](skills/flowkit-client-pt-prd-writer/) |
+| **flowkit-requirements-workshop** | `1.3` | Interaktywny warsztat wymagań prowadzony krok po kroku: koncepcja, zakres, wymagania biznesowe (role, procesy, reguły, user stories Given-When-Then) i techniczne (integracje, dane, NFR), ryzyka i plan testów, a na końcu docelowy PT/PRD przez `flowkit-client-pt-prd-writer`. Każda faza zatwierdzana przez użytkownika, bez trybu AUTO; stan w pliku warsztatu, który można wznowić. | [`skills/flowkit-requirements-workshop/`](skills/flowkit-requirements-workshop/) |
+| **flowkit-client-message-editor** | `1.1` | Redakcja szkicu e-maila lub wiadomości (Teams, Slack) do klienta: ton, struktura, jedna prośba z terminem, bez nowych faktów i zobowiązań. Tryb `ZWYKŁY` albo `DUPOKRYTKA` (potwierdzenie na piśmie: ponumerowane fakty z datami, decyzje, zakres, ryzyka, zależności od klienta, prośba o potwierdzenie do daty). Kontrola `check_message.py`. | [`skills/flowkit-client-message-editor/`](skills/flowkit-client-message-editor/) |
+| **flowkit-client-solution-docs-writer** | `1.3` | Dokumentacja gotowego rozwiązania z jego kodu: **pomoc dla użytkownika końcowego** (help, podręcznik, szybki start, FAQ), instrukcja administratora albo dokumentacja techniczna. Najpierw brief w oknie pytań: typ dokumentu, odbiorca (rola, poziom wiedzy), kod rozwiązania (repozytorium, moduł, wersja) i szablon Word. Inwentaryzacja kodu z perspektywy roli (ekrany, pola, walidacje, komunikaty, uprawnienia, flagi), plan do akceptacji, tematy-zadania krok po kroku w języku odbiorcy, zapis `.docx` w stylach szablonu, tryby roboczy, dla klienta i końcowy. Pełna struktura rozdziału modułu (układ ekranu z legendą, wszystkie opcje, słownik kolumn, statusy, zakładki), katalog opcji z kontrolą pokrycia `check_coverage.py` i rysunki z silnika diagramów. Domyślnie dokument dla klienta bez dopisków (`make_client_version.py`, pochodzenie w osobnym rejestrze). Kontrola `check_user_docs.py`. | [`skills/flowkit-client-solution-docs-writer/`](skills/flowkit-client-solution-docs-writer/) |
+| **flowkit-client-meeting-recap** | `1.6` | Z transkrypcji (`.vtt`, `.docx`, `.txt`) dwa osobne pliki: wewnętrzny radar ryzyk z cytatami jako dowodami oraz szkic maila do klienta z decyzjami, zadaniami i właścicielami potwierdzonymi w rozmowie oraz prośbą o korekty w ustalonym oknie. | [`skills/flowkit-client-meeting-recap/`](skills/flowkit-client-meeting-recap/) |
 
 ### Dane i SQL
 
 | Skill | Wersja | Opis | Ścieżka |
 |---|---|---|---|
-| **flowkit-sql-data-assistant** | `1.2` | Zapytania, zestawienia analityczne i raportowe oraz skrypty poprawy danych dla PostgreSQL, SQL Server, Oracle, MySQL i MariaDB w trybach `READ_ONLY`, `ANALYTICS_REPORT`, `DATA_INVESTIGATION` i `DATA_REPAIR`: karta raportu z definicjami miar, funkcje okna, porównania okresów, rankingi, kohorty, kontrola spójności raportu; transakcja, kontrola liczby rekordów, domyślne `ROLLBACK`, zachowanie poprzednich wartości i skrypt odtworzenia. Nigdy nie łączy się z bazą. | [`skills/flowkit-sql-data-assistant/`](skills/flowkit-sql-data-assistant/) |
+| **flowkit-sql-data-assistant** | `1.4` | Zapytania, raporty analityczne i skrypty poprawy danych. Bazy: PostgreSQL, SQL Server, Oracle, MySQL i MariaDB. Tryby: `READ_ONLY`, `ANALYTICS_REPORT`, `DATA_INVESTIGATION` i `DATA_REPAIR`. Raporty: karta raportu z definicjami miar, funkcje okna, porównania okresów, rankingi, kohorty i kontrola spójności. Zmiany danych: transakcja, kontrola liczby rekordów, domyślne `ROLLBACK`, zachowanie poprzednich wartości i skrypt odtworzenia. Nigdy nie łączy się z bazą. | [`skills/flowkit-sql-data-assistant/`](skills/flowkit-sql-data-assistant/) |
 
 ### DevOps i SRE
 
 | Skill | Wersja | Opis | Ścieżka |
 |---|---|---|---|
-| **flowkit-devops-sre-review** | `1.1` | Przegląd niezawodności usługi na podstawie plików: SLI/SLO i error budget, alerty, metryki RED/USE, sondy, requests i limits, HPA i PDB, backup i RPO/RTO, koszt. Ustalenia z dowodem `plik:linia`, rekomendacje z sygnałem, progiem i uzasadnieniem. | [`skills/flowkit-devops-sre-review/`](skills/flowkit-devops-sre-review/) |
-| **flowkit-devops-incident-postmortem** | `1.5` | Bezobwiniający raport postmortem: klasyfikacja SEV, oś czasu, łańcuch przyczyn (Trigger, Amplifier, Detection/Process Gap, 5 Whys), komunikacja i działania PREVENT/DETECT/MITIGATE. | [`skills/flowkit-devops-incident-postmortem/`](skills/flowkit-devops-incident-postmortem/) |
+| **flowkit-devops-sre-review** | `1.2` | Przegląd niezawodności usługi na podstawie plików: SLI/SLO i error budget, alerty, metryki RED/USE, sondy, requests i limits, HPA i PDB, backup i RPO/RTO, koszt. Ustalenia z dowodem `plik:linia`, rekomendacje z sygnałem, progiem i uzasadnieniem. | [`skills/flowkit-devops-sre-review/`](skills/flowkit-devops-sre-review/) |
+| **flowkit-devops-incident-postmortem** | `1.6` | Bezobwiniający raport postmortem: klasyfikacja SEV, oś czasu, łańcuch przyczyn (Trigger, Amplifier, Detection/Process Gap, 5 Whys), komunikacja i działania PREVENT/DETECT/MITIGATE. | [`skills/flowkit-devops-incident-postmortem/`](skills/flowkit-devops-incident-postmortem/) |
 
-Nowy skill zaczyna się od wzorca [`skills/_template/`](skills/_template/) — patrz [Rozwój i współtworzenie](#rozwój-i-współtworzenie).
+Nowy skill zaczyna się od wzorca [`skills/_template/`](skills/_template/) - patrz [Rozwój i współtworzenie](#rozwój-i-współtworzenie).
 
 ---
 
@@ -122,7 +126,7 @@ Nowy skill zaczyna się od wzorca [`skills/_template/`](skills/_template/) — p
 
 | Platforma | Jak jest widoczny |
 |---|---|
-| Claude Code | `claude --agent flowkit-orchestrator` (wtyczka: `flowkit:flowkit-orchestrator`). Domyślny agent projektu: `install.ps1 -SetDefaultAgent` / `install.sh --set-default-agent` zapisuje `"agent": "flowkit-orchestrator"` w `.claude/settings.json` bieżącego projektu; w instalacji przez wtyczkę wpisz tam `flowkit:flowkit-orchestrator`. Lista `/agents` pokazuje także subagentów — Claude Code nie pozwala ich ukryć. |
+| Claude Code | `claude --agent flowkit-orchestrator` (wtyczka: `flowkit:flowkit-orchestrator`). Domyślny agent projektu: `install.ps1 -SetDefaultAgent` / `install.sh --set-default-agent` zapisuje `"agent": "flowkit-orchestrator"` w `.claude/settings.json` bieżącego projektu; w instalacji przez wtyczkę wpisz tam `flowkit:flowkit-orchestrator`. Lista `/agents` pokazuje także subagentów - Claude Code nie pozwala ich ukryć. |
 | VS Code Copilot | Na liście wyboru agentów jest tylko `flowkit-orchestrator`. Subagenci mają `user-invocable: false`: są ukryci, a orkiestrator może ich wywołać (lista w polu `agents`). |
 
 ### Subagenci
@@ -143,7 +147,7 @@ Definicje źródłowe są w [`agents/*_agent.md`](agents/), kontrakty niezależn
 
 ### Prefiksy orkiestratora
 
-Prefiksy są opcjonalne — bez nich orkiestrator sam dobiera działanie i podaje je w linii `Mode:`. Można je łączyć: `PLAN: LOG: zadanie`, `AUTO: BA: zadanie`.
+Prefiksy są opcjonalne - bez nich orkiestrator sam dobiera działanie i podaje je w linii `Mode:`. Można je łączyć: `PLAN: LOG: zadanie`, `AUTO: BA: zadanie`.
 
 | Prefiks | Działanie |
 |---|---|
@@ -174,12 +178,30 @@ Prefiksy są opcjonalne — bez nich orkiestrator sam dobiera działanie i podaj
 
 1. Agent pyta o znane źródła danych do przygotowania i weryfikacji dokumentu (w trybie `AUTO` pracuje na dostarczonych materiałach).
 2. Czyta materiały i szablon poleceniem `read-document` (Word, Excel, PDF, tekst, kod źródłowy; duże pliki partiami).
-3. Pisze treść w Markdown według zasad skilla: tylko ze źródeł, zwięźle, z oznaczonymi lukami.
-4. Zapisuje DOCX poleceniem `md-to-docx` na kopii szablonu klienta — dokument ma komplet jego stylów, numerację, nagłówki i stopki. `--template` zachowuje stronę tytułową i metryczkę, `--set POLE=WARTOŚĆ` wypełnia pola szablonu, diagramy mermaid i SVG trafiają do dokumentu jako PNG.
+3. Pisze treść w Markdown według zasad skilla: tylko ze źródeł, zwięźle, z oznaczonymi lukami, prostym językiem.
+   Przed oddaniem sprawdza tekst poleceniem `plain-check` (patrz [Prosty język](#prosty-język)).
+4. Zapisuje DOCX poleceniem `md-to-docx` na kopii szablonu klienta - dokument ma komplet jego stylów, numerację, nagłówki i stopki. `--template` zachowuje stronę tytułową i metryczkę, `--set POLE=WARTOŚĆ` wypełnia pola szablonu, diagramy mermaid i SVG trafiają do dokumentu jako PNG.
 5. Konwerter ponownie otwiera wynik i porównuje jego strukturę ze źródłem (`Kontrola DOCX: PASS/FAIL`); opcjonalnie tworzy podgląd PDF.
-6. Przed przekazaniem dokumentu końcowego lub wersji dla klienta `flowkit-verifier` wykonuje niezależny audyt `DOC-AUDIT:` na samych materiałach źródłowych, dokumencie i checkliście skilla (pokrycie w źródłach, brak bagatelizowania pracochłonności, spójność stylu i tabel, sprzeczności między źródłami oraz między dokumentem a źródłami jako `CONTRADICTION-NNN` z cytatami obu stron).
+6. Przed przekazaniem dokumentu końcowego lub wersji dla klienta `flowkit-verifier` wykonuje niezależny audyt `DOC-AUDIT:`. Audyt widzi tylko materiały źródłowe, dokument i checklistę skilla. Sprawdza pokrycie w źródłach, brak bagatelizowania pracochłonności, prosty język oraz spójność stylu i tabel. Sprzeczności między źródłami oraz między dokumentem a źródłami zgłasza jako `CONTRADICTION-NNN` z cytatami obu stron.
 
 Szczegóły: [docx-engine.md](skills/flowkit-client-pt-prd-writer/references/docx-engine.md).
+
+### Prosty język
+
+Tekst dla ludzi (dokumenty, maile, podsumowania, raporty) w języku polskim i angielskim spełnia standard
+[runtime/procedures/plain-language.md](runtime/procedures/plain-language.md). Standard opiera się na zaleceniach
+gov.pl (prosty język), Obserwatorium Językowego UW (korpomowa) i artykule o kalkach składniowych z Magazynu PAN.
+Dla angielskiego korzysta z Federal Plain Language Guidelines i GOV.UK Style Guide.
+
+- Najważniejsze na początku, zdania do 20 słów (EN: 25), czasowniki zamiast „dokonać zmiany”.
+- Bez korpomowy („zaparkować”, „zaadresować”, „na ten moment”) i kalk składniowych („To, co…, to…”).
+- W angielskim bez fałszywych przyjaciół (*actual*, *eventually*, *realize*).
+
+Polecenie executora `plain-check <plik> [--strict] [--lang pl|en] [--audience user]` sprawdza około 60 reguł.
+Czyta `.md`, `.txt`, `.docx` i `.pdf`, a terminy projektu bierze ze słownika w `flowkit-project.md`. Tryb roboczy
+zgłasza ostrzeżenia, a `--strict` blokuje wynik przy błędach. Kalki są zawsze ostrzeżeniem. Szyk zdania i stronę
+bierną ocenia autor oraz verifier w audycie `DOC-AUDIT:`. Redaktor maili i skill dokumentacji rozwiązania sprawdzają
+prosty język własnymi skryptami (`check_message.py`, `check_user_docs.py`).
 
 ### Infrastruktura
 
@@ -187,7 +209,7 @@ Diagnostics zbiera dowody → DevOps przygotowuje zmianę w plikach → Validato
 
 ### Statusy
 
-Wszyscy agenci i raporty używają tych samych statusów: `PASS` (sprawdzone, zaliczone), `FAIL` (sprawdzone, niezaliczone), `NOT_RUN` (nie wykonano — brak narzędzia, dostępu lub warunku wstępnego), `UNKNOWN` (za mało danych), `BLOCKED` (zatrzymane przez brak uprawnień lub zależność).
+Wszyscy agenci i raporty używają tych samych statusów: `PASS` (sprawdzone, zaliczone), `FAIL` (sprawdzone, niezaliczone), `NOT_RUN` (nie wykonano - brak narzędzia, dostępu lub warunku wstępnego), `UNKNOWN` (za mało danych), `BLOCKED` (zatrzymane przez brak uprawnień lub zależność).
 
 ---
 
@@ -199,7 +221,7 @@ Wszyscy agenci i raporty używają tych samych statusów: `PASS` (sprawdzone, za
 | `FLOWKIT_EXTRA_PATHS` | zmienna środowiskowa | dodatkowe katalogi poza projektem, z których agenci mogą czytać (rozdzielone `;` w Windows, `:` w Linux/macOS) |
 | `~/.flowkit/allow.json` | katalog domowy (inna ścieżka: `FLOWKIT_ALLOW_FILE`) | polecenia spoza listy roli, które świadomie pozwalasz agentom wykonywać |
 
-Przykład pliku zgód — wpis to początek polecenia, dla wszystkich ról (`"*"`) albo dla jednej roli:
+Przykład pliku zgód - wpis to początek polecenia, dla wszystkich ról (`"*"`) albo dla jednej roli:
 
 ```json
 {
@@ -244,10 +266,10 @@ Zmienne środowiskowe i plik zgód ustawia tylko użytkownik: hook odrzuca przyp
 - **Executor z listą dozwoloną dla roli** ([`runtime/flowkit_exec.py`](runtime/flowkit_exec.py)): polecenia bez powłoki, potoków i przekierowań; każda rola ma minimalny zestaw poleceń (`help` je pokazuje).
 - **Hook w Claude Code** ([`runtime/guard_bash.py`](runtime/guard_bash.py)): agent FlowKit nie uruchomi polecenia z pominięciem executora i nie zmieni pliku zgód, dziennika audytu, plików runtime, katalogu `.git` (hooki gita uruchamiają kod) ani plików wrażliwych (`.env*` poza `.env.example`, klucze). Ochrona obowiązuje także w katalogach z `FLOWKIT_EXTRA_PATHS`. Zwykłe sesje nie są objęte hookiem.
 - **Dziennik audytu**: każde polecenie agenta, wykonane i odrzucone, trafia jako wiersz JSON do `~/.flowkit/audit.log` (czas UTC, rola, katalog, polecenie po ukryciu sekretów, skrót SHA-256 argumentów, decyzja, powód odrzucenia, kod wyjścia, czas trwania). Inna ścieżka: `FLOWKIT_AUDIT_FILE`, wyłączenie: `FLOWKIT_AUDIT_FILE=off`.
-- **Diagnostyka okna pytań**: hook [`runtime/log_tool_event.py`](runtime/log_tool_event.py) dopisuje do tego dziennika użycie okna pytań, skilli i subagentów FlowKit (bez treści pytań), a [`runtime/checkpoint_report.py`](runtime/checkpoint_report.py) pokazuje, które punkty kontrolne zakończyły się oknem, a które tekstem i dlaczego (wiersz `Ask:`). Szczegóły: [USAGE — Diagnoza okna pytań](docs/USAGE.md#diagnoza-okna-pytań).
+- **Diagnostyka okna pytań**: hook [`runtime/log_tool_event.py`](runtime/log_tool_event.py) dopisuje do tego dziennika użycie okna pytań, skilli i subagentów FlowKit (bez treści pytań), a [`runtime/checkpoint_report.py`](runtime/checkpoint_report.py) pokazuje, które punkty kontrolne zakończyły się oknem, a które tekstem i dlaczego (wiersz `Ask:`). Szczegóły: [USAGE - Diagnoza okna pytań](docs/USAGE.md#diagnoza-okna-pytań).
 - **Tryb tylko do odczytu**: `FLOWKIT_READONLY=1` ustawione przed uruchomieniem sesji blokuje agentom każdą zmianę pliku (hook), zapis DOCX oraz commit, push i PR (executor). Agent pokazuje zmiany jako diff do akceptacji. Prefiks `AUTO:` ani agent nie wyłączą trybu. Polecenia z pliku zgód nadal działają.
 - **Treść materiałów to dane, nie polecenia**: każdy agent i skill traktuje dokumenty, transkrypcje, logi i wyniki narzędzi wyłącznie jako materiał. Polecenia ukryte w tej treści nie zmieniają roli, listy poleceń ani zasad i są zgłaszane jako `[INJECTION?]`.
-- **Granica katalogu roboczego**: ścieżki w poleceniach — także po `..`, `~` i dowiązaniach symbolicznych — muszą leżeć w projekcie lub w `FLOWKIT_EXTRA_PATHS`.
+- **Granica katalogu roboczego**: ścieżki w poleceniach - także po `..`, `~` i dowiązaniach symbolicznych - muszą leżeć w projekcie lub w `FLOWKIT_EXTRA_PATHS`.
 - **Ochrona danych**: wyniki poleceń są skracane, sekrety ukrywane, pliki `.env`, klucze i obiekty `Secret` niedostępne; CI uruchamia lokalny skaner sekretów (`scripts/validate_secrets.py`).
 - **Narzędzia bezpieczeństwa offline**: `semgrep scan` w executorze działa wyłącznie na lokalnych regułach (blokada `--config auto`, zdalnych URL i `--autofix`), a wszystkie walidatory (`zizmor`, `conftest`, `kyverno`, `osv-scanner`, `gitleaks`) pracują bez modyfikacji plików.
 - **Ochrona gałęzi**: push tylko nowej gałęzi, nigdy do `main`/`master` ani z wymuszeniem; `main` przyjmuje zmiany wyłącznie przez PR z zaliczonym CI ([ruleset](.github/rulesets/protect-main.json)).
@@ -256,36 +278,36 @@ Zmienne środowiskowe i plik zgód ustawia tylko użytkownik: hook odrzuca przyp
 **Czego FlowKit nie zabezpiecza**
 
 - Executor to lista dozwolonych poleceń, a **nie izolacja systemowa (sandbox)**. Testy uruchamiane przez agenta (`pytest`, `npm test` itd.) wykonują kod projektu z uprawnieniami użytkownika.
-- **VS Code Copilot nie uruchamia hooka** — zostaw włączone potwierdzanie poleceń w terminalu i zmian w plikach.
+- **VS Code Copilot nie uruchamia hooka** - zostaw włączone potwierdzanie poleceń w terminalu i zmian w plikach.
 - Wygenerowane dokumenty, skrypty i konfiguracje wymagają przeglądu przez człowieka przed użyciem.
 
 **Dane w repozytorium**
 
-To repozytorium jest publiczne. Nie commituj sekretów, danych klientów ani plików roboczych agentów (`agent-context/`, `AGENT_LOG.md`) — wyklucza je [`.gitignore`](.gitignore). Przykłady w `examples/` i `tests/fixtures/` używają wyłącznie fikcyjnych danych.
+To repozytorium jest publiczne. Nie commituj sekretów, danych klientów ani plików roboczych agentów (`agent-context/`, `AGENT_LOG.md`) - wyklucza je [`.gitignore`](.gitignore). Przykłady w `examples/` i `tests/fixtures/` używają wyłącznie fikcyjnych danych.
 
 ---
 
 ## Obsługiwane platformy
 
-`TESTED` — sprawdzone automatycznie w CI · `PARTIAL` — CI sprawdza pliki, ale nie instalację ani działanie na platformie · `UNVERIFIED` — opis konfiguracji, bez testów.
+`TESTED` - sprawdzone automatycznie w CI · `PARTIAL` - CI sprawdza pliki, ale nie instalację ani działanie na platformie · `UNVERIFIED` - opis konfiguracji, bez testów.
 
 | Platforma | Skille | Agenci i runtime | Status | Ograniczenia |
 |---|---|---|---|---|
 | **Claude Code** | `~/.claude/skills/` lub wtyczka | adaptery `agents/adapters/claude-code/`, hook | `PARTIAL` | CI waliduje adaptery, manifest, hook i runtime; instalacja w Claude Code nie jest testowana w CI |
-| **VS Code Copilot** | `.github/skills/`, prompty `.github/prompts/` | adaptery `agents/adapters/vscode/` | `PARTIAL` | brak hooka — potwierdzanie poleceń w terminalu |
+| **VS Code Copilot** | `.github/skills/`, prompty `.github/prompts/` | adaptery `agents/adapters/vscode/` | `PARTIAL` | brak hooka - potwierdzanie poleceń w terminalu |
 | **Antigravity** | standard Agent Skills | bundle wtyczki | `UNVERIFIED` | brak testów |
-| **Cursor** | `.cursor/rules/<skill>.mdc` | — | `UNVERIFIED` | tylko treść skilli, bez agentów i runtime |
-| **ChatGPT / Codex** | Instructions + Knowledge | — | `UNVERIFIED` | tylko treść skilli, bez agentów i runtime |
+| **Cursor** | `.cursor/rules/<skill>.mdc` | - | `UNVERIFIED` | tylko treść skilli, bez agentów i runtime |
+| **ChatGPT / Codex** | Instructions + Knowledge | - | `UNVERIFIED` | tylko treść skilli, bez agentów i runtime |
 
 ---
 
 ## Instalacja
 
-### Claude Code — wtyczka (zalecane)
+### Claude Code: wtyczka (zalecane)
 
 Patrz [Szybki start](#szybki-start). Wtyczka instaluje skille, agentów, runtime i hook.
 
-### Claude Code — instalator
+### Claude Code: instalator
 
 ```powershell
 # Windows: agenci i runtime (~/.claude/agents, ~/.claude/flowkit/runtime)
@@ -305,7 +327,7 @@ Opcje: `-DryRun` / `--dry-run` (symulacja), `-Force` / `--force` (nadpisanie bez
 
 ### VS Code Copilot
 
-Uruchom instalator **z katalogu projektu** — agenci trafiają do `.github/agents`, runtime do `.github/flowkit/runtime`, skille do `.github/skills`:
+Uruchom instalator **z katalogu projektu** - agenci trafiają do `.github/agents`, runtime do `.github/flowkit/runtime`, skille do `.github/skills`:
 
 ```powershell
 & C:\sciezka\do\flowkit\scripts\install.ps1 -AgentName all -Platform vscode
@@ -324,7 +346,7 @@ Prompty skilli dla Copilot Chat są w [`.github/prompts/`](.github/prompts/) (np
 
 ## Aktualizacja z wersji 1.7
 
-1. Zainstaluj ponownie agentów i runtime (`-AgentName all`) oraz potrzebne skille — runtime zawiera nowe zabezpieczenia i polecenia.
+1. Zainstaluj ponownie agentów i runtime (`-AgentName all`) oraz potrzebne skille - runtime zawiera nowe zabezpieczenia i polecenia.
 2. **Usuń stare katalogi skilli bez prefiksu** `flowkit-` (np. `~/.claude/skills/client-pt-prd-writer`, `.github/skills/client-meeting-recap`), inaczej skille będą widoczne podwójnie.
 3. **Usuń starych agentów `agent-3x3*`** (`~/.claude/agents/agent-3x3*.md`, `.github/agents/agent-3x3*.agent.md`). Nowe nazwy:
 
@@ -361,8 +383,10 @@ Pełna lista zmian: [CHANGELOG.md](CHANGELOG.md).
 | diagram mermaid jako blok kodu | brak lokalnego mermaid-cli | `npm install -g @mermaid-js/mermaid-cli` |
 | `FlowKit zablokował zmianę pliku` | agent próbował zmienić plik zgód lub runtime | te pliki zmienia tylko użytkownik |
 | zgoda z `allow.json` nie działa | błąd składni, literówka w nazwie roli albo wpis pominięty (np. `bash`) | uruchom `doctor`: pokaże linię błędu, podpowie nazwę roli i powód pominięcia |
-| `doctor`: „Python dla hooków” — BŁĄD | `python` nie istnieje w PATH albo to alias Microsoft Store | zainstaluj Pythona z python.org z opcją „Add python.exe to PATH” i wyłącz alias w ustawieniach Windows |
-| `doctor`: „Agenci” — UWAGA (inna wersja) | agenci i runtime pochodzą z różnych wersji | zainstaluj ponownie agentów i runtime (`-AgentName all` / `agent all`) |
+| `doctor`: „Python dla hooków” - BŁĄD | `python` nie istnieje w PATH albo to alias Microsoft Store | zainstaluj Pythona z python.org z opcją „Add python.exe to PATH” i wyłącz alias w ustawieniach Windows |
+| `doctor`: „Agenci” - UWAGA (inna wersja) | agenci i runtime pochodzą z różnych wersji | zainstaluj ponownie agentów i runtime (`-AgentName all` / `agent all`) |
+| pytania zwykłym tekstem, `Ask: text — tool not in this agent's tool list` | zainstalowany orkiestrator jest starszy i nie ma narzędzia okna pytań | uruchom `doctor` - wiersz „Okno pytań” poda polecenie ponownej instalacji |
+| `read-document` odrzucone w audycie `DOC-AUDIT:` | stary runtime bez `read-document` dla roli `verifier` | zainstaluj ponownie agentów i runtime; nie dopisuj poleceń wbudowanych do pliku zgód |
 | w VS Code na liście agentów są `agent-3x3*` | starzy agenci z wersji 1.7 | usuń `.github/agents/agent-3x3*.agent.md` (patrz [Aktualizacja](#aktualizacja-z-wersji-17)) |
 
 ---
@@ -377,6 +401,18 @@ python scripts/run_evals.py triggers --dry-run   # scenariusze aktywacji skilli
 ```
 
 Ewaluacja z lokalnym Claude Code (`run_evals.py` bez `--dry-run`) ma limity czasu `--timeout` (scenariusz, 600 s) i `--total-timeout` (sesja, 3600 s), zapisuje wyniki po każdym scenariuszu i rozróżnia błędy jakości (`FAIL`) od błędów infrastruktury (`TIMEOUT`, `ERROR`, `SKIPPED`).
+Ta ewaluacja jest opcjonalna i wymaga działającego Claude Code. Skille, `plain-check` i skrypty kontrolne działają
+lokalnie, bez sieci i bez API.
+
+**Ocena bez API:** zapisz odpowiedź skilla w pliku i oceń ją lokalnie:
+
+```bash
+python scripts/grade_eval.py message-editor-plain-pl odpowiedz.md   # wzorce scenariusza z tests/evals/cases.yaml
+python runtime/plain_language.py odpowiedz.md --strict               # reguły prostego języka
+```
+
+Wzorcowe odpowiedzi scenariuszy prostego języka leżą w `tests/fixtures/plain_language/golden/`. Testy sprawdzają
+offline, że wzorzec przechodzi wszystkie kontrole, a szkic nie.
 
 **Nowy skill**
 

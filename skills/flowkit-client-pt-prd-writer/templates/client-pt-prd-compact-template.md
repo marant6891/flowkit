@@ -1,11 +1,11 @@
 <!--
-Szablon ZAPASOWY SKRÓCONY – dla małych zmian (SKILL.md, Etap 0: „Wariant dokumentu”).
+Szablon ZAPASOWY SKRÓCONY - dla małych zmian (SKILL.md, Etap 0: „Wariant dokumentu”).
 Używaj go tylko, gdy użytkownik nie dostarczył własnego szablonu.
-Cel: 1–3 strony. Sześć rozdziałów, bez rozdziałów „Nie dotyczy”. Tabela tylko dla wymagań
+Cel: 1-3 strony. Sześć rozdziałów, bez rozdziałów „Nie dotyczy”. Tabela tylko dla wymagań
 i tylko, gdy są co najmniej 3; pozostałe treści jako krótkie listy. Oznaczenia pochodzenia
 (SRC/OPEN/ASSUMPTION) dopiskiem w nawiasie na końcu punktu.
 Gdy w trakcie pracy okaże się, że zmiana dotyka integracji, migracji danych, uprawnień lub
-architektury w stopniu wymagającym opisu – przejdź na szablon pełny i powiedz o tym użytkownikowi.
+architektury w stopniu wymagającym opisu - przejdź na szablon pełny i powiedz o tym użytkownikowi.
 Usuń wszystkie komentarze i placeholdery [..] przed oddaniem dokumentu.
 -->
 
@@ -15,10 +15,10 @@ Usuń wszystkie komentarze i placeholdery [..] przed oddaniem dokumentu.
 
 ## 1. Cel i zakres
 
-[2–4 zdania: co się zmienia, dlaczego i jaki efekt ma klient (SRC-001).]
+[2-4 zdania: co się zmienia, dlaczego i jaki efekt ma klient (SRC-001).]
 
 - **W zakresie:** [element]; [element] (SRC-001)
-- **Poza zakresem:** [element – dlaczego] (SRC-001)
+- **Poza zakresem:** [element - dlaczego] (SRC-001)
 
 ## 2. Opis zmiany
 
@@ -29,7 +29,7 @@ Usuń wszystkie komentarze i placeholdery [..] przed oddaniem dokumentu.
 
 ## 3. Wymagania
 
-[1–2 wymagania: lista. Od 3 wymagań: tabela.]
+[1-2 wymagania: lista. Od 3 wymagań: tabela.]
 
 - **FR-001** [Wymaganie]. Akceptacja: [sprawdzalne kryterium]. (SRC-001)
 
@@ -39,9 +39,9 @@ Given-When-Then: „Mając [stan], gdy [akcja], wtedy [wynik].”]
 ## 4. Wpływ i ryzyka
 
 - **Wpływ:** [moduł, ekran, raport, którego dotyczy zmiana] (SRC-002 / plik:linia)
-- **Ryzyko:** [ryzyko ze źródła] – [działanie] (SRC-001)
+- **Ryzyko:** [ryzyko ze źródła] - [działanie] (SRC-001)
 
-[Brak dostępu do kodu: „Wpływu na kod nie analizowano – brak dostępu do repozytorium (OPEN-001).”]
+[Brak dostępu do kodu: „Wpływu na kod nie analizowano - brak dostępu do repozytorium (OPEN-001).”]
 
 ## 5. Testy i odbiór
 
@@ -51,8 +51,8 @@ Given-When-Then: „Mając [stan], gdy [akcja], wtedy [wynik].”]
 
 ## 6. Tematy do wyjaśnienia
 
-- **OPEN-001** [Czego brakuje] – wpływa na [FR/obszar]. Decyduje: [rola lub DO POTWIERDZENIA].
-- **ASSUMPTION-001** [Założenie] – do potwierdzenia przez [rola].
+- **OPEN-001** [Czego brakuje] - wpływa na [FR/obszar]. Decyduje: [rola lub DO POTWIERDZENIA].
+- **ASSUMPTION-001** [Założenie] - do potwierdzenia przez [rola].
 
 [Brak tematów: „Brak otwartych tematów.”]
 

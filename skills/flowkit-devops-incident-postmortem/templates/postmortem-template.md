@@ -1,6 +1,6 @@
 <!--
 Szablon ZAPASOWY. Używaj go tylko, gdy użytkownik nie dostarczył własnego szablonu.
-Wszystko w nawiasach [...] to placeholder – zastąp treścią ze źródeł albo wpisz
+Wszystko w nawiasach [...] to placeholder - zastąp treścią ze źródeł albo wpisz
 `DO POTWIERDZENIA`. Żaden placeholder nie jest przykładem do skopiowania.
 Usuń komentarze i placeholdery przed oddaniem raportu.
 -->
@@ -19,7 +19,7 @@ Usuń komentarze i placeholdery przed oddaniem raportu.
 | **Czas trwania przestoju** | [T4 minus T0] |
 | **Czas do wykrycia (TTD)** | [T1 minus T0] |
 | **Czas do naprawy (TTR)** | [T4 minus T1] |
-| **MTTD / MTTR (Średnie)** | [Wartość ze źródła lub „Nie dotyczy – incydent jednostkowy”] |
+| **MTTD / MTTR (Średnie)** | [Wartość ze źródła lub „Nie dotyczy - incydent jednostkowy”] |
 | **Naruszenie SLA / Kary umowne** | [Brak naruszenia / Naruszenie SLA (X%) / Ryzyko kary umownej] |
 | **Status raportu** | [Szkic / W recenzji / Zaakceptowany] |
 
@@ -27,7 +27,7 @@ Usuń komentarze i placeholdery przed oddaniem raportu.
 
 ## 1. Streszczenie incydentu (Executive Summary)
 
-[2–4 zdania dla kadry zarządzającej, pisane na końcu i wyłącznie z treści raportu:
+[2-4 zdania dla kadry zarządzającej, pisane na końcu i wyłącznie z treści raportu:
 co zawiodło, jaki był mierzalny wpływ, jak przywrócono działanie, co zapobiegnie powtórce.]
 
 ---
@@ -46,7 +46,7 @@ co zawiodło, jaki był mierzalny wpływ, jak przywrócono działanie, co zapobi
 
 [Strefa czasowa wszystkich wpisów, np. UTC.] Czasy przybliżone oznacz `[SZACUNEK]`.
 
-| Czas | Zdarzenie | Faza (T0–T4) | Źródło (Log / Alert / Chat) |
+| Czas | Zdarzenie | Faza (T0-T4) | Źródło (Log / Alert / Chat) |
 |---|---|---|---|
 | [HH:MM:SS] | [Zdarzenie inicjujące] | **T0 (Trigger)** | [Źródło] |
 | [HH:MM:SS] | [Pierwszy sygnał wykrycia] | **T1 (Detection)** | [Źródło] |
@@ -58,8 +58,8 @@ co zawiodło, jaki był mierzalny wpływ, jak przywrócono działanie, co zapobi
 
 ## 4. Łańcuch przyczyn awarii (Root Causes & Contributing Factors)
 
-- **1. Wyzwalacz bezpośredni (Trigger):** [Zdarzenie inicjujące – ze źródłem]
-- **2. Czynnik wzmacniający (Amplifier):** [Co spowodowało eskalację – ze źródłem]
+- **1. Wyzwalacz bezpośredni (Trigger):** [Zdarzenie inicjujące - ze źródłem]
+- **2. Czynnik wzmacniający (Amplifier):** [Co spowodowało eskalację - ze źródłem]
 - **3. Luka w detekcji (Detection Gap):** [Dlaczego monitoring nie zareagował od razu]
 - **4. Luka procesowa / testowa (Process Gap):** [Dlaczego problem nie został wykryty przed produkcją]
 
@@ -79,10 +79,10 @@ wpisem `DO POTWIERDZENIA` zamiast domyślać się przyczyny.]
 ## 5. Co zadziałało dobrze vs Gdzie pojawiły się trudności
 
 ### Co zadziałało dobrze
-- [Mechanizm lub procedura, która ograniczyła skutki awarii – ze źródłem]
+- [Mechanizm lub procedura, która ograniczyła skutki awarii - ze źródłem]
 
 ### Gdzie pojawiły się trudności
-- [Luka w narzędziach, runbookach lub uprawnieniach – ze źródłem]
+- [Luka w narzędziach, runbookach lub uprawnieniach - ze źródłem]
 
 ---
 

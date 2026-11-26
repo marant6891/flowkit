@@ -1,0 +1,11 @@
+Panie Tomku,
+
+po raz kolejny piszę w sprawie modułu faktur. Na spotkaniu 18.11 zdecydował Pan, że dokładamy jeszcze
+import z Excela, chociaż mówiliśmy że to wyjdzie poza zakres i przesunie termin. Dalej nie mamy od was
+dostępu do API od 12.11!!! Bez tego nie zrobimy testów i termin 20.12 nie jest realny.
+Jeśli nie odpowiecie do piątku uznajemy że się zgadzacie.
+
+[dla nas: zapytać Kasię czy wyceniamy import osobno]
+
+Pozdrawiam
+Jan

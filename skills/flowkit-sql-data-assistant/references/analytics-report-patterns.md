@@ -1,7 +1,7 @@
 # Wzorce zestawień analitycznych i raportowych
 
 Używaj w trybie `ANALYTICS_REPORT`. Nazwy `schemat.zamowienie`, `zamowienie_id`, `klient_id`, `data_zamowienia`,
-`status`, `wartosc_netto` i wartości statusów są **przykładowe** — zastąp je nazwami ze schematu lub zgłoszenia
+`status`, `wartosc_netto` i wartości statusów są **przykładowe** - zastąp je nazwami ze schematu lub zgłoszenia
 (zasada 2). Każdy wzorzec to tylko odczyt: `SELECT` z agregacją lub limitem.
 
 ## 1. Ściągawka różnic między bazami
@@ -13,7 +13,7 @@ Używaj w trybie `ANALYTICS_REPORT`. Nazwy `schemat.zamowienie`, `zamowienie_id`
 | Początek tygodnia (pon.) | `date_trunc('week', d)::date` | `DATEADD(day, -((DATEPART(weekday, d) + @@DATEFIRST - 2) % 7), CAST(d AS date))` | `TRUNC(d, 'IW')` | `DATE(d) - INTERVAL WEEKDAY(d) DAY` |
 | Dodanie miesiąca | `d + INTERVAL '1 month'` | `DATEADD(month, 1, d)` | `ADD_MONTHS(d, 1)` | `d + INTERVAL 1 MONTH` |
 | Kalendarz (pełny szereg okresów) | `generate_series(od, do, interval)` | rekurencyjne CTE + `OPTION (MAXRECURSION n)` | `CONNECT BY LEVEL` | `WITH RECURSIVE` |
-| Mediana / percentyl | `percentile_cont(0.5) WITHIN GROUP (ORDER BY x)` | `PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY x) OVER (PARTITION BY ...)` (tylko jako funkcja okna) | `PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY x)` | MySQL: brak — `ROW_NUMBER` + `COUNT`; MariaDB 10.3+: `PERCENTILE_CONT ... OVER` |
+| Mediana / percentyl | `percentile_cont(0.5) WITHIN GROUP (ORDER BY x)` | `PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY x) OVER (PARTITION BY ...)` (tylko jako funkcja okna) | `PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY x)` | MySQL: brak - `ROW_NUMBER` + `COUNT`; MariaDB 10.3+: `PERCENTILE_CONT ... OVER` |
 | Łączenie tekstów w grupie | `string_agg(x, ', ' ORDER BY x)` | `STRING_AGG(x, ', ') WITHIN GROUP (ORDER BY x)` (2017+) | `LISTAGG(x, ', ') WITHIN GROUP (ORDER BY x)` | `GROUP_CONCAT(x ORDER BY x SEPARATOR ', ')` |
 | Dzielenie bez błędu przez 0 | `a / NULLIF(b, 0)` | `a / NULLIF(b, 0)` | `a / NULLIF(b, 0)` | `a / NULLIF(b, 0)` |
 | Uniknięcie dzielenia całkowitego | `100.0 * a / ...` lub `::numeric` | `100.0 * a / ...` lub `CAST(a AS decimal(19,4))` | zwykle zbędne (`NUMBER`) | zwykle zbędne |
@@ -45,7 +45,7 @@ W Oracle aliasu tabeli nie poprzedza się `AS` (`FROM schemat.zamowienie z`).
    niezbędne; rozważ próg minimalnej liczebności grupy (np. pokaż grupę dopiero od 5 osób).
 9. **Wydajność.** Duże tabele: najpierw krótki okres testowy, filtr po kolumnach indeksowanych, plan wykonania
    (`EXPLAIN` / plan szacowany), uruchomienie na replice lub poza godzinami szczytu. Nie zalecaj `NOLOCK` ani
-   `READ UNCOMMITTED` — dają niespójne sumy.
+   `READ UNCOMMITTED` - dają niespójne sumy.
 
 ## 3. Pełny przykład: sprzedaż miesięcznie, zmiana m/m, udział i narastająco
 
@@ -410,5 +410,5 @@ WHERE z.data_zamowienia >= p.data_od
   AND z.data_zamowienia < p.data_do;
 ```
 
-`pominiete_bez_statusu` większe od zera oznacza, że warunek `status <> 'ANULOWANE'` po cichu pominął wiersze —
+`pominiete_bez_statusu` większe od zera oznacza, że warunek `status <> 'ANULOWANE'` po cichu pominął wiersze -
 opisz to w odpowiedzi i ustal z użytkownikiem, czy mają być w raporcie.

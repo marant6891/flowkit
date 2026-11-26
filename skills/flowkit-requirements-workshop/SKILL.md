@@ -1,6 +1,6 @@
 ---
 name: flowkit-requirements-workshop
-version: "1.2"
+version: "1.3"
 tags: [analyst, requirements, discovery, workshop, interactive, user-stories, prd]
 description: >
   Interaktywny warsztat wymagań prowadzony krok po kroku z użytkownikiem: od
@@ -37,12 +37,12 @@ i pilnujesz spójności; użytkownik decyduje.
    pracę w warsztacie albo (b) `flowkit-client-pt-prd-writer` w trybie AUTO na gotowych materiałach.
    Tryb AUTO orkiestratora nie przyjmuje za użytkownika odpowiedzi w tym skillu.
 2. **Źródłem są odpowiedzi użytkownika i materiały.** Każdą treść oznaczaj pochodzeniem:
-   - `USR-NNN` — odpowiedź użytkownika (data, wierne brzmienie lub streszczenie, które potwierdził),
-   - `SRC-NNN` — materiał (plik, sekcja, `plik:linia` w kodzie),
-   - `REC-NNN` — Twoja propozycja; **nie jest treścią projektu**, dopóki użytkownik jej nie przyjmie,
-   - `DEC-NNN` — decyzja: potwierdzona odpowiedź albo przyjęta `REC`, z odwołaniem do `USR`/`REC`,
-   - `ASSUMPTION-NNN` — tylko gdy użytkownik wprost każe przyjąć założenie,
-   - `OPEN-NNN` — brak odpowiedzi, z osobą, która może odpowiedzieć.
+   - `USR-NNN` - odpowiedź użytkownika (data, wierne brzmienie lub streszczenie, które potwierdził),
+   - `SRC-NNN` - materiał (plik, sekcja, `plik:linia` w kodzie),
+   - `REC-NNN` - Twoja propozycja; **nie jest treścią projektu**, dopóki użytkownik jej nie przyjmie,
+   - `DEC-NNN` - decyzja: potwierdzona odpowiedź albo przyjęta `REC`, z odwołaniem do `USR`/`REC`,
+   - `ASSUMPTION-NNN` - tylko gdy użytkownik wprost każe przyjąć założenie,
+   - `OPEN-NNN` - brak odpowiedzi, z osobą, która może odpowiedzieć.
    Nie uzupełniaj luk „typowymi” treściami. Liczb (budżet, terminy, wolumeny, SLA, czasy odpowiedzi)
    nie wymyślaj: pytaj, a zakres orientacyjny podawaj wyłącznie jako `REC` z uzasadnieniem.
 3. **Rundy pytań.** Najwyżej 5 pytań naraz, najważniejsze (blokujące) pierwsze. Każde pytanie ma format
@@ -75,13 +75,17 @@ i pilnujesz spójności; użytkownik decyduje.
 12. **Identyfikatory trzycyfrowe**, wspólne z dokumentem PT/PRD: `GOAL-001`, `SC-001`, `OOS-001`,
     `ACT-001`, `PROC-001`, `BR-001`, `US-001`, `AC-001`, `FR-001`, `INT-001`, `DATA-001`,
     `NFR-001`, `RISK-001`, `TEST-001`, `Q-001`, `USR-001`, `REC-001`, `DEC-001`, `OPEN-001`.
+13. **Prosty język.** Pytania rund i dokument docelowy pisz według standardu FlowKit
+    `<runtime>/procedures/plain-language.md`: jedno wymaganie w jednym zdaniu, do 20 słów (EN: 25), strona czynna z
+    podmiotem („System wysyła…”, „Kierownik zatwierdza…”), bez korpomowy i kalk składniowych. Skróty rozwijasz przy
+    pierwszym użyciu.
 
 # Pytania do użytkownika
 
 Każde pytanie do użytkownika zadawaj przez okno pytań, gdy jest dostępne (VS Code: `#tool:vscode/askQuestions`,
 Claude Code: `AskUserQuestion`):
 
-- jedno pytanie to jedna pozycja z 2–4 wariantami; rekomendowany wariant pierwszy, oznaczony „(rekomendowane)”;
+- jedno pytanie to jedna pozycja z 2-4 wariantami; rekomendowany wariant pierwszy, oznaczony „(rekomendowane)”;
   użytkownik zawsze może odpowiedzieć własnymi słowami,
 - najwyżej 4 pytania w jednym oknie; więcej pytań: najpierw blokujące, resztę w kolejnym oknie,
 - tabelę pytań (ID, uzasadnienie, propozycja domyślna) pokaż najpierw jako tekst, a każdy jej wiersz zadaj w oknie,
@@ -101,26 +105,31 @@ najpierw 4 pytania, piąte w kolejnym oknie. Ten skill nie ma trybu AUTO, więc 
 1. Sprawdź, czy istnieje plik `warsztat/*-warsztat.md` dla tego projektu. Jeśli tak (lub użytkownik
    prosi „wznów warsztat”): przeczytaj go, pokaż w 5 liniach, gdzie jesteście (zatwierdzone fazy,
    otwarte `OPEN`, ostatnia runda), i kontynuuj od pierwszej niezatwierdzonej fazy.
-2. Nowy warsztat — pierwsza runda (`Q-001`…), najwyżej 5 pytań:
+2. Nowy warsztat - pierwsza runda (`Q-001`…), najwyżej 5 pytań:
    - nazwa i skrót projektu (do nazwy pliku),
    - jakie materiały już są (brief, notatki, recap spotkania, zgłoszenia, repozytorium istniejącej
      aplikacji, szablon dokumentu klienta) i które jest nadrzędne przy sprzecznościach,
    - kto jest odbiorcą dokumentu docelowego i kto po stronie użytkownika decyduje o biznesie i technice,
-   - głębokość: **szybka** (fazy 0–2 w skrócie, faza 3 tylko dla integracji i danych, wariant skrócony
+   - głębokość: **szybka** (fazy 0-2 w skrócie, faza 3 tylko dla integracji i danych, wariant skrócony
      dokumentu) albo **pełna** (wszystkie fazy, wariant pełny),
    - czy to nowa aplikacja, czy zmiana istniejącej.
 3. Wskazane materiały przeczytaj (`read-document`, wyszukiwanie w repozytorium), wpisz do rejestru
-   źródeł i zaproponuj, co już z nich wynika — jako `SRC` do potwierdzenia, nie jako decyzje.
+   źródeł i zaproponuj, co już z nich wynika - jako `SRC` do potwierdzenia, nie jako decyzje.
 4. Utwórz plik warsztatu i przejdź do Fazy 0.
 
 # Faza 0: Koncepcja
 
-Ustal: problem i jego skutki dziś (kto cierpi, jak często, ile to kosztuje — tylko z odpowiedzi),
-obecny sposób radzenia sobie, cel (`GOAL`), dla kogo (`ACT`), miarę sukcesu (wartość obecna i docelowa,
-jeśli użytkownik je zna), ograniczenia (termin, budżet, regulacje, narzucona technologia) i interesariuszy.
+Ustal:
+- problem i jego skutki dziś (kto cierpi, jak często, ile to kosztuje; tylko z odpowiedzi),
+- obecny sposób radzenia sobie,
+- cel (`GOAL`) i dla kogo (`ACT`),
+- miarę sukcesu (wartość obecna i docelowa, jeśli użytkownik je zna),
+- ograniczenia (termin, budżet, regulacje, narzucona technologia),
+- interesariuszy.
+
 Technika: poproś o opis ostatniego konkretnego przypadku problemu („opowiedz, jak to wyglądało ostatnio”).
 
-**Bramka:** wizja w 3–5 zdaniach (problem → dla kogo → co zmieniamy → jak poznamy sukces), zatwierdzona.
+**Bramka:** wizja w 3-5 zdaniach (problem → dla kogo → co zmieniamy → jak poznamy sukces), zatwierdzona.
 
 # Faza 1: Zakres
 
@@ -137,7 +146,7 @@ Przejdź kolejno przez:
 1. **Aktorów i role** (`ACT`): kto korzysta, kto zatwierdza, kto administruje; uprawnienia każdej roli.
 2. **Procesy** (`PROC`): stan obecny i docelowy krok po kroku na przykładzie jednego przypadku; wyjątki
    („co, jeśli…”) i kto je obsługuje. Zaproponuj diagram procesu do dokumentu, gdy proces ma rozgałęzienia.
-3. **Reguły biznesowe** (`BR`): warunki, limity, wyliczenia, terminy — z odpowiedzi, nie z praktyki branżowej.
+3. **Reguły biznesowe** (`BR`): warunki, limity, wyliczenia, terminy - z odpowiedzi, nie z praktyki branżowej.
 4. **User stories** (`US`) „Jako <rola> chcę <cel>, aby <korzyść>” i dla każdej kryteria akceptacji
    (`AC`) w formacie Given-When-Then: co najmniej ścieżka poprawna i jedna ścieżka błędu lub wyjątku.
    Proponuj kryteria jako `REC`, użytkownik je zatwierdza lub poprawia.
@@ -157,7 +166,7 @@ potwierdzenia. Ustal:
    drugiej stronie, obsługa błędów i ponowień.
 3. **Dane** (`DATA`): nowe i zmieniane encje, migracja istniejących danych, retencja, kopie zapasowe.
 4. **Wymagania niefunkcjonalne** (`NFR`): wydajność, dostępność, bezpieczeństwo i uprawnienia, audyt,
-   ochrona danych osobowych, dostępność dla osób z niepełnosprawnościami — wartości tylko od użytkownika.
+   ochrona danych osobowych, dostępność dla osób z niepełnosprawnościami - wartości tylko od użytkownika.
 5. **Środowiska i wdrożenie**: gdzie działa, jak jest wdrażane, kto utrzymuje.
 
 **Bramka:** rejestr `FR`, `INT`, `DATA`, `NFR`; każda `INT` ma właściciela albo `OPEN`, zatwierdzony.
@@ -169,23 +178,23 @@ potwierdzenia. Ustal:
 3. **Plan testów** (`TEST`): każdy `AC` z zakresu MVP ma test; testy integracji i `NFR`.
 4. **Definition of Done** odbioru i etapy wdrożenia (MVP, kolejne wydania).
 5. **Kontrola pokrycia**: pokaż wymagania bez testu, `US` bez `AC`, `INT` bez właściciela, `NFR` bez wartości.
-   Luka zostaje luką albo staje się `OPEN` — nie dopisuj powiązań na siłę.
+   Luka zostaje luką albo staje się `OPEN` - nie dopisuj powiązań na siłę.
 
 **Bramka:** lista ryzyk i `OPEN` z właścicielami, pokrycie zaakceptowane przez użytkownika.
 
 # Faza 5: Dokument docelowy
 
 1. Podsumuj gotowość: zatwierdzone fazy, liczba wymagań, otwarte `OPEN` (w tym blokujące).
-2. Zapytaj o: szablon dokumentu klienta, format (`.docx`, `.md`), tryb wyniku — **roboczy**, **wersja dla
+2. Zapytaj o: szablon dokumentu klienta, format (`.docx`, `.md`), tryb wyniku - **roboczy**, **wersja dla
    klienta** (otwarte kwestie w rozdziale końcowym) albo **końcowy bez dopisków** (możliwy dopiero, gdy nie
-   ma otwartych `OPEN`) — i miejsce zapisu.
+   ma otwartych `OPEN`) - i miejsce zapisu.
 3. Uruchom `flowkit-client-pt-prd-writer`, przekazując **plik warsztatu jako źródło nadrzędne**, pozostałe
    materiały z rejestru źródeł, szablon i tryb. Identyfikatory wymagań zostają te same; `USR`/`DEC` są dla
-   tego skilla źródłami `SRC`. Pytania Etapu 1–2 tamtego skilla są już rozstrzygnięte — przekaż odpowiedzi.
+   tego skilla źródłami `SRC`. Pytania Etapu 1-2 tamtego skilla są już rozstrzygnięte - przekaż odpowiedzi.
    **Rekomendacje warsztatu:** przyjęte `REC` są już decyzjami `DEC` i trafiają do treści; odrzucone nie
    trafiają do dokumentu wcale; nierozstrzygnięte trafiają do sekcji „Rekomendacje” dokumentu tylko za zgodą
    użytkownika, inaczej jako `OPEN`. W dokumencie PT/PRD `REC-NNN` oznacza wyłącznie taką rekomendację.
-4. Po dokumencie zleć niezależny audyt `DOC-AUDIT:` — robi to orkiestrator; gdy pracujesz bez niego,
+4. Po dokumencie zleć niezależny audyt `DOC-AUDIT:` - robi to orkiestrator; gdy pracujesz bez niego,
    zaproponuj użytkownikowi polecenie `VERIFY: DOC-AUDIT: <dokument>, źródła: <plik warsztatu i materiały>`.
    Ustalenia (`FAIL`, `CONTRADICTION-NNN`) wracają do warsztatu: wskaż fazę, której dotyczą, zadaj pytania,
    zaktualizuj plik i wygeneruj dokument ponownie.
@@ -210,10 +219,11 @@ Q-015 · …
 Zapisane w tej rundzie: USR-031…USR-034, DEC-012. Plik: warsztat/zwroty-warsztat.md
 ```
 
-Odpowiedzi użytkownika w skrócie („14c, 15a”) są w porządku — zapisz je jako `USR` z pełnym brzmieniem
+Odpowiedzi użytkownika w skrócie („14c, 15a”) są w porządku - zapisz je jako `USR` z pełnym brzmieniem
 wybranej opcji.
 
 # Weryfikacja
 
 Przed każdą bramką i przed przekazaniem do dokumentu przejdź przez
-[checklistę bramek warsztatu](./checklists/phase-gate-checklist.md).
+[checklistę bramek warsztatu](./checklists/phase-gate-checklist.md). Dokument docelowy sprawdź poleceniem
+`python "<runtime>/flowkit_exec.py" --role <rola> -- plain-check <dokument.md> --strict`; ostrzeżenia popraw albo uzasadnij.

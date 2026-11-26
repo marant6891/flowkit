@@ -91,7 +91,8 @@ Every question to the user — checkpoint `Next:` choice, `ASK_USER`, `WAIT_FOR_
 - One question per item, 2–4 options, the recommended option first and marked `(Recommended)`; the user can always answer in their own words.
 - At most 4 questions per call; more questions → the most blocking ones first, the rest in the next call. A question table from a skill (ID, reason, default) stays as text above the call, and each row becomes one question.
 - Plain-text options do not count as asking. Do not end the turn with an unanswered question that was not sent through the window.
-- Only when the tool is unavailable, fails, or the session is non-interactive, ask in plain text.
+- Only when the tool is unavailable, fails, or the session is non-interactive, ask in plain text. This includes `AUTO:` stops (`WAIT_FOR_APPROVAL`): they also go through the window.
+- The reason in `Ask: text — <reason>` is concrete: `tool not in this agent's tool list` (then tell the user to run `doctor`: the installed agent is probably outdated), `running as a subagent`, `non-interactive session`, or `tool error: <message>`.
 - Every checkpoint block and every question ends with the line `Ask: window | text — <reason> | auto` saying how the user was asked (`auto` = `AUTO:` mode took the recommended option). The line is diagnostic and must be truthful.
 """
 

@@ -21,6 +21,8 @@
 - [ ] Oczekiwana liczba rekordów jest podana, a inna liczba przerywa skrypt.
 - [ ] Poprzednie wartości są zachowane i jest skrypt odtworzenia; `UPDATE` sprawdza poprzednią wartość lub wersję.
 - [ ] Opisano blokady i czas transakcji dla dużych tabel; nieznane triggery, klucze obce i ograniczenia wypisano jako niewiadome.
+- [ ] Opakowanie (zasada 14): nagłówek z `ZGŁOSZENIE:`, wypisany serwer i baza z kontrolą oczekiwanej bazy, kroki `KROK n` z komunikatami liczby wierszy.
+- [ ] Obsługa błędów wycofuje całość (SQL Server `TRY/CATCH` z `ROLLBACK` i `THROW`); tabele tymczasowe są sprzątane, a skrypt odtworzenia jest w komentarzu.
 
 ## D. Zestawienie analityczne (`ANALYTICS_REPORT`)
 - [ ] Karta raportu jest kompletna: pytanie biznesowe, okres, granulacja, data biznesowa i strefa czasowa, wymiary, filtry, odbiorca.
@@ -35,5 +37,6 @@
 
 ## E. Odbiorca
 - [ ] Instrukcja wyjaśnia prostym językiem, co uzupełnić i jaki wynik jest poprawny.
+- [ ] Opisy i podsumowania spełniają standard prostego języka (`<runtime>/procedures/plain-language.md`): najważniejsze na początku, zdania do 20 słów, bez korpomowy; kod SQL jest poza tymi regułami.
 - [ ] Opisano, co zrobić przy innym wyniku i kto zatwierdza zmianę.
 - [ ] `check_sql.py` nie zgłasza błędów.

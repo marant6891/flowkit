@@ -9,7 +9,7 @@ Usuń komentarze i placeholdery [..] przed oddaniem.
 
 ## Podsumowanie
 
-[Najwyżej 3 zdania: ogólna gotowość, 1–3 najważniejsze luki.]
+[Najwyżej 3 zdania: ogólna gotowość, 1-3 najważniejsze luki.]
 
 ## Ustalenia
 
@@ -25,5 +25,5 @@ Usuń komentarze i placeholdery [..] przed oddaniem.
 
 ## Brak danych i sprawdzenia w środowisku
 
-- **Brak danych:** [obszar – czego brakuje do oceny]
+- **Brak danych:** [obszar - czego brakuje do oceny]
 - **NOT_RUN:** [co wymaga sprawdzenia w działającym klastrze lub monitoringu, np. test odtworzenia backupu]

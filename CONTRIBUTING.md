@@ -39,15 +39,15 @@ description: >
 **Zasady:**
 - `name` **musi być identyczne** z nazwą katalogu (`skills/<name>/`).
 - Nazwa w formacie `kebab-case`, małe litery, bez polskich znaków.
-- `tags` — co najmniej 3 słowa kluczowe po angielsku.
-- `version` — format `"X.Y"` (np. `"1.0"`).
+- `tags` - co najmniej 3 słowa kluczowe po angielsku.
+- `version` - format `"X.Y"` (np. `"1.0"`).
 
 ### Wymagana zawartość SKILL.md
 
 Skill musi zawierać:
-1. **Cel** — 2–4 zdania opisujące przeznaczenie.
-2. **Zasady nadrzędne** — minimum 3, zawsze obowiązujące reguły (sprawdzalne obiektywnie).
-3. **Etapy pracy** — minimum 3 etapy, ostatni musi być etapem weryfikacji z odesłaniem do checklisty.
+1. **Cel** - 2-4 zdania opisujące przeznaczenie.
+2. **Zasady nadrzędne** - minimum 3, zawsze obowiązujące reguły (sprawdzalne obiektywnie).
+3. **Etapy pracy** - minimum 3 etapy, ostatni musi być etapem weryfikacji z odesłaniem do checklisty.
 
 ### Zasada rzetelności (obowiązkowa we wszystkich skillach)
 

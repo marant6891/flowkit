@@ -62,7 +62,7 @@ generowaniu. Aby przenieść taki diagram, wstaw nowy znacznik. Opcja
 
 Skrypt dodaje zdanie wprowadzające w stylu tekstu dokumentu, grafikę, tekst alternatywny i podpis „Rysunek N.”.
 Numeracja wynika z kolejności w dokumencie i uwzględnia rysunki już obecne w szablonie klienta. Uruchomienie skryptu ponownie podmienia diagramy, zamiast je powielać, więc po zmianie jednego
-modelu wystarczy powtórzyć kroki 1–4 dla tego diagramu.
+modelu wystarczy powtórzyć kroki 1-4 dla tego diagramu.
 
 - **DOCX i DOTX:** szablon `.dotx` pozostaje bez zmian, a wynik zapisywany jest jako `.docx`. Osadzany jest PNG (3×), dopasowany do marginesów sekcji. Style, nagłówki i stopki szablonu pozostają bez zmian.
 - **Markdown:** dokument odwołuje się względną ścieżką do pliku SVG.

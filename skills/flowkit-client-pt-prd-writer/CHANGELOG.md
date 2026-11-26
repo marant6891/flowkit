@@ -1,5 +1,9 @@
 # Historia zmian skilla flowkit-client-pt-prd-writer
 
+## 3.5 (26.11.2026)
+
+- **Domyślnie wersja dla klienta.** Domyślnym trybem wyniku jest teraz „Wersja dla klienta” (czysta treść bez oznaczeń roboczych, wątpliwości zebrane w sekcji „Kwestie do wyjaśnienia”, rejestr pochodzenia poza dokumentem). Tryb roboczy jest dostępny wyłącznie na wyraźną prośbę.
+
 ## 3.4 (26.11.2026)
 
 - Prosty język PL i EN według standardu FlowKit (`runtime/procedures/plain-language.md`): treść dla klienta. Nowa zasada

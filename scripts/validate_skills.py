@@ -60,6 +60,13 @@ def check_skill(skill_path: Path, readme: str) -> None:
     if not isinstance(tags, list) or len(tags) < 3:
         err("'tags' must be a list with at least 3 entries")
 
+    # Prosty język: każdy skill odwołuje się do wspólnego standardu (runtime/procedures/plain-language.md).
+    if "procedures/plain-language.md" not in body:
+        err("SKILL.md must reference the plain language standard `<runtime>/procedures/plain-language.md`")
+    checklists = " ".join(p.read_text(encoding="utf-8") for p in (skill_path / "checklists").glob("*.md"))
+    if "prost" not in checklists.casefold():
+        err("checklists/ must include a plain language check (prosty język)")
+
     # Wymagana struktura
     if not has_md(skill_path / "templates"):
         err("'templates/' must contain at least one .md file")

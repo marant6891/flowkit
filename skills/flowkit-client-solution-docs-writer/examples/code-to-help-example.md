@@ -46,7 +46,7 @@ Zgłoś zwrot produktów z dostarczonego zamówienia. Masz na to 30 dni od dosta
 | „Zwrot można zgłosić tylko dla dostarczonego zamówienia” | Zamówienie nie zostało jeszcze dostarczone | Poczekaj na dostarczenie zamówienia |
 | „Minął termin zwrotu” | Od dostarczenia minęło ponad 30 dni | DO POTWIERDZENIA (OPEN-003: kontakt do obsługi) |
 
-[ZRZUT: Moje zamówienia > Zgłoś zwrot – formularz z wybranym powodem]
+[ZRZUT: Moje zamówienia > Zgłoś zwrot, formularz z wybranym powodem]
 
 (SRC-001, routes.py:17-37; SRC-002, pl.json)
 ```

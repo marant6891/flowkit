@@ -1,5 +1,12 @@
 # Historia zmian skilla flowkit-client-message-editor
 
+## 1.1 (26.11.2026)
+
+- Prosty język PL i EN według standardu FlowKit (`runtime/procedures/plain-language.md`): zasada 11, nowe sekcje
+  w zwrotach (wata, korpomowa, kalki, fałszywi przyjaciele w angielskim) i punkty checklisty.
+- `check_message.py` sprawdza reguły prostego języka wspólnym modułem `plain_language` (opcja `--lang`).
+  Reguły FAIL są błędami tylko z `--final`.
+
 ## 1.0 (26.11.2026)
 
 - Redakcja szkicu e-maila lub wiadomości (Teams, Slack) do klienta: język, ton, struktura, jedna wyraźna prośba z terminem, bez nowych faktów i zobowiązań.

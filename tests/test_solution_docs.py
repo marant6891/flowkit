@@ -98,6 +98,15 @@ class TestCheckUserDocs(unittest.TestCase):
         self.assertIn("krok ma", joined)
         self.assertIn("formułka", joined)
 
+    def test_working_sections_are_exempt_only_in_draft(self):
+        doc = ("# Pomoc\n\n## 1. Logowanie\n\nKliknij **Zaloguj**.\n\n"
+               "## Załącznik B. Materiały źródłowe\n\n| SRC-001 | views/login/login.html | Strona logowania |\n\n"
+               "## 2. Wylogowanie\n\nPlik login.html.\n")
+        errors, _ = run(doc, mode="draft")
+        self.assertEqual(len(errors), 1)  # tylko rozdział 2 po sekcji roboczej
+        self.assertIn("login.html", errors[0])
+        self.assertGreater(len(run(doc, mode="client")[0]), 1)
+
     def test_code_blocks_are_ignored(self):
         self.assertEqual(run("```\nGET /api/orders\n```\n")[0], [])
 
@@ -130,11 +139,125 @@ class TestCheckUserDocs(unittest.TestCase):
             self.assertTrue(any("zrzutu" in e for e in errors))
 
 
+CATALOG = """| ID | Element (nazwa w interfejsie) | Rodzaj | Gdzie | Co robi lub co znaczy | Warunek | Funkcja | Status | Źródło |
+|---|---|---|---|---|---|---|---|---|
+| OPT-001 | **Zgłoś zwrot** | przycisk | lista zamówień | Otwiera formularz | brak | FEAT-001 | opisana | pl.json |
+| OPT-002 | **Powód zwrotu** | pole | formularz | Wymagany wybór | brak | FEAT-001 | opisana | routes.py:27 |
+| OPT-003 | **Akceptuj częściowo** | przycisk | panel kierownika | Brak działania | rola | FEAT-002 | pominięta: nieukończona | routes.py:44 |
+"""
+
+
+class TestCheckCoverage(unittest.TestCase):
+
+    def files(self, document: str):
+        import check_coverage as cc
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        doc = Path(tmp.name) / "pomoc.md"
+        doc.write_text(document, encoding="utf-8")
+        catalog = Path(tmp.name) / "katalog.md"
+        catalog.write_text(CATALOG, encoding="utf-8")
+        return cc.check(doc, catalog)
+
+    def test_skipped_items_are_not_required(self):
+        errors, _, stats = self.files(GOOD_TOPIC + "\n| **Powód zwrotu** | Tak | Wybór z listy |\n")
+        self.assertEqual(errors, [])
+        self.assertEqual((stats["total"], stats["required"], stats["skipped"]), (3, 2, 1))
+
+    def test_missing_option_fails(self):
+        errors, _, _ = self.files("# Zwroty\n\nKliknij **Zgłoś zwrot**.\n")
+        self.assertEqual(len(errors), 1)
+        self.assertIn("OPT-002", errors[0])
+
+    def test_no_pictures_in_large_help_is_warning(self):
+        text = "# A\n\nZgłoś zwrot, Powód zwrotu\n\n# B\n\ntekst\n\n# C\n\ntekst\n"
+        _, warnings, _ = self.files(text)
+        self.assertTrue(any("rysunku" in w for w in warnings))
+        _, warnings, stats = self.files(text + "\n[[DIAGRAM:D-01]]\n")
+        self.assertEqual(warnings, [])
+        self.assertEqual(stats["images"], 1)
+
+
+DRAFT = """# Pomoc
+
+**Uwaga dla zespołu (wersja robocza):** nazwy są robocze.
+Do sprawdzenia z eksportem.
+
+## 1. Logowanie
+
+1. Otwórz adres aplikacji w przeglądarce. (OPEN-002: adres)
+2. Kliknij **Zaloguj**.
+
+[ZRZUT: Strona logowania, pusty formularz]
+
+(SRC-001, login.html:168-256)
+
+## 2. Wylogowanie
+
+Wybierz **Wyloguj**. DO POTWIERDZENIA (OPEN-004: położenie panelu).
+
+## 3. Tematy do wyjaśnienia
+
+| ID | Temat | Czego brakuje | Kto |
+|---|---|---|---|
+| OPEN-004 | Wylogowanie | Położenie panelu | Zespół |
+
+## Załącznik A. Robocze nazwy
+
+| Nazwa | Klucz |
+|---|---|
+| Zaloguj | login.LOG |
+"""
+
+
+class TestMakeClientVersion(unittest.TestCase):
+
+    def setUp(self):
+        import make_client_version as mcv
+        self.mcv = mcv
+
+    def test_final_refuses_open_gaps(self):
+        _, _, gaps = self.mcv.convert(DRAFT, "final")
+        self.assertEqual(len(gaps), 1)
+        self.assertIn("OPEN-004", gaps[0])
+
+    def test_final_output_is_clean_and_register_keeps_sources(self):
+        draft = DRAFT.replace(" DO POTWIERDZENIA (OPEN-004: położenie panelu).", " (OPEN-004: położenie panelu)")
+        body, register, gaps = self.mcv.convert(draft, "final")
+        self.assertEqual(gaps, [])
+        for marker in ("SRC-", "OPEN-", "ZRZUT", "Uwaga dla zespołu", "Tematy do wyjaśnienia", "Załącznik A",
+                       "login.html", "Do sprawdzenia z eksportem"):
+            self.assertNotIn(marker, body, marker)
+        self.assertIn("Otwórz adres aplikacji w przeglądarce.", body)
+        self.assertIn("Kliknij **Zaloguj**.", body)
+        self.assertIn("SRC-001, login.html:168-256", register)
+        self.assertIn("[ZRZUT: Strona logowania", register)
+        self.assertIn("login.LOG", register)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "pomoc.md"
+            path.write_text(body, encoding="utf-8")
+            self.assertEqual(cu.check_file(path, "user", "final")[0], [])
+
+    def test_client_mode_turns_gaps_into_questions(self):
+        body, _, gaps = self.mcv.convert(DRAFT, "client")
+        self.assertEqual(gaps, [])
+        self.assertIn("Do ustalenia (K-01).", body)
+        self.assertIn("| K-01 | Wylogowanie |", body)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "pomoc.md"
+            path.write_text(body, encoding="utf-8")
+            self.assertEqual(cu.check_file(path, "user", "client")[0], [])
+
+
 class TestSkillWiring(unittest.TestCase):
 
     def test_executor_allows_check_script(self):
         self.assertIn("check_user_docs.py", fx.SKILL_SCRIPTS["flowkit-client-solution-docs-writer"])
         self.assertIn("check_user_docs.py", fx.READONLY_SKILL_SCRIPTS["flowkit-client-solution-docs-writer"])
+        self.assertIn("check_coverage.py", fx.SKILL_SCRIPTS["flowkit-client-solution-docs-writer"])
+        self.assertIn("check_coverage.py", fx.READONLY_SKILL_SCRIPTS["flowkit-client-solution-docs-writer"])
+        self.assertIn("make_client_version.py", fx.SKILL_SCRIPTS["flowkit-client-solution-docs-writer"])
+        self.assertNotIn("make_client_version.py", fx.READONLY_SKILL_SCRIPTS["flowkit-client-solution-docs-writer"])
         self.assertIsNone(fx.check("analyst", ["python", str(SCRIPT), "pomoc.md", "--mode", "client"]))
 
     def test_docx_engine_reference_is_shared_copy(self):

@@ -8,6 +8,7 @@ Specialized requirements and decision role. Produces numbered User Stories (`US-
 - Keep `US-N` and `AC-N` identifiers stable once written to preserve downstream traceability into Planner and Verifier.
 - Explicitly separate confirmed decisions from open questions (`OPEN-N`).
 - Document explicit non-goals under `Out of scope:`.
+- Write in plain language per `<runtime>/procedures/plain-language.md`: one requirement per sentence, clear actor and verb, no corporate jargon.
 
 ## Output Contract
 

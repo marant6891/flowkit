@@ -1,8 +1,8 @@
 <!--
   Szablon ZAPASOWY. Używaj go tylko, gdy użytkownik nie dostarczył własnego wzoru.
   Wynik to DWA OSOBNE PLIKI:
-  - PLIK 1 (Część A): recap-YYYY-MM-DD-[skrót-projektu]-wewnetrzne.md — NIE wysyłać klientowi!
-  - PLIK 2 (Część B): recap-YYYY-MM-DD-[skrót-projektu]-klient.md — szkic e-maila do klienta.
+  - PLIK 1 (Część A): recap-YYYY-MM-DD-[skrót-projektu]-wewnetrzne.md - NIE wysyłać klientowi!
+  - PLIK 2 (Część B): recap-YYYY-MM-DD-[skrót-projektu]-klient.md - szkic e-maila do klienta.
   Wszystko w nawiasach [...] to placeholder; brak danych oznacz `DO POTWIERDZENIA`.
   Usuń komentarze i placeholdery przed oddaniem.
 -->
@@ -20,23 +20,23 @@ Każdy wpis: obserwacja + dowód (cytat, mówca, znacznik czasu). Bez dowodu nie
 
 | Obszar | Dowód z transkrypcji (cytat, mówca, czas) | Interpretacja |
 |---|---|---|
-| Nastroje klienta / dynamika rozmowy | [„cytat” — Imię i Nazwisko, HH:MM:SS] | [Interpretacja: …] |
-| Próby rozszerzenia zakresu (Scope Creep) | [„cytat” — Imię i Nazwisko, HH:MM:SS] | [Interpretacja: …] |
-| Zależności i wąskie gardła | [„cytat” — Imię i Nazwisko, HH:MM:SS] | [Interpretacja: …] |
+| Nastroje klienta / dynamika rozmowy | [„cytat” - Imię i Nazwisko, HH:MM:SS] | [Interpretacja: …] |
+| Próby rozszerzenia zakresu (Scope Creep) | [„cytat” - Imię i Nazwisko, HH:MM:SS] | [Interpretacja: …] |
+| Zależności i wąskie gardła | [„cytat” - Imię i Nazwisko, HH:MM:SS] | [Interpretacja: …] |
 
 [Obszar bez obserwacji: „Brak obserwacji w transkrypcji”.]
 
 ## 2. Kluczowe punkty uwagi dla PM / Account / Analityka
 
-- [Kwestia wymagająca wewnętrznego przedyskutowania przed kolejnym spotkaniem — z odwołaniem do wpisu z Radaru]
+- [Kwestia wymagająca wewnętrznego przedyskutowania przed kolejnym spotkaniem - z odwołaniem do wpisu z Radaru]
 
 <!-- ===================== PLIK 2: CZĘŚĆ B ===================== -->
 
-**Temat:** [Podsumowanie spotkania] [Nazwa Projektu] — Ustalenia i kolejne kroki (DD.MM.YYYY)
+**Temat:** [Podsumowanie spotkania] [Nazwa Projektu] - Ustalenia i kolejne kroki (DD.MM.YYYY)
 
 ---
 
-[Wybierz jedno powitanie zgodnie z tonem relacji — formalne: „Szanowni Państwo,” / semi-formalne: „Dzień dobry {Imię},”]
+[Wybierz jedno powitanie zgodnie z tonem relacji - formalne: „Szanowni Państwo,” / semi-formalne: „Dzień dobry {Imię},”]
 
 dziękuję za dzisiejsze spotkanie dotyczące **[Temat spotkania / Nazwa Projektu]**.
 
@@ -69,7 +69,7 @@ Poniżej przesyłam zwięzłe podsumowanie naszych kluczowych ustaleń oraz list
 ### 3. Tematy otwarte i pytania blokujące
 
 *Kwestie, które wymagają dodatkowych konsultacji lub decyzji:*
-1. **[Temat]:** [Opis wątpliwości i kto musi podjąć decyzję — lub DO POTWIERDZENIA].
+1. **[Temat]:** [Opis wątpliwości i kto musi podjąć decyzję - lub DO POTWIERDZENIA].
 
 [Jeśli brak: „Brak tematów otwartych.”]
 
@@ -77,7 +77,7 @@ Poniżej przesyłam zwięzłe podsumowanie naszych kluczowych ustaleń oraz list
 
 ### 4. Następne kroki i weryfikacja ustaleń
 
-- **Kolejne spotkanie:** [DD.MM.YYYY, godz. HH:MM — tylko jeśli padło na spotkaniu; inaczej DO POTWIERDZENIA].
+- **Kolejne spotkanie:** [DD.MM.YYYY, godz. HH:MM - tylko jeśli padło na spotkaniu; inaczej DO POTWIERDZENIA].
 - **Weryfikacja ustaleń:** *Gdyby którykolwiek z powyższych punktów różnił się od Państwa notatek lub wymagał doprecyzowania, uprzejmie proszę o informację zwrotną w ciągu [48 godzin / okno ustalone w projekcie].*
 
 Pozdrawiam serdecznie,  

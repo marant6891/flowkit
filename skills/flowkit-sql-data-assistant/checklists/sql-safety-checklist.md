@@ -37,5 +37,6 @@
 
 ## E. Odbiorca
 - [ ] Instrukcja wyjaśnia prostym językiem, co uzupełnić i jaki wynik jest poprawny.
+- [ ] Opisy i podsumowania spełniają standard prostego języka (`<runtime>/procedures/plain-language.md`): najważniejsze na początku, zdania do 20 słów, bez korpomowy; kod SQL jest poza tymi regułami.
 - [ ] Opisano, co zrobić przy innym wyniku i kto zatwierdza zmianę.
 - [ ] `check_sql.py` nie zgłasza błędów.

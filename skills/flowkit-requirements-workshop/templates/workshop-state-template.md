@@ -5,11 +5,11 @@
 | Skrót projektu | <skrót> |
 | Rozpoczęty | <RRRR-MM-DD> |
 | Ostatnia aktualizacja | <RRRR-MM-DD>, runda <N> |
-| Uczestnicy i role | <osoba — rola; kto decyduje o biznesie, kto o technice> |
+| Uczestnicy i role | <osoba - rola; kto decyduje o biznesie, kto o technice> |
 | Odbiorca dokumentu docelowego | <klient / zespół / …> |
 | Głębokość | szybka / pełna |
 | Rodzaj | nowa aplikacja / zmiana istniejącej |
-| Aktualna faza | <0–5> |
+| Aktualna faza | <0-5> |
 
 ## Status faz
 

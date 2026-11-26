@@ -19,6 +19,17 @@ Dla każdego punktu zapisz: „jest (SRC-NNN, plik:linia)”, „nie dotyczy” 
 - [ ] Statusy i dozwolone przejścia.
 - [ ] Limity i reguły biznesowe (terminy, kwoty, liczby) z kodu lub konfiguracji domyślnej.
 
+## B2. Katalog opcji (zasada 11)
+
+- [ ] Każdy przycisk i ikona widoku: podpowiedź, działanie (handler), warunek widoczności.
+- [ ] Wszystkie kolumny tabel z definicji kolumn, także domyślnie ukryte, z formatem wartości.
+- [ ] Wszystkie zakładki i panele szczegółów z ich opcjami (daty, filtry, przyciski).
+- [ ] Wszystkie polecenia menu podręcznego; polecenia bez działania oznaczone jako pominięte.
+- [ ] Statusy, typy obiektów, kolory wierszy i ikony stanu z enumeracji i stylów.
+- [ ] Odświeżanie danych: automatyczne (interwał), ręczne, zależności od uprawnień.
+- [ ] Źródło tekstów interfejsu: pliki tłumaczeń w repozytorium albo serwer lub baza (wtedy pytanie blokujące z Etapu 0).
+- [ ] Kandydaci na rysunki: układ ekranu, procesy z decyzją, cykle statusów, przepływ danych.
+
 ## C. Administracja (admin)
 
 - [ ] Wymagania środowiska z plików projektu.

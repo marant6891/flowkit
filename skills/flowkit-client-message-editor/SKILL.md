@@ -1,6 +1,6 @@
 ---
 name: flowkit-client-message-editor
-version: "1.0"
+version: "1.1"
 tags: [email, message, editor, client, communication, tone, confirmation, teams, slack]
 description: >
   Redaguje szkic e-maila lub wiadomości (Teams, Slack) do klienta: poprawia język,
@@ -31,7 +31,7 @@ Ustal tryb i kanał na początku i podaj je w pierwszym wierszu odpowiedzi (`Try
 | Kanał | Forma |
 |---|---|
 | `EMAIL` (domyślny) | temat, powitanie, treść, prośba, zamknięcie, podpis |
-| `WIADOMOŚĆ` | komunikator: 1–5 zdań, bez formalnego nagłówka, prośba w pierwszym lub ostatnim zdaniu |
+| `WIADOMOŚĆ` | komunikator: 1-5 zdań, bez formalnego nagłówka, prośba w pierwszym lub ostatnim zdaniu |
 
 Gdy użytkownik nie podał trybu, rozpoznaj go z treści. Sygnały trybu `DUPOKRYTKA`: zmiana zakresu, terminu
 lub budżetu, czekanie na klienta, odrzucona rekomendacja, ryzyko, „ustaliliśmy telefonicznie”, eskalacja.
@@ -67,13 +67,18 @@ Komunikator nie jest dobrym miejscem na zapis ustaleń.
 10. **Zwięźle i naturalnie.** `ZWYKŁY`: nie dłużej niż szkic, chyba że brakuje prośby lub terminu.
     `WIADOMOŚĆ`: najwyżej 5 zdań. Bez długich myślników (`—`, `–`; użyj przecinka, dwukropka lub `-`), bez
     ozdobnych emoji i formułek AI („Mam nadzieję, że ta wiadomość zastaje…”, „Warto podkreślić…”).
+11. **Prosty język.** Stosuj standard FlowKit `<runtime>/procedures/plain-language.md` (PL i EN): najważniejsze
+    na początku, zdania do 20 słów (EN: 25), czasowniki zamiast „dokonać zmiany”, bez korpomowy („zaparkować”,
+    „zaadresować”, „na ten moment”) i bez kalk składniowych („To, co…, to…”, „To drugi raz, gdy…”). W angielskim
+    unikaj fałszywych przyjaciół (*actual*, *eventually*, *realize*). Poprawiasz formę, nie sens (zasada 2).
+    Zamienniki: [zwroty](./references/phrasebook.md).
 
 # Pytania do użytkownika
 
 Każde pytanie do użytkownika zadawaj przez okno pytań, gdy jest dostępne (VS Code: `#tool:vscode/askQuestions`,
 Claude Code: `AskUserQuestion`):
 
-- jedno pytanie to jedna pozycja z 2–4 wariantami; rekomendowany wariant pierwszy, oznaczony „(rekomendowane)”;
+- jedno pytanie to jedna pozycja z 2-4 wariantami; rekomendowany wariant pierwszy, oznaczony „(rekomendowane)”;
   użytkownik zawsze może odpowiedzieć własnymi słowami,
 - najwyżej 4 pytania w jednym oknie; więcej pytań: najpierw blokujące, resztę w kolejnym oknie,
 - tabelę pytań (ID, uzasadnienie, propozycja domyślna) pokaż najpierw jako tekst, a każdy jej wiersz zadaj w oknie,
@@ -100,22 +105,29 @@ Według sekcji „Tryby i kanały”. Gdy pytasz, zrób to raz, na początku.
 
 ### Etap 3: Zredaguj
 Użyj [szablonów wiadomości](./templates/message-templates.md) dla trybu i kanału oraz
-[zwrotów](./references/phrasebook.md). W trybie `DUPOKRYTKA` ułóż treść w ponumerowane punkty: stan na dzień,
-ustalenia i decyzje (kto, kiedy), zakres (w zakresie / poza zakresem), ryzyka i ich akceptacja, na co czekamy
-od klienta (od kiedy, wpływ na termin), prośba o potwierdzenie do daty z możliwością odpowiedzi punkt po
-punkcie. Przykłady przed i po: [przykłady](./examples/rewrite-examples.md).
+[zwrotów](./references/phrasebook.md). W trybie `DUPOKRYTKA` ułóż treść w ponumerowane punkty:
+1. stan na dzień,
+2. ustalenia i decyzje (kto, kiedy),
+3. zakres (w zakresie / poza zakresem),
+4. ryzyka i ich akceptacja,
+5. na co czekamy od klienta (od kiedy, wpływ na termin),
+6. prośba o potwierdzenie do daty, z możliwością odpowiedzi punkt po punkcie.
+
+Przykłady przed i po: [przykłady](./examples/rewrite-examples.md).
 
 ### Etap 4: Oddaj wynik
 Według [wzoru odpowiedzi](./templates/answer-template.md):
 1. `Tryb: … · Kanał: …`,
 2. wersja do wysłania (temat i treść) w bloku do skopiowania,
 3. co zmieniono (najwyżej 7 punktów),
-4. `[DO UZUPEŁNIENIA]` — lista brakujących elementów,
+4. `[DO UZUPEŁNIENIA]` - lista brakujących elementów,
 5. uwagi tylko dla autora: usunięte emocje i uwagi wewnętrzne, ryzykowne zobowiązania, sugestie zmiany sensu.
 Na prośbę dodaj wariant krótszy albo wersję w innym języku.
 
 ### Etap 5: Weryfikacja przed oddaniem
 Zapisz wersję do wysłania w pliku `.txt` lub `.md` i sprawdź ją poleceniem
-`python "<SKILL_DIR>/scripts/check_message.py" <plik> --mode zwykly|dupokrytka`, gdzie `<SKILL_DIR>` to katalog
-tego pliku (w Claude Code: `${CLAUDE_SKILL_DIR}`). Popraw błędy, a ostrzeżenia wyjaśnij w uwagach. Na koniec
-przejdź przez [checklistę redaktora](./checklists/message-editor-checklist.md).
+`python "<SKILL_DIR>/scripts/check_message.py" <plik> --mode zwykly|dupokrytka --final`, gdzie `<SKILL_DIR>` to
+katalog tego pliku (w Claude Code: `${CLAUDE_SKILL_DIR}`). Skrypt sprawdza też prosty język (`--lang auto|pl|en`).
+Popraw błędy, a ostrzeżenia `prosty język` popraw albo krótko uzasadnij w uwagach. Reguł wymagających oceny
+(szyk zdania, strona bierna) skrypt nie wykryje: sprawdź je sam. Na koniec przejdź przez
+[checklistę redaktora](./checklists/message-editor-checklist.md).

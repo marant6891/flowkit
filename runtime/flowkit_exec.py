@@ -57,7 +57,7 @@ VALIDATION = (
 )
 DELIVERY = ("git switch -c", "git add", "git commit -m", "git push -u origin", "gh pr create")
 HELP = ("help", "doctor")
-DOCUMENTS = ("read-document", "detect-docx-libs")
+DOCUMENTS = ("read-document", "detect-docx-libs", "plain-check")
 DOCUMENT_WRITE = ("md-to-docx",)
 STATUS_FOOTER = "[kod wyjścia: {code}]"
 BUILTINS = {
@@ -66,6 +66,8 @@ BUILTINS = {
               "dziennik audytu, FLOWKIT_EXTRA_PATHS, narzędzia DOCX; każdy problem z podpowiedzią",
     "read-document": "read-document <plik> [--outline] [--lines OD-DO] — odczyt .docx/.dotx/.xlsx/.pdf/.md/.txt",
     "detect-docx-libs": "detect-docx-libs — biblioteki i narzędzia do pracy z DOCX i diagramami",
+    "plain-check": "plain-check <plik> [...] [--lang auto|pl|en] [--strict] [--audience tech|user] [--glossary plik] — "
+                   "prosty język i kalki według runtime/procedures/plain-language.md (.md/.txt/.docx/.pdf); --strict: tryb końcowy",
     "check-json": "check-json <plik.json> [...] — sprawdza poprawność składni JSON (PASS/FAIL dla każdego pliku)",
     "md-to-docx": "md-to-docx <wejście.md> <wynik.docx> [--reference-doc szablon] [--template szablon] "
                   "[--engine auto|pandoc|python-docx] [--set POLE=WARTOŚĆ] [--keep-images] [--pdf] — zapis DOCX z Markdown, "
@@ -88,14 +90,14 @@ SKILL_SCRIPTS = {
                              "check_status_labels.py", "check_client_version.py"},
     "flowkit-sql-data-assistant": {"check_sql.py"},
     "flowkit-client-message-editor": {"check_message.py"},
-    "flowkit-client-solution-docs-writer": {"check_user_docs.py"},
+    "flowkit-client-solution-docs-writer": {"check_user_docs.py", "check_coverage.py", "make_client_version.py"},
 }
 # Skrypty kontrolne, które tylko czytają pliki: Verifier uruchamia je w audycie, ale nie generuje ani nie wstawia diagramów.
 READONLY_SKILL_SCRIPTS = {
     "flowkit-client-pt-prd-writer": {"validate_diagram.py", "check_status_labels.py", "check_client_version.py"},
     "flowkit-sql-data-assistant": {"check_sql.py"},
     "flowkit-client-message-editor": {"check_message.py"},
-    "flowkit-client-solution-docs-writer": {"check_user_docs.py"},
+    "flowkit-client-solution-docs-writer": {"check_user_docs.py", "check_coverage.py"},
 }
 ROLE_SKILL_SCRIPTS = {"orchestrator": SKILL_SCRIPTS, "analyst": SKILL_SCRIPTS, "verifier": READONLY_SKILL_SCRIPTS}
 SKILL_SCRIPT_ROLES = set(ROLE_SKILL_SCRIPTS)
@@ -575,6 +577,16 @@ def check_json(paths: list[str]) -> int:
     return 1 if failed else 0
 
 
+def plain_check(args: list[str]) -> int:
+    """plain-check: kontrola prostego języka (runtime/plain_language.py), bez zapisu plików."""
+    import plain_language
+
+    try:
+        return plain_language.main(args)
+    except SystemExit as error:  # argparse: błędne opcje lub --help
+        return error.code if isinstance(error.code, int) else 2
+
+
 def show_help(role: str) -> int:
     print(f"Rola: {role}. Uruchamiaj: flowkit_exec.py --role {role} -- <polecenie> [argumenty]")
     print("Polecenia wbudowane:")
@@ -650,6 +662,8 @@ def run(argv: list[str], role: str = "orchestrator") -> int:
         return detect_docx_libs()
     if name[0] == "check-json":
         return check_json(argv[1:])
+    if name[0] == "plain-check":
+        return plain_check(argv[1:])
     argv = with_limits(argv)
     executable = sys.executable if name[0] in PYTHON_NAMES else shutil.which(argv[0])
     if executable is None:

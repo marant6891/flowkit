@@ -1,7 +1,7 @@
 <!--
 Szablon ZAPASOWY. Używaj go tylko, gdy użytkownik nie dostarczył własnego szablonu.
 Sekcje oznaczone (warunkowa) umieszczaj tylko, gdy dotyczą zmiany. Niedotyczące usuń
-i wymień jednym zdaniem w sekcji 3 („Pominięto sekcje: …”). Brak danych: „Brak danych – patrz OPEN-NNN”.
+i wymień jednym zdaniem w sekcji 3 („Pominięto sekcje: …”). Brak danych: „Brak danych - patrz OPEN-NNN”.
 Zwięzłość: każda informacja raz, tabele bez zdań wprowadzających, objętość wg SKILL.md (Etap 5).
 Usuń wszystkie komentarze i placeholdery [..] przed oddaniem dokumentu.
 Statusy, priorytety i wymagalność zapisuj po polsku (references/status-vocabulary.md).
@@ -35,9 +35,9 @@ Procesy, przepływy, integracje i relacje oceń pod kątem diagramu (SKILL.md, E
 |---|---|---|---|---|
 | SRC-001 | [Nazwa / link] | [Ticket / mail / notatka / kod / dokumentacja] | [Data] | [Co z niego wynika] |
 
-Oznaczenia w dokumencie: `SRC-NNN` – informacja potwierdzona źródłem;
-`ASSUMPTION-NNN` – założenie do potwierdzenia; `OPEN-NNN` – temat do wyjaśnienia;
-`DO POTWIERDZENIA` – wartość nieznana.
+Oznaczenia w dokumencie: `SRC-NNN` - informacja potwierdzona źródłem;
+`ASSUMPTION-NNN` - założenie do potwierdzenia; `OPEN-NNN` - temat do wyjaśnienia;
+`DO POTWIERDZENIA` - wartość nieznana.
 
 ## 1. Streszczenie zarządcze
 
@@ -46,7 +46,7 @@ efekt dla klienta, kluczowe ryzyka i decyzje oczekujące.]
 
 ## 2. Kontekst i cel zmiany
 
-[Jeden akapit: obecny stan i powód zmiany – ze źródłem.]
+[Jeden akapit: obecny stan i powód zmiany - ze źródłem.]
 
 | ID | Cel | Mierzalny efekt | Źródło |
 |---|---|---|---|
@@ -71,10 +71,10 @@ Pominięto sekcje: [lista sekcji warunkowych, których zmiana nie dotyczy].
 ## 4. Proces obecny i docelowy (warunkowa)
 
 ### 4.1 Stan obecny
-[As-is – ze źródła / z analizy kodu.]
+[As-is - ze źródła / z analizy kodu.]
 
 ### 4.2 Stan docelowy
-[To-be – ze źródła. Diagram procesu, gdy spełnia kryteria z Etapu 5a.]
+[To-be - ze źródła. Diagram procesu, gdy spełnia kryteria z Etapu 5a.]
 
 ### 4.3 Różnice
 
@@ -105,7 +105,7 @@ Pominięto sekcje: [lista sekcji warunkowych, których zmiana nie dotyczy].
 | S1 Ścieżka główna | [stan początkowy] | [akcja] | [oczekiwany wynik] |
 | S2 [Przypadek brzegowy ze źródła] | [stan] | [akcja] | [wynik] |
 
-## 8. Wymagania niefunkcjonalne (warunkowa – tylko ze źródeł)
+## 8. Wymagania niefunkcjonalne (warunkowa - tylko ze źródeł)
 
 | ID | Kategoria | Wymaganie | Miara / kryterium | Źródło |
 |---|---|---|---|---|
@@ -113,7 +113,7 @@ Pominięto sekcje: [lista sekcji warunkowych, których zmiana nie dotyczy].
 
 ## 9. Analiza wpływu na aplikację
 
-[Jeśli brak dostępu do kodu/dokumentacji: „Nie analizowano – brak dostępu do …” + OPEN.]
+[Jeśli brak dostępu do kodu/dokumentacji: „Nie analizowano - brak dostępu do …” + OPEN.]
 
 | Obszar / komponent | Obecny stan | Planowana zmiana | Wpływ / regresja | Źródło |
 |---|---|---|---|---|
@@ -142,11 +142,11 @@ spełnia kryteria z Etapu 5a; każdy węzeł musi występować w tekście i tabe
 
 ## 13. Bezpieczeństwo i zgodność (warunkowa)
 
-[Uwierzytelnianie, autoryzacja, dane osobowe/RODO, audyt – tylko to, czego zmiana dotyczy.]
+[Uwierzytelnianie, autoryzacja, dane osobowe/RODO, audyt - tylko to, czego zmiana dotyczy.]
 
 ## 14. Plan testów
 
-Scenariusze akceptacyjne: US-001/S1–S2 [odwołania do US]. Dodatkowe testy (tylko te, których US nie pokrywają):
+Scenariusze akceptacyjne: US-001/S1-S2 [odwołania do US]. Dodatkowe testy (tylko te, których US nie pokrywają):
 
 | ID | Scenariusz | Oczekiwany wynik | Wymaganie |
 |---|---|---|---|
@@ -154,11 +154,11 @@ Scenariusze akceptacyjne: US-001/S1–S2 [odwołania do US]. Dodatkowe testy (ty
 
 ## 15. Kryteria ukończenia zmiany (Definition of Done - DoD)
 
-[Tylko kryteria tej zmiany, ze źródeł, wymagań i testów – bez ogólnych formułek.]
+[Tylko kryteria tej zmiany, ze źródeł, wymagań i testów - bez ogólnych formułek.]
 
 | Lp. | Kryterium DoD | Odpowiedzialny |
 |---|---|---|
-| 1 | [np. Scenariusze US-001–US-003 zaliczone na środowisku testowym] | [Rola ze źródła lub DO POTWIERDZENIA] |
+| 1 | [np. Scenariusze US-001-US-003 zaliczone na środowisku testowym] | [Rola ze źródła lub DO POTWIERDZENIA] |
 
 ## 16. Wdrożenie i rollback (warunkowa)
 
@@ -166,7 +166,7 @@ Scenariusze akceptacyjne: US-001/S1–S2 [odwołania do US]. Dodatkowe testy (ty
 |---|---|---|---|---|
 | 1 | [Działanie] | [Osoba lub DO POTWIERDZENIA] | [Warunek] | [Warunek] |
 
-Rollback: [Sposób wycofania – ze źródła lub OPEN.]
+Rollback: [Sposób wycofania - ze źródła lub OPEN.]
 
 ## 17. Ryzyka i zależności
 
@@ -174,7 +174,7 @@ Rollback: [Sposób wycofania – ze źródła lub OPEN.]
 |---|---|---|---|---|---|---|
 | RISK-001 | [Ryzyko] | [W/Ś/N] | [W/Ś/N] | [Działanie] | [Osoba lub DO POTWIERDZENIA] | [SRC-NNN / analiza] |
 
-## 18. Rekomendacje (opcjonalna – poza zakresem wymagań)
+## 18. Rekomendacje (opcjonalna - poza zakresem wymagań)
 
 | ID | Rekomendacja | Uzasadnienie | Wymaga decyzji |
 |---|---|---|---|
@@ -186,7 +186,7 @@ Rollback: [Sposób wycofania – ze źródła lub OPEN.]
 |---|---|
 | [Pojęcie] | [Wyjaśnienie] |
 
-## 20. Macierz śledzenia wymagań (warunkowa – od 6 FR, gdy powiązania nie wynikają z tabel)
+## 20. Macierz śledzenia wymagań (warunkowa - od 6 FR, gdy powiązania nie wynikają z tabel)
 
 | Wymaganie | User story | Test | Komponent | Źródło | Status |
 |---|---|---|---|---|---|
@@ -204,4 +204,4 @@ Rollback: [Sposób wycofania – ze źródła lub OPEN.]
 
 | ID | Temat | Czego brakuje i na co wpływa | Właściciel decyzji | Priorytet | Status |
 |---|---|---|---|---|---|
-| OPEN-001 | [Temat] | [Czego brakuje] – wpływa na [FR/US/obszar] | [Osoba lub DO POTWIERDZENIA] | [W/Ś/N] | Otwarty |
+| OPEN-001 | [Temat] | [Czego brakuje] - wpływa na [FR/US/obszar] | [Osoba lub DO POTWIERDZENIA] | [W/Ś/N] | Otwarty |

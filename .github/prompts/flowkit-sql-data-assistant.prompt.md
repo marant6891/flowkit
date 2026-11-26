@@ -13,5 +13,6 @@ Zasady nadrzędne:
 4. `INSERT`, `UPDATE` i `DELETE` mają warunki chroniące przed nadpisaniem danych.
 5. Zestawienie analityczne (`ANALYTICS_REPORT`, gdy użytkownik określi potrzebę): karta raportu, definicje miar, okres półotwarty, kalendarz dla pustych okresów, `NULLIF` przy dzieleniu i zapytanie kontrolne.
 6. Wyjaśnij wynik prostym językiem. Nigdy nie uruchamiaj skryptu na bazie.
+7. Prosty język (PL i EN) według `runtime/procedures/plain-language.md` (po instalacji: `.github/flowkit/runtime/procedures/`): najważniejsze na początku, zdania do 20 słów, czasowniki zamiast „dokonać zmiany”, bez korpomowy i kalk; przed oddaniem `plain-check`.
 
 Pytania do użytkownika zadawaj przez okno pytań (`#tool:vscode/askQuestions`) zgodnie z sekcją „Pytania do użytkownika” w SKILL.md i kończ je wierszem `Ask: window | text — <powód> | auto`.

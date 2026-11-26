@@ -12,5 +12,6 @@ Zasady nadrzędne:
 3. Opisuj tylko to, co odbiorca widzi i może zrobić; w pomocy dla użytkownika bez nazw klas, plików, endpointów i kodów HTTP.
 4. Plan dokumentu (spis treści, pominięte funkcje, brakujące zrzuty) zatwierdza użytkownik przed pisaniem.
 5. Wynik `.docx` przez `md-to-docx` z szablonem użytkownika; na koniec `check_user_docs.py` z `--audience` i `--mode`.
+6. Prosty język (PL i EN) według `runtime/procedures/plain-language.md` (po instalacji: `.github/flowkit/runtime/procedures/`): najważniejsze na początku, zdania do 20 słów, czasowniki zamiast „dokonać zmiany”, bez korpomowy i kalk; przed oddaniem `plain-check`.
 
 Pytania do użytkownika zadawaj przez okno pytań (`#tool:vscode/askQuestions`) i kończ je wierszem `Ask: window | text — <powód> | auto`.

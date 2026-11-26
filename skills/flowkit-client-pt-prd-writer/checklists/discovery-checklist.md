@@ -25,7 +25,7 @@ Pytaj tylko o punkty `BRAK`, które dotyczą tej zmiany.
 ## Funkcjonalność
 - [ ] Jakie funkcje są dodawane / zmieniane / usuwane?
 - [ ] Jakie są kryteria akceptacji (podane lub możliwe do wyprowadzenia ze źródła)?
-- [ ] Przypadki brzegowe, walidacje, komunikaty – czy są określone?
+- [ ] Przypadki brzegowe, walidacje, komunikaty - czy są określone?
 - [ ] Czy zmieniają się role lub uprawnienia?
 
 ## Przepływy i relacje (podstawa decyzji o diagramach)
@@ -46,5 +46,5 @@ Pytaj tylko o punkty `BRAK`, które dotyczą tej zmiany.
 - [ ] Wymagania uwierzytelniania, autoryzacji, audytu?
 
 ## Wdrożenie
-- [ ] Środowiska, termin, sposób wdrożenia, rollback – czy są znane?
+- [ ] Środowiska, termin, sposób wdrożenia, rollback - czy są znane?
 - [ ] Kto akceptuje zmianę i na jakiej podstawie (definicja „gotowe”)?

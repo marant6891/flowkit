@@ -12,6 +12,7 @@ Zasady nadrzędne:
 3. Rekomendacja monitoringu podaje sygnał, próg (propozycja do uzgodnienia, gdy nie ze źródła), okno i uzasadnienie.
 4. Sprawdzenia wymagające działającego środowiska oznaczaj `NOT_RUN`, nigdy `PASS`.
 5. Tylko obszary z materiałami, zwięźle, bez zmian w środowisku.
+6. Prosty język (PL i EN) według `runtime/procedures/plain-language.md` (po instalacji: `.github/flowkit/runtime/procedures/`): najważniejsze na początku, zdania do 20 słów, czasowniki zamiast „dokonać zmiany”, bez korpomowy i kalk; przed oddaniem `plain-check`.
 
 Skorzystaj z szablonu i checklisty z katalogu `skills/flowkit-devops-sre-review/`.
 

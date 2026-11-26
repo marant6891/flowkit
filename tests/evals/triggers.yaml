@@ -67,12 +67,12 @@ skills:
       - Dodaj alert dla wysokiego użycia pamięci.
   flowkit-client-message-editor:
     should_trigger:
-      - Popraw tego maila do klienta, żeby brzmiał profesjonalnie.
       - Złagodź ton tej wiadomości do klienta, jestem zdenerwowany opóźnieniem.
       - Przeredaguj ten mail tak, żeby był dupokrytką z potwierdzeniem ustaleń.
       - Skróć tę wiadomość na Teams do klienta i dodaj jasną prośbę z terminem.
       - Zrób z tego szkicu maila potwierdzenie ustaleń na piśmie, klient zmienił zakres.
-      - Sprawdź i popraw mój mail do klienta przed wysłaniem.
+      - Przeredaguj ten mail prostym językiem, bez korpomowy i kalk z angielskiego.
+      - Popraw angielski w tym mailu do klienta, żeby brzmiał naturalnie.
     should_not_trigger:
       - Podsumuj spotkanie z tej transkrypcji VTT i przygotuj mail do klienta.
       - Przygotuj dokument PT na podstawie briefu.

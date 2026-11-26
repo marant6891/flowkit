@@ -10,7 +10,7 @@ Temat: [czego dotyczy] - [czego oczekujemy, np. prośba o decyzję do 05.12]
 
 Dzień dobry [Pani/Panie Imię | Państwu],
 
-[1–2 zdania: cel wiadomości.]
+[1-2 zdania: cel wiadomości.]
 
 [Treść: krótkie akapity albo punkty, tylko to, co potrzebne do odpowiedzi.]
 

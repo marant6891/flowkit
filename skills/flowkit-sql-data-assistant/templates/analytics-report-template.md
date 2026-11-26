@@ -2,7 +2,7 @@
 
 ## Co pokazuje to zestawienie
 
-[1–2 proste zdania: na jakie pytanie biznesowe odpowiada. Skrypt tylko odczytuje dane.]
+[1-2 proste zdania: na jakie pytanie biznesowe odpowiada. Skrypt tylko odczytuje dane.]
 
 **Baza:** [typ i wersja] · **Środowisko:** [środowisko] · **Zgłoszenie / zamawiający:** [numer lub osoba]
 
@@ -11,7 +11,7 @@
 | Element | Wartość | Źródło |
 |---|---|---|
 | Pytanie biznesowe | [np. jak zmienia się sprzedaż netto miesiąc do miesiąca] | [zgłoszenie / użytkownik] |
-| Okres | [od – do, półotwarty: `>= od` i `< do`] | |
+| Okres | [od - do, półotwarty: `>= od` i `< do`] | |
 | Granulacja | [dzień / tydzień / miesiąc / kwartał] | |
 | Data biznesowa i strefa czasowa | [kolumna daty, strefa] | |
 | Wymiary (podział) | [np. miesiąc, region, kategoria] | |

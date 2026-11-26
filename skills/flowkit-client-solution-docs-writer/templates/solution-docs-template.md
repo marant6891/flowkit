@@ -2,7 +2,7 @@
 
 Używaj tylko, gdy użytkownik nie dał szablonu Word. Kolumna „Profil” mówi, dla którego dokumentu rozdział jest
 przeznaczony: **A** = instrukcja administratora, **T** = dokumentacja techniczna. Rozdziały, które nie dotyczą
-rozwiązania lub nie mają źródła, pomijasz albo (tryb roboczy) oznaczasz „Brak danych – patrz OPEN-NNN”.
+rozwiązania lub nie mają źródła, pomijasz albo (tryb roboczy) oznaczasz „Brak danych - patrz OPEN-NNN”.
 
 | Rozdział | Profil | Treść |
 |---|---|---|

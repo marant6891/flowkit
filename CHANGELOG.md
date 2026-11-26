@@ -20,6 +20,12 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 - **OpenSSF Scorecard:** workflow `scorecard.yml` (push do `main`, co tydzień, zmiana ochrony gałęzi) z wynikami w Code scanning i odznaką w README.
 - **`flowkit_doctor.py init`:** tworzy `~/.flowkit` i pusty plik zgód ze wszystkimi rolami (`0600`), nigdy nie nadpisuje istniejącego i nie dopisuje zgód; agenci nie mogą go uruchomić. Wzór `docs/allow.example.json` i schemat `docs/allow.schema.json` (podpowiedzi ról i walidacja w edytorze).
 
+- **Prosty język PL i EN we wszystkich skillach i agentach:** standard `runtime/procedures/plain-language.md` oparty na zaleceniach gov.pl, Obserwatorium Językowego UW, artykule o kalkach składniowych (Magazyn PAN 4/2023), Federal Plain Language Guidelines i GOV.UK Style Guide. Reguły mają identyfikatory, poziomy (`FAIL`, `WARN`, `PRZEGLĄD`) i przykłady.
+  - Wspólny checker `runtime/plain_language.py` i polecenie executora `plain-check` (role orchestrator, analyst, verifier, implementer): długość zdań, wata i nominalizacje, korpomowa, kalki składniowe, fałszywi przyjaciele w angielskim, skróty bez rozwinięcia, półpauzy, emoji i formułki AI; słownik projektu z `flowkit-project.md`, znaczniki `<!-- plain-check: off/on -->` dla celowych złych przykładów.
+  - Każdy skill ma zasadę prostego języka, sekcję checklisty i kontrolę przed oddaniem; `check_message.py` i `check_user_docs.py` korzystają ze wspólnego modułu. Wersje: message-editor 1.1, solution-docs-writer 1.1, meeting-recap 1.6, pt-prd-writer 3.4, postmortem 1.6, sre-review 1.2, requirements-workshop 1.3, sql-data-assistant 1.4.
+  - Agenci orchestrator, analyst, verifier i product-owner stosują standard; `DOC-AUDIT:` uruchamia `plain-check --strict`. Reguła w `copilot-instructions.md` i w promptach VS Code.
+  - Walidatory i testy: `validate_skills.py` wymaga odwołania do standardu, `validate_agents.py` pilnuje go w adapterach, testy sprawdzają szablony, dokumentację i pliki skilli w trybie końcowym. Nowe scenariusze ewaluacji `message-editor-plain-pl` i `message-editor-plain-en` z wzorcowymi odpowiedziami ocenianymi offline (bez API) w testach.
+
 ### Zmieniono
 - `flowkit-sql-data-assistant` 1.3: skrypty zmieniające dane są opakowane jak skrypt wdrożeniowy — nagłówek, kontrola serwera i bazy, numerowane kroki z komunikatami liczby wierszy, plan zmian z kopią poprzednich wartości, obsługa błędów, domyślne `ROLLBACK` z gotowym `COMMIT` w komentarzu, sprzątanie i skrypt odtworzenia; `check_sql.py` pilnuje opakowania.
 - **Nowy `doctor`** (`runtime/flowkit_doctor.py`, także jako polecenie executora): sekcje Instalacja, Bezpieczeństwo, Konfiguracja i Narzędzia ze statusem `OK`/`INFO`/`UWAGA`/`BŁĄD` i podpowiedzią dla każdego problemu.
@@ -33,6 +39,8 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 - Hook blokuje agentom edycję katalogu `.git`, plików wrażliwych (`.env*` poza `.env.example`, klucze) i dziennika audytu, także w katalogach z `FLOWKIT_EXTRA_PATHS`; `md-to-docx` nie zapisuje w `.git`.
 - Akcje GitHub w CI przypięte do SHA commita; checkout bez zapisanych poświadczeń (`persist-credentials: false`).
 - CI: nowy push do PR anuluje nieaktualny przebieg (`concurrency`); na `main` każdy commit ma własny przebieg.
+- CI uruchamia wszystkie pliki `tests/test_*.py` (wcześniej 4 pliki z listy; nie były uruchamiane m.in. testy `doctor`, redaktora maili i dokumentacji rozwiązania).
+- Szablony zapasowe skilli, README, `docs/USAGE.md` i pliki skilli bez półpauz i pauz oraz bez zdań dłuższych niż 35 słów.
 
 ### Naprawiono
 - **Niezależny audyt `DOC-AUDIT:` nie mógł czytać dokumentów:** rola `verifier` dostała `read-document` i `detect-docx-libs` oraz skrypty kontrolne skilli, które tylko czytają pliki (`check_client_version.py`, `check_status_labels.py`, `validate_diagram.py`, `check_sql.py`); nadal nie zapisuje DOCX i nie generuje diagramów. Verifier ma instrukcję czytania DOCX/XLSX/PDF w audycie.

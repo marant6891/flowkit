@@ -13,25 +13,56 @@ Szybki start: tylko rozdziały 1, 2 i 3 (3 najważniejsze zadania). FAQ: rozdzia
 
 ## 1. Wprowadzenie
 
-Dla kogo jest ta pomoc, do czego służy aplikacja lub moduł (2–4 zdania). Wymagania wstępne odbiorcy:
+Dla kogo jest ta pomoc, do czego służy aplikacja lub moduł (2-4 zdania). Wymagania wstępne odbiorcy:
 konto, rola, przeglądarka, tylko jeśli wynikają ze źródeł.
+
+Konwencje dokumentu: **pogrubienie** to nazwa z ekranu, `>` to ścieżka menu, ikony bez napisu opisano kształtem.
 
 ## 2. Pierwsze kroki *(warunkowy)*
 
-Logowanie, ekran główny, nawigacja (menu, wyszukiwanie), ustawienia profilu dostępne dla roli.
+Logowanie, ekran główny, nawigacja (menu, wyszukiwanie), ustawienia profilu dostępne dla roli. Rysunek
+przebiegu logowania, gdy są warianty (kod weryfikacyjny, reset hasła). `[[DIAGRAM:D-01]]`
 
-## 3. Praca z aplikacją
+## 3. [Moduł]
 
-Rozdział na każdy obszar lub proces z katalogu funkcji; w nim tematy-zadania według
-[wzorców tematów](./topic-patterns.md), w kolejności pracy odbiorcy (od najczęstszych).
+Jeden rozdział na moduł lub ekran z katalogu funkcji, w strukturze z
+[references/help-structure.md](../references/help-structure.md):
 
-### 3.1 [Obszar]
+### 3.1 Do czego służy
 
-#### [Zadanie]
+### 3.2 Najważniejsze pojęcia
 
-## 4. Pojęcia i statusy *(warunkowy)*
+### 3.3 Układ ekranu
 
-Pojęcia domenowe i tabela statusów.
+`[[DIAGRAM:D-02]]` albo zrzut ekranu, pod nim legenda:
+
+| Nr | Obszar | Co zawiera |
+|---|---|---|
+| 1 | [Pasek narzędzi] | [przyciski z tabeli opcji] |
+
+### 3.4 Opcje i przyciski
+
+| Element | Gdzie | Co robi | Kiedy dostępny |
+|---|---|---|---|
+| [ikona i nazwa] | [obszar z legendy] | [skutek] | [zawsze / uprawnienie / typ obiektu] |
+
+### 3.5 Praca z modułem
+
+#### [Zadanie według wzorców tematów]
+
+### 3.6 Informacje w tabeli
+
+Wszystkie kolumny, pogrupowane tematycznie (Kolumna, Co pokazuje, Format).
+
+### 3.7 Statusy, kolory i ikony *(warunkowy)*
+
+### 3.8 Zakładki i panele szczegółów *(warunkowy)*
+
+### 3.9 Uprawnienia *(warunkowy)*
+
+## 4. Pojęcia wspólne *(warunkowy)*
+
+Pojęcia używane w wielu modułach.
 
 ## 5. Rozwiązywanie problemów *(warunkowy)*
 

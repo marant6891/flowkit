@@ -1,4 +1,4 @@
-# Obsługa plików .docx — odczyt, zapis i diagramy
+# Obsługa plików .docx: odczyt, zapis i diagramy
 
 Instrukcja obowiązuje zawsze, gdy skill lub agent musi **odczytać lub wygenerować plik `.docx`/`.dotx`**.
 Agenci FlowKit uruchamiają polecenia wyłącznie przez lokalny executor:
@@ -9,10 +9,10 @@ python "<runtime>/flowkit_exec.py" --role <rola> -- <polecenie> [argumenty]
 
 `<runtime>` to `${CLAUDE_PLUGIN_ROOT}/runtime` (wtyczka), `~/.claude/flowkit/runtime` (Claude Code) albo
 `.github/flowkit/runtime` (VS Code). Listę poleceń dozwolonych dla roli pokazuje `-- help`.
-Nie uruchamiaj `pandoc`, `pypandoc`, `python -c` ani własnych skryptów — executor je odrzuci.
+Nie uruchamiaj `pandoc`, `pypandoc`, `python -c` ani własnych skryptów - executor je odrzuci.
 Do zapisu DOCX służy wbudowane polecenie `md-to-docx`.
 
-## Krok 1 — Wykrycie środowiska (raz na sesję)
+## Krok 1: Wykrycie środowiska (raz na sesję)
 
 ```bash
 python "<runtime>/flowkit_exec.py" --role <rola> -- detect-docx-libs
@@ -21,7 +21,7 @@ python "<runtime>/flowkit_exec.py" --role <rola> -- detect-docx-libs
 Wynik pokazuje: `python-docx`, `pypandoc`, `pandoc`, `mermaid-cli (mmdc)`, `npx`, `playwright`, `cairosvg`,
 `rsvg-convert`. Zapisz go i nie powtarzaj wykrywania przy każdym pliku.
 
-## Krok 2 — Odczyt szablonu i materiałów
+## Krok 2: Odczyt szablonu i materiałów
 
 ```bash
 python "<runtime>/flowkit_exec.py" --role <rola> -- read-document szablon.dotx --outline
@@ -31,10 +31,10 @@ python "<runtime>/flowkit_exec.py" --role <rola> -- read-document szablon.dotx -
 `read-document` czyta `.docx`, `.dotx`, `.xlsx`, `.pdf` i pliki tekstowe lokalnie, bez dodatkowych bibliotek.
 Duże dokumenty czytaj partiami: najpierw `--outline`, potem `--lines OD-DO`.
 
-## Krok 3 — Zapis DOCX
+## Krok 3: Zapis DOCX
 
 Najpierw zapisz kompletny dokument w Markdown (narzędziem edycji plików), a potem skonwertuj go.
-**Gdy użytkownik dał szablon, zawsze przekaż go do konwersji** — dokument końcowy ma mieć komplet stylów
+**Gdy użytkownik dał szablon, zawsze przekaż go do konwersji** - dokument końcowy ma mieć komplet stylów
 i formatowania szablonu:
 
 ```bash
@@ -47,9 +47,9 @@ python "<runtime>/flowkit_exec.py" --role <rola> -- md-to-docx output/dokument.m
 
 W obu trybach dokument powstaje na **kopii pliku szablonu** (silnik python-docx), więc przejmuje wszystkie style,
 numerację nagłówków, motyw, czcionki, marginesy, nagłówki i stopki stron. Markdown jest mapowany na style
-szablonu: `#`–`######` → Nagłówek 1–6 (`Heading N`), tekst → styl podstawowy szablonu, listy → `List Bullet`/`List Number`
+szablonu: `#`-`######` → Nagłówek 1-6 (`Heading N`), tekst → styl podstawowy szablonu, listy → `List Bullet`/`List Number`
 (lub polskie odpowiedniki), tabele → styl tabeli użyty już w szablonie, podpis obrazu → `Caption`/`Legenda`.
-Wynik zgłasza linię `Style szablonu: ...` — sprawdź, czy wskazuje style klienta.
+Wynik zgłasza linię `Style szablonu: ...` - sprawdź, czy wskazuje style klienta.
 
 | Opcja | Działanie |
 |---|---|
@@ -62,32 +62,32 @@ Wynik zgłasza linię `Style szablonu: ...` — sprawdź, czy wskazuje style kli
 
 **Rekomendacja dla dokumentów klienta:** w kopii roboczej szablonu zostaw stronę tytułową i metryczkę, w miejscu
 treści wstaw akapit `[[FLOWKIT:TREŚĆ]]`, a Markdown zacznij od pierwszego rozdziału szablonu. Nie zmieniaj
-nazw stylów ani nie dodawaj formatowania ręcznie w Markdown — wygląd pochodzi wyłącznie z szablonu.
+nazw stylów ani nie dodawaj formatowania ręcznie w Markdown - wygląd pochodzi wyłącznie z szablonu.
 
 Konwerter:
 - renderuje bloki ` ```mermaid ` do PNG lokalnym `mmdc` (albo `npx --no -p @mermaid-js/mermaid-cli`, bez pobierania),
 - zamienia obrazy SVG na PNG: plik `.png` obok `.svg` → Playwright → CairoSVG → `rsvg-convert`,
   dzięki czemu Pandoc nie zgłasza błędu `rsvg-convert is not in path`,
-- nie pobiera obrazów z adresów http(s) — zostaje tekst alternatywny,
+- nie pobiera obrazów z adresów http(s) - zostaje tekst alternatywny,
 - nie nadpisuje pliku źródłowego ani szablonu; szablon `.dotx` pozostaje bez zmian.
 
 Każde `OSTRZEŻENIE:` z wyniku przekaż użytkownikowi w podsumowaniu (np. diagram mermaid pozostawiony jako kod).
-Kod wyjścia `3` oznacza brak silnika DOCX — przejdź do trybu Markdown.
+Kod wyjścia `3` oznacza brak silnika DOCX - przejdź do trybu Markdown.
 
 Po zapisie konwerter ponownie otwiera wynik i porównuje go ze źródłem: liczbę nagłówków, tabel i obrazów oraz
 nagłówki i stopki stron szablonu (`Kontrola DOCX: ... PASS/FAIL`). Kod wyjścia `4` oznacza, że dokument
-zapisano, ale kontrola nie przeszła — nie oddawaj go bez sprawdzenia przyczyny. `python-docx` nie obsługuje
-w pełni pól (spis treści, odsyłacze), komentarzy, śledzenia zmian ani złożonych kształtów — dla dokumentów
-krytycznych sprawdź wynik wizualnie w Word albo w podglądzie PDF.
+zapisano, ale kontrola nie przeszła. Nie oddawaj go bez sprawdzenia przyczyny. `python-docx` nie obsługuje
+w pełni pól (spis treści, odsyłacze), komentarzy, śledzenia zmian ani złożonych kształtów. Dokumenty krytyczne
+sprawdź wizualnie w Word albo w podglądzie PDF.
 
 ### Uzupełnianie szablonu z polami do wypełnienia
 
 Markdown odtwarza strukturę szablonu: te same rozdziały w tej samej kolejności i z tymi samymi nazwami.
-Wartości metryczki (tytuł, wersja, data, autor) wpisz opcją `--set` — pola w szablonie (np. `[WPISZ TUTAJ]`,
+Wartości metryczki (tytuł, wersja, data, autor) wpisz opcją `--set` - pola w szablonie (np. `[WPISZ TUTAJ]`,
 `{{TYTUŁ}}`) zostaną zastąpione z zachowaniem czcionki, pogrubienia i stylu komórki. Pola, których nie znasz,
 zostaw do decyzji użytkownika (`OPEN-NNN`), nie wpisuj wartości „typowych”.
 
-## Krok 4 — Weryfikacja wyniku
+## Krok 4: Weryfikacja wyniku
 
 ```bash
 python "<runtime>/flowkit_exec.py" --role <rola> -- read-document output/dokument.docx --outline
@@ -95,7 +95,7 @@ python "<runtime>/flowkit_exec.py" --role <rola> -- read-document output/dokumen
 
 Sprawdź, czy nagłówki i tabele są kompletne, a diagramy osadzone (brak ostrzeżeń o pominiętych obrazach).
 
-## Tryb bezpieczny — Markdown
+## Tryb bezpieczny: Markdown
 
 Gdy `md-to-docx` zwraca kod `3` albo polecenia są niedostępne:
 

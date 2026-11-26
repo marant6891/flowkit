@@ -1,5 +1,10 @@
 # Historia zmian skilla flowkit-sql-data-assistant
 
+## 1.4 (26.11.2026)
+
+- Prosty język PL i EN według standardu FlowKit (`runtime/procedures/plain-language.md`): objaśnienia i podsumowania (bez kodu SQL). Nowa zasada
+  nadrzędna, sekcja checklisty i kontrola poleceniem `plain-check` przed oddaniem.
+
 ## 1.3 (26.11.2026)
 
 - Opakowanie skryptów zmieniających dane (zasada 14): nagłówek w ramce z `ZGŁOSZENIE:`, wypisanie serwera i bazy z kontrolą oczekiwanej bazy, numerowane kroki `KROK n` z komunikatami liczby wierszy, plan zmian w tabeli tymczasowej (kopia poprzednich wartości), obsługa błędów wycofująca całość, `ROLLBACK` z komunikatem i gotowym `COMMIT` w komentarzu, sprzątanie i skrypt odtworzenia.

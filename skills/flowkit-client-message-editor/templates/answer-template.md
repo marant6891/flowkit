@@ -17,12 +17,12 @@ Temat: […]
 
 ## Do uzupełnienia
 
-- `[DO UZUPEŁNIENIA: …]` — [czego brakuje i skąd to wziąć]. [„Brak” — gdy wszystko jest.]
+- `[DO UZUPEŁNIENIA: …]` - [czego brakuje i skąd to wziąć]. [„Brak” - gdy wszystko jest.]
 
 ## Uwagi tylko dla Ciebie (nie wysyłać)
 
 - **Usunięte emocje i presja:** [„cytat ze szkicu” → zamiennik].
 - **Uwagi wewnętrzne usunięte z treści:** […].
-- **Ryzykowne zobowiązania:** [np. „gwarantujemy termin” — usunięte; termin zależy od …].
+- **Ryzykowne zobowiązania:** [np. „gwarantujemy termin” - usunięte; termin zależy od …].
 - **Sugestie zmiany sensu (nie wprowadzone):** […].
 - [Gdy dotyczy umowy, kar lub sporu: przed wysłaniem pokaż osobie odpowiedzialnej za umowę.]

@@ -47,7 +47,7 @@ Plan pokaż użytkownikowi w Etapie 4. Obejmuje tematy z diagramem i tematy bez 
 | ID | Temat | Sekcja | Decyzja | Typ | Priorytet | Uzasadnienie | Źródła |
 |---|---|---|---|---|---|---|---|
 | D-01 | Komunikacja portalu z systemem ERP | 11. Integracje | Diagram | Sekwencja | Wysoki | 4 komunikaty i obsługa błędu | SRC-001, SRC-002 |
-| – | Parametry eksportu | 8. Wymagania niefunkcjonalne | Bez diagramu | – | – | Zestawienie parametrów, tabela wystarcza | SRC-003 |
+| - | Parametry eksportu | 8. Wymagania niefunkcjonalne | Bez diagramu | - | - | Zestawienie parametrów, tabela wystarcza | SRC-003 |
 
 Identyfikator `D-NN` jest stały przez cały cykl życia dokumentu, także po zmianie kolejności rysunków.
 
@@ -61,4 +61,4 @@ Jeden diagram to jedna myśl. Po przekroczeniu limitu podziel treść na przegl�
 | Sekwencja | 6 uczestników |
 | Swimlane | 5 ról |
 | Macierz | 8 kolumn, 14 wierszy |
-| Wyróżnienie akcentem | 1–2 elementy |
+| Wyróżnienie akcentem | 1-2 elementy |

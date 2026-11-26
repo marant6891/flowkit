@@ -2,7 +2,7 @@
 
 ## Co robi ten skrypt
 
-[1–2 proste zdania. Czy tylko odczytuje dane, czy może je zmienić.]
+[1-2 proste zdania. Czy tylko odczytuje dane, czy może je zmienić.]
 
 **Baza:** [typ] · **Środowisko:** [środowisko] · **Zgłoszenie:** [numer]
 

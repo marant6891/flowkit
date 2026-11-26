@@ -36,3 +36,11 @@
 - [ ] Każda rekomendacja monitoringu ma sygnał, próg (oznaczony jako propozycja, gdy nie ze źródła), okno i uzasadnienie.
 - [ ] Sprawdzenia wymagające działającego środowiska są oznaczone `NOT_RUN`, a nie `PASS`.
 - [ ] Raport obejmuje tylko obszary z materiałami; sekrety zastąpiono `[UKRYTO]`.
+
+## Prosty język (`<runtime>/procedures/plain-language.md`)
+- [ ] Najważniejsze na początku: ustalenia od najpoważniejszego.
+- [ ] Zdania do 20 słów (EN: 25); czasowniki zamiast rzeczowników („wdrożyć”, nie „dokonać wdrożenia”).
+- [ ] Bez korpomowy i kalk („zaparkować”, „zaadresować”, „na ten moment”, „To, co…, to…”, „To drugi raz, gdy…”); w EN bez fałszywych przyjaciół (*actual*, *eventually*).
+- [ ] Szyk naturalny: to, co znane, na początku zdania, a nowe na końcu; strona czynna, gdy wiadomo, kto działa.
+- [ ] Skróty rozwinięte przy pierwszym użyciu, chyba że są w słowniku projektu.
+- [ ] `plain-check` nie zgłasza błędów; ostrzeżenia poprawione albo uzasadnione.

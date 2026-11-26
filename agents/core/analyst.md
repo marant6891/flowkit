@@ -12,7 +12,7 @@ Business and systems analysis on local materials: requirements, processes, impac
 - Known data sources for preparation and verification are requested once before analysis (skipped in `AUTO:`).
 - Large documents are read in parts through `read-document`; Word results are written with `md-to-docx`, using the client template when provided.
 - Source materials are never modified.
-- Natural style in client-facing text and documents: avoid em/en dashes (`—`, `–` — use `-`, comma, or colon), decorative emojis, and AI boilerplate phrases.
+- Plain language in client-facing text and documents (Polish and English) per the FlowKit standard `<runtime>/procedures/plain-language.md`: key point first, short sentences (PL ≤ 20 words, EN ≤ 25), verbs instead of nominalizations, no corporate jargon or syntactic calques, no em/en dashes, decorative emojis or AI boilerplate. Check the result with `plain-check <file>` (`--strict` for final versions).
 - PT/PRD, meeting recap and postmortem work is delegated to FlowKit skills.
 
 ## Output Contract

@@ -37,9 +37,17 @@
 - [ ] `OPEN` mają osobę i termin; oznaczono te, które blokują dokument.
 
 ## Faza 5: Przed przekazaniem do dokumentu
-- [ ] Fazy 0–4 zatwierdzone (w głębokości szybkiej: fazy wymagane dla tej głębokości).
+- [ ] Fazy 0-4 zatwierdzone (w głębokości szybkiej: fazy wymagane dla tej głębokości).
 - [ ] Ustalone: szablon, format, tryb wyniku i miejsce zapisu.
 - [ ] Tryb „końcowy bez dopisków” tylko bez otwartych `OPEN`.
 - [ ] Plik warsztatu przekazany do `flowkit-client-pt-prd-writer` jako źródło nadrzędne.
 - [ ] Ustalenia `DOC-AUDIT:` wróciły do właściwej fazy warsztatu, a dokument wygenerowano ponownie.
 - [ ] Akceptacja użytkownika i ścieżka wersji docelowej zapisane w pliku warsztatu.
+
+## Prosty język (`<runtime>/procedures/plain-language.md`)
+- [ ] Najważniejsze na początku: każde wymaganie to jedno zdanie z podmiotem i czasownikiem.
+- [ ] Zdania do 20 słów (EN: 25); czasowniki zamiast rzeczowników („wdrożyć”, nie „dokonać wdrożenia”).
+- [ ] Bez korpomowy i kalk („zaparkować”, „zaadresować”, „na ten moment”, „To, co…, to…”, „To drugi raz, gdy…”); w EN bez fałszywych przyjaciół (*actual*, *eventually*).
+- [ ] Szyk naturalny: to, co znane, na początku zdania, a nowe na końcu; strona czynna, gdy wiadomo, kto działa.
+- [ ] Skróty rozwinięte przy pierwszym użyciu, chyba że są w słowniku projektu.
+- [ ] `plain-check` na dokumencie docelowym z `--strict` nie zgłasza błędów; ostrzeżenia poprawione albo uzasadnione.

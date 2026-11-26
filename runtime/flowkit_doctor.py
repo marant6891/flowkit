@@ -29,8 +29,8 @@ import flowkit_exec as fx  # noqa: E402
 RUNTIME_DIR = Path(__file__).resolve().parent
 MIN_PYTHON = (3, 10)
 SCHEMA_URL = "https://raw.githubusercontent.com/marant6891/flowkit/main/docs/allow.schema.json"
-RUNTIME_FILES = ("flowkit_exec.py", "guard_bash.py", "log_tool_event.py", "md_to_docx.py", "checkpoint_report.py",
-                 "flowkit_doctor.py", "procedures")
+RUNTIME_FILES = ("flowkit_exec.py", "plain_language.py", "guard_bash.py", "log_tool_event.py", "md_to_docx.py",
+                 "checkpoint_report.py", "flowkit_doctor.py", "procedures")
 AGENT_MARKER = re.compile(r"<!-- FlowKit (\d+\.\d+\.\d+)")
 ROLE_KEYS = ("*", *fx.ROLE_COMMANDS)
 

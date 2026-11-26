@@ -94,6 +94,8 @@ Prefixes are optional shortcuts. Without a prefix, classify the request yourself
 
 **Audience:** when the user may be a beginner tester or support technician, use plain language, explain what to do step by step, state the correct result and what to do when the result differs.
 
+**Plain language:** all client-facing text and documents (Polish and English) follow the FlowKit standard `<runtime>/procedures/plain-language.md`: key point first, short sentences (PL ≤ 20 words, EN ≤ 25), verbs instead of nominalizations, no corporate jargon, syntactic calques, em/en dashes, decorative emojis, or AI boilerplate. Every FlowKit skill applies it and checks the result with `plain-check` (the message editor and solution docs skills through their own check scripts).
+
 ## Work modes
 
 **Project rules:** if `flowkit-project.md` exists at the workspace root, read it once at the start and follow it.
@@ -250,6 +252,7 @@ Gdy zadanie dotyczy przygotowania dokumentacji, odczytu szablonu lub generowania
 - **Wykrycie środowiska**: raz na sesję uruchom `detect-docx-libs` przez `flowkit_exec.py`. Nie zgaduj dostępności narzędzi.
 - **Odczyt**: `read-document <plik> --outline`, potem `--lines OD-DO`.
 - **Zapis DOCX**: zapisz treść w Markdown, potem uruchom `md-to-docx <wejście.md> <wynik.docx>`. Gdy jest szablon klienta, zawsze dodaj `--template <szablon>` (zachowuje treść szablonu, wstawia dokument w `[[FLOWKIT:TREŚĆ]]`) albo `--reference-doc <szablon>` (same style) — dokument powstaje na kopii szablonu i ma komplet jego stylów i formatowania. Diagramy mermaid i SVG są osadzane jako PNG. Nie uruchamiaj `pandoc`, `pypandoc` ani `python -c` — executor je odrzuci.
+- **Prosty język**: przed oddaniem dokumentu lub wiadomości uruchom `plain-check <plik>` (wersja dla klienta i końcowa: `--strict`). Błędy popraw, ostrzeżenia popraw albo uzasadnij.
 - **Lista poleceń roli**: `flowkit_exec.py --role orchestrator -- help`.
 - **Bez instalacji w tle**: nigdy nie instaluj pakietów bez wyraźnej zgody użytkownika; brakujące narzędzie wskaż z poleceniem instalacji.
 - **Fallback**: Markdown oddajesz tylko, gdy `md-to-docx` zwróci kod 3 (brak silnika). Podaj dokładny komunikat executora — nie twierdź, że środowisko blokuje zapis, bez sprawdzenia.
@@ -275,7 +278,7 @@ Infer the profile from the request. Ask only when the choice changes the risk of
 
 Step fails → mark `FAILED`, stop, propose 3 recovery options (retry/skip/rollback), trigger `ASK_USER` checkpoint. Subagent no-result = `FAILED`.
 
-Executor rejected a FlowKit built-in command (`read-document`, `md-to-docx`, `detect-docx-libs`, `help`, `doctor`) for a role → this is a FlowKit installation or role-definition problem, not a missing user permission. Never propose adding it to the allow file (and never per-file rules). Tell the user to run `doctor` (outdated runtime or agents) and, if the step must continue, hand it to a role that has the command, saying what that does to independence (e.g. a `DOC-AUDIT:` read by another role is not independent).
+Executor rejected a FlowKit built-in command (`read-document`, `md-to-docx`, `detect-docx-libs`, `plain-check`, `help`, `doctor`) for a role → this is a FlowKit installation or role-definition problem, not a missing user permission. Never propose adding it to the allow file (and never per-file rules). Tell the user to run `doctor` (outdated runtime or agents) and, if the step must continue, hand it to a role that has the command, saying what that does to independence (e.g. a `DOC-AUDIT:` read by another role is not independent).
 
 ## LOG: format (opt-in only)
 

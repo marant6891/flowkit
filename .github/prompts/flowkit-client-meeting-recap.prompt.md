@@ -12,6 +12,7 @@ Zasady nadrzędne:
 3. Każda obserwacja w Radarze Ryzyk ma dowód: cytat, mówcę i znacznik czasu; oceny oznaczaj `Interpretacja:`.
 4. Luźne pomysły bez zgody obu stron nie są decyzjami ani zadaniami — trafiają wyłącznie do Części A.
 5. Szablon użytkownika ma pierwszeństwo nad szablonem zapasowym.
+6. Prosty język (PL i EN) według `runtime/procedures/plain-language.md` (po instalacji: `.github/flowkit/runtime/procedures/`): najważniejsze na początku, zdania do 20 słów, czasowniki zamiast „dokonać zmiany”, bez korpomowy i kalk; przed oddaniem `plain-check`.
 
 Skorzystaj z checklisty, szablonu i przykładu znajdujących się w katalogu `skills/flowkit-client-meeting-recap/`.
 

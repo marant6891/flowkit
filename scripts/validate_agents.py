@@ -21,17 +21,17 @@ VSCODE_TOOLS = {"vscode/askQuestions", "execute", "read", "agent", "edit", "sear
 CORE_TERMS = {
     "flowkit-orchestrator": ["REPORT_PROGRESS", "ASK_USER", "WAIT_FOR_APPROVAL", "Correction loop", "Reconciliation",
                   "Task profiles", "Risk labels", "Error handling", "SHIP:", "Automatic routing", "SQL:", "DOC-AUDIT:", "QA:",
-                  "Ask: window"],
+                  "Ask: window", "plain-language.md"],
     "flowkit-code-analyzer": ["Scanned:", "Not checked:", "Confidence:", "Assumptions:"],
     "flowkit-verifier": ["Logic", "Contracts", "Tests", "Dependencies", "Security", "Performance",
                            "Consistency", "Docs", "Requirements", "[NOT VERIFIED]", "DOC-AUDIT:", "SKILL-AUDIT:", "QA-AUDIT:",
-                           "CONTRADICTION-NNN"],
+                           "CONTRADICTION-NNN", "plain-check"],
     "flowkit-planner": ["Iter 1:", "Effort:", "Risks:"],
     "flowkit-implementer": ["Self-check", "DONE", "PARTIAL", "BLOCKED"],
     "flowkit-devops": ["Validate:", "Apply:", "REQUIRES APPROVAL"],
     "flowkit-product-owner": ["US-1", "AC-1", "Given", "ADR-N"],
     "flowkit-diagnostics": ["DIAGNOSTICS:", "Probable cause:", "REQUIRES APPROVAL"],
-    "flowkit-analyst": ["ANALYST:", "read-document", "Critical review"],
+    "flowkit-analyst": ["ANALYST:", "read-document", "Critical review", "plain-check"],
     "flowkit-validator": ["VALIDATOR:", "NOT_RUN", "Overall:", "Not validated:"],
 }
 

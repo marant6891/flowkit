@@ -2,7 +2,7 @@
 
 Użycie:
   python check_user_docs.py dokument.md|dokument.docx [--audience user|admin|tech] [--mode draft|client|final]
-                                                       [--questions-heading TEKST]
+                                                       [--questions-heading TEKST] [--lang auto|pl|en]
 
 --audience  profil odbiorcy: `user` (help dla użytkownika końcowego, bez języka kodu), `admin`, `tech`
 --mode      `draft` (roboczy, oznaczenia źródeł dozwolone), `client` (wersja dla klienta, wątpliwości tylko
@@ -10,13 +10,16 @@ Użycie:
 
 Sprawdza: sekrety i adresy wewnętrzne, język kodu w pomocy dla użytkownika (pliki, endpointy, kody HTTP,
 wyjątki, identyfikatory), oznaczenia robocze i znaczniki zrzutów w wersji dla klienta i końcowej, odwołania
-K-NN / OPEN-NNN bez punktu w sekcji wątpliwości, długie myślniki, formułki AI, zbyt długie kroki.
+K-NN / OPEN-NNN bez punktu w sekcji wątpliwości, długie myślniki, formułki AI, zbyt długie kroki oraz prosty
+język według runtime/procedures/plain-language.md (w trybach client i final reguły FAIL są błędami).
 
 Kody wyjścia: 0 = PASS (mogą być ostrzeżenia), 1 = błędy, 2 = nie można odczytać pliku, 3 = brak python-docx.
 """
 from __future__ import annotations
 
 import argparse
+import importlib
+import os
 import re
 import sys
 from pathlib import Path
@@ -24,6 +27,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 QUESTION_HEADINGS = ("kwestie do wyjaśnienia", "tematy do wyjaśnienia", "otwarte kwestie", "pytania otwarte")
+# Sekcje dla zespołu w wersji roboczej: mogą zawierać nazwy plików i klucze, kontrola języka odbiorcy ich nie obejmuje.
+WORKING_HEADINGS = ("materiały źródłowe", "rejestr źródeł", "rejestr pochodzenia", "tematy do wyjaśnienia", "robocze")
 CODE_EXT = r"(?:cs|py|java|kt|ts|tsx|js|jsx|vue|sql|xml|json|ya?ml|config|properties|go|rb|php|razor|cshtml|html)"
 
 SECRET = (
@@ -145,8 +150,54 @@ def split_questions(blocks: list[Block], heading_text: str | None) -> tuple[list
     return blocks[:start] + blocks[end:], blocks[start:end]
 
 
+# Te reguły prostego języka sprawdza już ten skrypt, więc nie są powtarzane.
+OWN_PLAIN_RULES = {"NS-1", "NS-3"}
+
+
+def load_plain_language():
+    """Wspólny moduł FlowKit (runtime/plain_language.py): wtyczka, instalacja Claude Code lub VS Code."""
+    here = Path(__file__).resolve()
+    candidates = [Path(os.environ["FLOWKIT_RUNTIME"])] if os.environ.get("FLOWKIT_RUNTIME") else []
+    candidates += [here.parents[3] / "runtime", here.parents[3] / "flowkit" / "runtime",
+                   Path.home() / ".claude" / "flowkit" / "runtime"]
+    for directory in candidates:
+        if (directory / "plain_language.py").is_file():
+            if str(directory) not in sys.path:
+                sys.path.insert(0, str(directory))
+            return importlib.import_module("plain_language")
+    return None
+
+
+def plain_language_check(body: list[Block], audience: str, mode: str,
+                         lang: str) -> tuple[list[str], list[str]] | None:
+    """Prosty język w całej treści (bez kodu); None, gdy modułu nie ma w instalacji."""
+    module = load_plain_language()
+    if module is None:
+        return None
+    starts: list[tuple[int, Block]] = []
+    parts: list[str] = []
+    line = 1
+    for block in body:
+        if block.code or not block.text.strip():
+            continue
+        starts.append((line, block))
+        parts.append(block.text)
+        line += block.text.count("\n") + 2
+    findings = module.check_text("\n\n".join(parts), lang=lang, strict=mode in ("client", "final"),
+                                 audience="user" if audience == "user" else "tech")
+    errors: list[str] = []
+    warnings: list[str] = []
+    for finding in findings:
+        if finding.rule_id in OWN_PLAIN_RULES:
+            continue
+        block = next(b for start, b in reversed(starts) if start <= finding.line)
+        message = f"{block.where}: prosty język {finding.rule_id}: {finding.message} [{finding.excerpt}]"
+        (errors if finding.level == module.FAIL else warnings).append(message)
+    return errors, warnings
+
+
 def check_blocks(blocks: list[Block], audience: str = "user", mode: str = "draft",
-                 heading_text: str | None = None) -> tuple[list[str], list[str]]:
+                 heading_text: str | None = None, lang: str = "auto") -> tuple[list[str], list[str]]:
     """Zwraca (błędy, ostrzeżenia)."""
     errors: list[str] = []
     warnings: list[str] = []
@@ -160,8 +211,14 @@ def check_blocks(blocks: list[Block], audience: str = "user", mode: str = "draft
             target = errors if audience == "user" else warnings
             target.append(f"{block.where}: adres wewnętrzny „{host.group(0)}” — sprawdź, czy odbiorca ma go znać")
 
+    working_level = 0  # poziom nagłówka otwartej sekcji roboczej (0 = poza nią)
     for block in body:
-        if block.code:
+        if block.heading:
+            if working_level and block.heading <= working_level:
+                working_level = 0
+            if mode == "draft" and any(w in block.text.casefold() for w in WORKING_HEADINGS):
+                working_level = block.heading
+        if block.code or working_level:
             continue
         text = SOURCE_NOTE.sub("", block.text) if mode == "draft" else block.text
         if mode in ("client", "final"):
@@ -220,13 +277,19 @@ def check_blocks(blocks: list[Block], audience: str = "user", mode: str = "draft
         missing = sorted({ref for b in body for ref in OPEN_REF.findall(b.text)} - defined)
         if missing:
             warnings.append("tematy bez wiersza w „Tematach do wyjaśnienia”: " + ", ".join(missing))
+    plain = plain_language_check(body, audience, mode, lang)
+    if plain is None:
+        warnings.append("brak modułu plain_language w runtime FlowKit: reguły prostego języka nie zostały sprawdzone")
+    else:
+        errors.extend(plain[0])
+        warnings.extend(plain[1])
     return errors, warnings
 
 
 def check_file(path: Path, audience: str = "user", mode: str = "draft",
-               heading_text: str | None = None) -> tuple[list[str], list[str]]:
+               heading_text: str | None = None, lang: str = "auto") -> tuple[list[str], list[str]]:
     blocks = docx_blocks(path) if path.suffix.lower() in (".docx", ".dotx") else markdown_blocks(path)
-    return check_blocks(blocks, audience, mode, heading_text)
+    return check_blocks(blocks, audience, mode, heading_text, lang)
 
 
 def main() -> int:
@@ -235,11 +298,12 @@ def main() -> int:
     parser.add_argument("--audience", choices=("user", "admin", "tech"), default="user")
     parser.add_argument("--mode", choices=("draft", "client", "final"), default="draft")
     parser.add_argument("--questions-heading", help="nagłówek sekcji wątpliwości, gdy szablon nazywa ją inaczej")
+    parser.add_argument("--lang", choices=("auto", "pl", "en"), default="auto")
     args = parser.parse_args()
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     try:
-        errors, warnings = check_file(args.document, args.audience, args.mode, args.questions_heading)
+        errors, warnings = check_file(args.document, args.audience, args.mode, args.questions_heading, args.lang)
     except ImportError:
         print("BRAK python-docx: nie można sprawdzić pliku .docx (pip install python-docx).")
         return 3

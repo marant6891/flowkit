@@ -12,6 +12,7 @@ Zasady nadrzędne:
 3. Każda treść ma pochodzenie: `USR-NNN` (odpowiedź), `SRC-NNN` (materiał), `DEC-NNN` (decyzja), a brak odpowiedzi to `OPEN-NNN`.
 4. Faza kończy się podsumowaniem i pytaniem: zatwierdzasz / poprawiasz / wracamy. Bez zatwierdzenia nie przechodź dalej.
 5. Stan prowadź w `warsztat/<skrót>-warsztat.md`; dokument docelowy przygotuj skillem `flowkit-client-pt-prd-writer` z plikiem warsztatu jako źródłem nadrzędnym.
+6. Prosty język (PL i EN) według `runtime/procedures/plain-language.md` (po instalacji: `.github/flowkit/runtime/procedures/`): najważniejsze na początku, zdania do 20 słów, czasowniki zamiast „dokonać zmiany”, bez korpomowy i kalk; przed oddaniem `plain-check`.
 
 Skorzystaj z szablonu, checklisty i przykładu z katalogu `skills/flowkit-requirements-workshop/`.
 

@@ -1,5 +1,10 @@
 # Historia zmian skilla flowkit-client-solution-docs-writer
 
+## 1.4 (26.11.2026)
+
+- **Jakość dokumentacji technicznej i integracyjnej (`admin`/`tech`):** rozszerzono `references/help-structure.md` oraz `SKILL.md` o wymagane elementy i głębię dla dokumentacji technicznej/integracyjnej (kontrakty API, mapowanie komunikatów, przepływy end-to-end, model danych, pełne tabele konfiguracji z typem, wartością domyślną i skutkiem zmiany) oraz zakaz ogólnikowych sekcji-zaślepek.
+- **Rysunki w wersji dla klienta:** zakaz pozostawiania surowych bloków `mermaid` i niezastąpionych znaczników `[[DIAGRAM:...]]` w dokumentach `client`/`final`; `scripts/check_user_docs.py` zgłasza je jako błąd i ostrzega przed zbyt krótkimi sekcjami.
+
 ## 1.3 (26.11.2026)
 
 - **Domyślnie dokument dla klienta bez dopisków.** W treści nie ma oznaczeń źródeł, `plik:linia`, `OPEN`, `ASSUMPTION`, „DO POTWIERDZENIA”, znaczników zrzutów ani rozdziałów roboczych. Wersja robocza i rejestr pochodzenia to pliki wewnętrzne; tryb z kwestiami do wyjaśnienia i roboczy tylko na prośbę.

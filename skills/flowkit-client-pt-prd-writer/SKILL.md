@@ -1,6 +1,6 @@
 ---
 name: flowkit-client-pt-prd-writer
-version: "3.5"
+version: "3.6"
 tags: [analyst, prd, pt, requirements, documentation, client, gherkin, dod, diagrams]
 description: >
   Tworzy profesjonalną dokumentację PT/PRD (projekt techniczny, specyfikacja
@@ -265,6 +265,11 @@ Zasady pisania:
 - Kryteria akceptacji formułuj tak, aby były sprawdzalne; jeśli źródło nie daje
   podstaw do kryterium, nie wymyślaj progu - oznacz OPEN.
 - Streszczenie zarządcze pisz na końcu, z treści dokumentu, bez nowych faktów.
+- **Struktura i przykłady komunikatów (JSON/XML/kontrakt):** jeśli źródła opisują strukturę komunikatu,
+  payload lub schemat żądania/odpowiedzi (JSON, XML itp.), zachowaj w sekcji „Integracje” zwięzły przykład
+  takiego komunikatu oprócz tabeli. Nie usuwaj przykładu struktury w wersji dla klienta — dokument czytają
+  także osoby techniczne po stronie klienta (użyj wyłącznie pól ze źródeł oraz danych fikcyjnych, bez sekretów
+  i dopisków roboczych).
 - Zobacz [przykłady: źródło vs zmyślenie](./examples/sourced-vs-invented.md).
 
 **Styl sekcji technicznych i zakaz bagatelizowania nakładu** (Analiza wpływu, Architektura, Integracje, Model danych):
@@ -382,7 +387,9 @@ w jednej sekcji na końcu dokumentu.
 1. **Treść dokumentu bez dopisków.** W rozdziałach, tabelach, streszczeniu i podsumowaniach nie ma:
    `SRC-NNN`, `plik:linia`, kolumn „Źródło” i legendy oznaczeń, `ASSUMPTION-NNN`, `OPEN-NNN`, `Q-NNN`,
    `REC-NNN`, „DO POTWIERDZENIA”, „Brak danych”, „Nie analizowano”, oznaczeń interpretacji, komentarzy
-   ani placeholderów. Identyfikatory wymagań (`FR-001`, `US-001` itd.) zostają, bo służą klientowi.
+   ani placeholderów. Identyfikatory wymagań (`FR-001`, `US-001` itd.) oraz konkrety techniczne ze źródeł
+   (w tym przykłady struktur komunikatów JSON/XML i kontrakty API) **zostają**, bo służą także osobom
+   technicznym po stronie klienta.
 2. **Brakująca informacja w treści** to krótkie odwołanie do punktu na końcu: „Do ustalenia (K-03)”.
    W tabeli - tylko w komórce, której dotyczy luka. Streszczenie zarządcze i podsumowania nie zawierają
    odwołań; wolno w nich jedno zdanie: „Kwestie wymagające decyzji opisano w rozdziale <numer>.”

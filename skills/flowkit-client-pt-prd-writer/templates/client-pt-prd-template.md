@@ -132,6 +132,8 @@ spełnia kryteria z Etapu 5a; każdy węzeł musi występować w tekście i tabe
 |---|---|---|---|---|---|---|
 | INT-001 | [System] | [We/Wy] | [Dane] | [Format] | [Ze źródła lub DO POTWIERDZENIA] | SRC-001 |
 
+[Gdy źródła opisują strukturę komunikatu (np. JSON, XML) lub kontrakt API, zamieść pod tabelą zwięzły przykład struktury ze źródeł.]
+
 ## 12. Model danych i migracje (warunkowa)
 
 [Diagram ER, gdy spełnia kryteria z Etapu 5a.]

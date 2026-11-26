@@ -32,12 +32,24 @@ modułu, pomijasz (szablon zapasowy) albo oznaczasz „Nie dotyczy.” (szablon 
 4. Rozdziały modułów według struktury powyżej.
 5. Słownik pojęć, tematy lub kwestie do wyjaśnienia, załączniki robocze (tylko tryb roboczy).
 
-## Dokumentacja rozwiązania (administrator, zespół techniczny)
+## Dokumentacja rozwiązania (administrator, zespół techniczny, integracje)
 
-Dla każdego obszaru: przeznaczenie, rysunek (komponenty, przepływ danych, sekwencja integracji, model danych),
-tabela elementów (ustawienia, endpointy, tabele, zadania cykliczne) z kompletnym katalogiem, procedury krok po
-kroku (instalacja, konfiguracja, diagnostyka), problemy. Katalog opcji obejmuje tu ustawienia, role
-i uprawnienia, zadania cykliczne, integracje i komunikaty w logach.
+Dokumentacja dla administratora (`--audience admin`) i zespołu technicznego (`--audience tech`) nie może być
+ogólnikowym streszczeniem w 2-3 zdaniach na sekcję. Każda sekcja opisuje konkretne fakty z kodu:
+
+| Obszar | Wymagana głębia i zawartość (tylko z kodu) |
+|---|---|
+| **Wprowadzenie** | Cel biznesowy i rola rozwiązania, granice systemu (co jest częścią rozwiązania, a co systemem zewnętrznym), odbiorca, wersja kodu (gałąź/tag/commit). Unikaj pustych wstępów powtarzających tytuł. |
+| **Architektura i moduły** | Dla każdego modułu/serwisu: odpowiedzialność, główne klasy/komponenty i ich rola, zależności zewnętrzne, przepływ danych między komponentami (rysunek `architecture` lub `flowchart`). |
+| **Przepływy end-to-end** | Dla każdego głównego procesu lub kierunku integracji (np. przychodzący, wychodzący): przebieg krok po kroku od wyzwalacza przez zapis stanu, mapowanie, wysyłkę, aż po callback/finalizację, korelację, idempotencję, ponowienia (retry/backoff) i obsługę błędów (rysunek `sequence` lub `swimlane`). |
+| **API i integracje (kontrakty)** | Dla każdego endpointu i wywołania wychodzącego: metoda HTTP i ścieżka, uwierzytelnianie/role, nagłówki (wymagane i opcjonalne), kluczowe pola żądania i odpowiedzi, kody HTTP i błędy; tabela mapowania typów komunikatów na handlery/endpointy. |
+| **Model danych** | Tabele/encje z kodu lub migracji, kluczowe pola i klucze obce, relacje (rysunek `er` od 3 encji), maszyna stanów z przejściami i warunkami (rysunek `state-machine` od 3 stanów). |
+| **Konfiguracja** | Tabela z kolumnami: `Klucz / ustawienie`, `Znaczenie`, `Typ / dozwolone wartości`, `Wartość domyślna`, `Skutek zmiany` (bez sekretów). |
+| **Uruchamianie, logi i diagnostyka** | Wymagania z plików projektu, kolejność kroków uruchomienia i migracji, endpointy zdrowia, pola logów służące do korelacji, tabela objawów/kodów błędów → przyczyna w kodzie → działanie. |
+
+Zakaz sekcji-zaślepek: jeśli dany obszar dotyczy rozwiązania, rozwiń go na podstawie kodu do poziomu użytecznego dla
+administratora lub developera; jeśli w kodzie brak informacji (np. wartości środowiskowych), zgłoś lukę (`OPEN-NNN`
+w trybie roboczym / `K-NN` w trybie `client`) albo rozstrzygnij z użytkownikiem przed oddaniem wersji końcowej.
 
 ## Jakość opisu opcji
 

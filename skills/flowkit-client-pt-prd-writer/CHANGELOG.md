@@ -1,5 +1,9 @@
 # Historia zmian skilla flowkit-client-pt-prd-writer
 
+## 3.6 (26.11.2026)
+
+- **Przykłady struktur komunikatów (JSON/XML) w wersji dla klienta:** dodano jawną zasadę w `SKILL.md` i wskazówkę w `templates/client-pt-prd-template.md`, aby zachowywać przykłady struktur komunikatów (JSON/XML) opisane w źródłach obok tabeli integracji — dokument czytają także osoby techniczne po stronie klienta.
+
 ## 3.5 (26.11.2026)
 
 - **Domyślnie wersja dla klienta.** Domyślnym trybem wyniku jest teraz „Wersja dla klienta” (czysta treść bez oznaczeń roboczych, wątpliwości zebrane w sekcji „Kwestie do wyjaśnienia”, rejestr pochodzenia poza dokumentem). Tryb roboczy jest dostępny wyłącznie na wyraźną prośbę.

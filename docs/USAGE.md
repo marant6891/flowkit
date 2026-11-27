@@ -229,7 +229,8 @@ Popraw tego maila do klienta, tryb dupokrytka, odpowiedź potrzebna do 05.12:
 <wklejony szkic>
 ```
 
-Wynik: wersja do wysłania, lista zmian, lista `[DO UZUPEŁNIENIA]` i uwagi tylko dla Ciebie (usunięte emocje,
+Wynik: wersja do wysłania zapisana w pliku `mail-RRRR-MM-DD-[temat].md` (komunikator: `wiadomosc-…md`) i
+pokazana w odpowiedzi, lista zmian, lista `[DO UZUPEŁNIENIA]` i uwagi tylko dla Ciebie (usunięte emocje,
 uwagi wewnętrzne, ryzykowne zobowiązania). Bez podanego trybu skill sam go rozpozna i zapyta tylko wtedy, gdy
 treść wskazuje na `DUPOKRYTKA`. Wiadomość na komunikator: dopisz „na Teams” albo „na Slacka”.
 

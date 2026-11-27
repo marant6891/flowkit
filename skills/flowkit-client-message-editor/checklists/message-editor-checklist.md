@@ -26,4 +26,5 @@
 - [ ] Prosty język: najważniejsze na początku, zdania do 20 słów (EN: 25), czasowniki zamiast „dokonać zmiany”.
 - [ ] Bez korpomowy i kalk („zaparkować”, „zaadresować”, „To, co…, to…”, „To drugi raz, gdy…”); w EN bez fałszywych przyjaciół.
 - [ ] Szyk naturalny: to, co znane, na początku zdania, a nowe na końcu.
+- [ ] Wersja do wysłania jest zapisana w pliku `mail-…md` lub `wiadomosc-…md` (tylko treść dla klienta, bez uwag); treść w odpowiedzi jest taka sama jak w pliku.
 - [ ] `check_message.py` nie zgłasza błędów; ostrzeżenia są wyjaśnione w uwagach.

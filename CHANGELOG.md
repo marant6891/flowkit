@@ -6,6 +6,10 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 
 ## [Unreleased]
 
+### Zmieniono
+- `flowkit-client-message-editor` 1.2: wersja do wysłania trafia do pliku `mail-RRRR-MM-DD-[temat].md` (komunikator: `wiadomosc-…md`), sprawdzanego przez `check_message.py`.
+- `doctor`: przy nieaktualnych agentach w `.githubgents` podpowiedź `install.ps1` zawiera `-AgentTargetPath` z pełną ścieżką, więc działa z dowolnego katalogu.
+
 ### Dodano
 - **Skill `flowkit-client-solution-docs-writer` 1.0:** dokumentacja gotowego rozwiązania na podstawie jego kodu: pomoc dla użytkownika końcowego (help, podręcznik, szybki start, FAQ), instrukcja administratora albo dokumentacja techniczna. Brief w oknie pytań (typ dokumentu, odbiorca, kod rozwiązania, szablon Word), inwentaryzacja kodu z perspektywy roli odbiorcy (ekrany, pola, walidacje, komunikaty, uprawnienia, flagi), plan do akceptacji, tematy-zadania w języku odbiorcy, zapis `.docx` w szablonie, tryby roboczy, dla klienta i końcowy. Kontrola `check_user_docs.py` (uruchamiana przez executor), prompt VS Code, przypadki aktywacji i ewaluacji, sekcja w `docs/USAGE.md`, przykładowy moduł w `tests/fixtures/app/returns/`.
 - **Skill `flowkit-client-message-editor` 1.0:** redaktor e-maili i wiadomości do klienta. Poprawia język, ton i strukturę szkicu bez dodawania faktów i zobowiązań; tryb `ZWYKŁY` albo `DUPOKRYTKA` (potwierdzenie ustaleń na piśmie z datami, decyzjami, zakresem, ryzykami i prośbą o potwierdzenie do daty), kanał e-mail albo komunikator. Kontrola `check_message.py` (uruchamiana przez executor), prompt VS Code, przypadki aktywacji i ewaluacji, sekcja w `docs/USAGE.md`.

@@ -1,6 +1,6 @@
 ---
 name: flowkit-client-message-editor
-version: "1.1"
+version: "1.2"
 tags: [email, message, editor, client, communication, tone, confirmation, teams, slack]
 description: >
   Redaguje szkic e-maila lub wiadomości (Teams, Slack) do klienta: poprawia język,
@@ -9,7 +9,8 @@ description: >
   fakty z datami, decyzje i kto je podjął, zakres, ryzyka, zależności od klienta,
   prośba o potwierdzenie do terminu, neutralny ton). Użyj, gdy użytkownik wkleja
   treść maila lub wiadomości i prosi o poprawienie, przeredagowanie, złagodzenie
-  tonu, skrócenie albo przygotowanie maila potwierdzającego ustalenia.
+  tonu, skrócenie albo przygotowanie maila potwierdzającego ustalenia. Wersję
+  do wysłania zapisuje w pliku Markdown (.md).
 ---
 
 # Cel
@@ -17,7 +18,7 @@ description: >
 Zamień szkic e-maila lub wiadomości od użytkownika w wersję gotową do wysłania klientowi: jasną, uprzejmą,
 z jedną wyraźną prośbą i bez ryzykownych sformułowań. W trybie `DUPOKRYTKA` wiadomość ma dodatkowo
 zostawić czytelny ślad na piśmie: co ustalono, kto zdecydował, na co czekamy i od kiedy, oraz o co prosimy
-z terminem. Skill tylko redaguje: niczego nie wysyła.
+z terminem. Wersję do wysłania zapisuje w pliku `.md`. Skill tylko redaguje: niczego nie wysyła.
 
 # Tryby i kanały
 
@@ -72,6 +73,15 @@ Komunikator nie jest dobrym miejscem na zapis ustaleń.
     „zaadresować”, „na ten moment”) i bez kalk składniowych („To, co…, to…”, „To drugi raz, gdy…”). W angielskim
     unikaj fałszywych przyjaciół (*actual*, *eventually*, *realize*). Poprawiasz formę, nie sens (zasada 2).
     Zamienniki: [zwroty](./references/phrasebook.md).
+12. **Wynik w pliku `.md`.** Wersję do wysłania zapisz w katalogu roboczym jako
+    `mail-RRRR-MM-DD-[krótki-temat].md` (kanał `WIADOMOŚĆ`: `wiadomosc-RRRR-MM-DD-[krótki-temat].md`; data
+    dzisiejsza, temat małymi literami bez polskich znaków, słowa łączone `-`). Plik zawiera tylko treść dla
+    klienta: wiersz `Temat: …` (tylko e-mail), pusty wiersz i treść, bez bloku kodu i bez uwag dla autora.
+    Plik o tej nazwie już istnieje: dopisz `-2`, `-3`… zamiast go nadpisywać. `DUPOKRYTKA` w kanale
+    `WIADOMOŚĆ`: dwa pliki, `mail-…md` (zapis ustaleń) i `wiadomosc-…md` (krótka wiadomość, która do niego
+    odsyła). Wariant krótszy lub w innym języku na prośbę: osobny plik z dopiskiem `-krotko` lub `-en`.
+    Gdy nie możesz zapisać pliku (tryb tylko do odczytu, brak narzędzia), oddaj treść w odpowiedzi i powiedz,
+    dlaczego pliku nie ma.
 
 # Pytania do użytkownika
 
@@ -115,19 +125,20 @@ Użyj [szablonów wiadomości](./templates/message-templates.md) dla trybu i kan
 
 Przykłady przed i po: [przykłady](./examples/rewrite-examples.md).
 
-### Etap 4: Oddaj wynik
-Według [wzoru odpowiedzi](./templates/answer-template.md):
+### Etap 4: Zapisz plik i oddaj wynik
+Zapisz wersję do wysłania w pliku `.md` według zasady 12. Odpowiedź ułóż według
+[wzoru odpowiedzi](./templates/answer-template.md):
 1. `Tryb: … · Kanał: …`,
-2. wersja do wysłania (temat i treść) w bloku do skopiowania,
+2. `Plik: <ścieżka>` i wersja do wysłania (temat i treść) w bloku do skopiowania, taka sama jak w pliku,
 3. co zmieniono (najwyżej 7 punktów),
 4. `[DO UZUPEŁNIENIA]` - lista brakujących elementów,
 5. uwagi tylko dla autora: usunięte emocje i uwagi wewnętrzne, ryzykowne zobowiązania, sugestie zmiany sensu.
-Na prośbę dodaj wariant krótszy albo wersję w innym języku.
+Na prośbę dodaj wariant krótszy albo wersję w innym języku (osobny plik, zasada 12).
 
 ### Etap 5: Weryfikacja przed oddaniem
-Zapisz wersję do wysłania w pliku `.txt` lub `.md` i sprawdź ją poleceniem
-`python "<SKILL_DIR>/scripts/check_message.py" <plik> --mode zwykly|dupokrytka --final`, gdzie `<SKILL_DIR>` to
+Sprawdź plik `.md` z Etapu 4 poleceniem
+`python "<SKILL_DIR>/scripts/check_message.py" <plik.md> --mode zwykly|dupokrytka --final`, gdzie `<SKILL_DIR>` to
 katalog tego pliku (w Claude Code: `${CLAUDE_SKILL_DIR}`). Skrypt sprawdza też prosty język (`--lang auto|pl|en`).
-Popraw błędy, a ostrzeżenia `prosty język` popraw albo krótko uzasadnij w uwagach. Reguł wymagających oceny
+Popraw błędy w pliku (i w bloku w odpowiedzi), a ostrzeżenia `prosty język` popraw albo krótko uzasadnij w uwagach. Reguł wymagających oceny
 (szyk zdania, strona bierna) skrypt nie wykryje: sprawdź je sam. Na koniec przejdź przez
 [checklistę redaktora](./checklists/message-editor-checklist.md).

@@ -95,7 +95,7 @@ Wszystkie skille mają prefiks `flowkit-`. Skill uruchamia się automatycznie, g
 
 | Skill | Wersja | Opis | Ścieżka |
 |---|---|---|---|
-| **flowkit-client-pt-prd-writer** | `3.6` | Dokument PT/PRD dla klienta wyłącznie na podstawie materiałów, w szablonie klienta (`.docx`, `.dotx`, `.md`) z kompletem jego stylów. Wariant skrócony dla małych zmian (1-3 strony) i pełny. Trzy tryby wyniku: **wersja dla klienta** (domyślna: czysta treść, wątpliwości zebrane w rozdziale końcowym), dokument końcowy bez dopisków i roboczy z oznaczeniami źródeł. User stories Given-When-Then, Definition of Done, kontrola pokrycia wymagań testami, diagramy oparte na źródłach, tryb `AUTO`. | [`skills/flowkit-client-pt-prd-writer/`](skills/flowkit-client-pt-prd-writer/) |
+| **flowkit-client-pt-prd-writer** | `3.7` | Dokument PT/PRD dla klienta wyłącznie na podstawie materiałów, w szablonie klienta (`.docx`, `.dotx`, `.md`) z kompletem jego stylów. Wariant skrócony dla małych zmian (1-3 strony) i pełny. Trzy tryby wyniku: **wersja dla klienta** (domyślna: czysta treść, wątpliwości zebrane w rozdziale końcowym), dokument końcowy bez dopisków i roboczy z oznaczeniami źródeł. User stories Given-When-Then, Definition of Done, kontrola pokrycia wymagań testami, diagramy oparte na źródłach, tryb `AUTO`. | [`skills/flowkit-client-pt-prd-writer/`](skills/flowkit-client-pt-prd-writer/) |
 | **flowkit-requirements-workshop** | `1.3` | Interaktywny warsztat wymagań prowadzony krok po kroku: koncepcja, zakres, wymagania biznesowe (role, procesy, reguły, user stories Given-When-Then) i techniczne (integracje, dane, NFR), ryzyka i plan testów, a na końcu docelowy PT/PRD przez `flowkit-client-pt-prd-writer`. Każda faza zatwierdzana przez użytkownika, bez trybu AUTO; stan w pliku warsztatu, który można wznowić. | [`skills/flowkit-requirements-workshop/`](skills/flowkit-requirements-workshop/) |
 | **flowkit-client-message-editor** | `1.2` | Redakcja szkicu e-maila lub wiadomości (Teams, Slack) do klienta: ton, struktura, jedna prośba z terminem, bez nowych faktów i zobowiązań. Tryb `ZWYKŁY` albo `DUPOKRYTKA` (potwierdzenie na piśmie: ponumerowane fakty z datami, decyzje, zakres, ryzyka, zależności od klienta, prośba o potwierdzenie do daty). Wynik w pliku `mail-…md`. Kontrola `check_message.py`. | [`skills/flowkit-client-message-editor/`](skills/flowkit-client-message-editor/) |
 | **flowkit-client-solution-docs-writer** | `1.4` | Dokumentacja gotowego rozwiązania z jego kodu: **pomoc dla użytkownika końcowego** (help, podręcznik, szybki start, FAQ), instrukcja administratora albo dokumentacja techniczna. Najpierw brief w oknie pytań: typ dokumentu, odbiorca (rola, poziom wiedzy), kod rozwiązania (repozytorium, moduł, wersja) i szablon Word. Inwentaryzacja kodu z perspektywy roli (ekrany, pola, walidacje, komunikaty, uprawnienia, flagi), plan do akceptacji, tematy-zadania krok po kroku w języku odbiorcy, zapis `.docx` w stylach szablonu, tryby roboczy, dla klienta i końcowy. Pełna struktura rozdziału modułu (układ ekranu z legendą, wszystkie opcje, słownik kolumn, statusy, zakładki), katalog opcji z kontrolą pokrycia `check_coverage.py` i rysunki z silnika diagramów. Domyślnie dokument dla klienta bez dopisków (`make_client_version.py`, pochodzenie w osobnym rejestrze). Kontrola `check_user_docs.py`. | [`skills/flowkit-client-solution-docs-writer/`](skills/flowkit-client-solution-docs-writer/) |
@@ -111,7 +111,7 @@ Wszystkie skille mają prefiks `flowkit-`. Skill uruchamia się automatycznie, g
 
 | Skill | Wersja | Opis | Ścieżka |
 |---|---|---|---|
-| **flowkit-devops-sre-review** | `1.2` | Przegląd niezawodności usługi na podstawie plików: SLI/SLO i error budget, alerty, metryki RED/USE, sondy, requests i limits, HPA i PDB, backup i RPO/RTO, koszt. Ustalenia z dowodem `plik:linia`, rekomendacje z sygnałem, progiem i uzasadnieniem. | [`skills/flowkit-devops-sre-review/`](skills/flowkit-devops-sre-review/) |
+| **flowkit-devops-sre-review** | `1.3` | Przegląd niezawodności usługi na podstawie plików: SLI/SLO i error budget, alerty, metryki RED/USE, sondy, requests i limits, HPA i PDB, backup i RPO/RTO, GitOps (Argo CD, Flux), koszt (FinOps). Ustalenia z dowodem `plik:linia`, rekomendacje z sygnałem, progiem i uzasadnieniem. | [`skills/flowkit-devops-sre-review/`](skills/flowkit-devops-sre-review/) |
 | **flowkit-devops-incident-postmortem** | `1.6` | Bezobwiniający raport postmortem: klasyfikacja SEV, oś czasu, łańcuch przyczyn (Trigger, Amplifier, Detection/Process Gap, 5 Whys), komunikacja i działania PREVENT/DETECT/MITIGATE. | [`skills/flowkit-devops-incident-postmortem/`](skills/flowkit-devops-incident-postmortem/) |
 
 Nowy skill zaczyna się od wzorca [`skills/_template/`](skills/_template/) - patrz [Rozwój i współtworzenie](#rozwój-i-współtworzenie).
@@ -138,7 +138,7 @@ Nowy skill zaczyna się od wzorca [`skills/_template/`](skills/_template/) - pat
 | **flowkit-planner** | tylko odczyt | Plan iteracji z etykietami ryzyka i szacunkiem pracy |
 | **flowkit-product-owner** | tylko odczyt | User stories, kryteria akceptacji, ADR |
 | **flowkit-implementer** | edycja, testy | Jeden atomowy krok zmiany z samokontrolą diffa |
-| **flowkit-verifier** | tylko odczyt, testy | Weryfikacja kodu w 9 wymiarach (bez testów `[NOT VERIFIED]`), niezależny audyt dokumentów klienckich (`DOC-AUDIT:`), zmian w skillach/agentach (`SKILL-AUDIT:`) oraz defensywny audyt bezpieczeństwa OWASP i testów frontu (`QA-AUDIT:`) |
+| **flowkit-verifier** | tylko odczyt, testy | Weryfikacja kodu w 9 wymiarach (bez testów `[NOT VERIFIED]`), niezależny audyt dokumentów klienckich (`DOC-AUDIT:`), zmian w skillach/agentach (`SKILL-AUDIT:`) defensywny audyt bezpieczeństwa OWASP i testów frontu (`QA-AUDIT:`) oraz przegląd planu i przypadków testowych (`TEST-AUDIT:`) |
 | **flowkit-devops** | edycja, bez wykonywania poleceń | CI/CD, Docker, Kubernetes, IaC, chmura; polecenia zmieniające środowisko tylko jako propozycja `REQUIRES APPROVAL` |
 | **flowkit-diagnostics** | tylko odczyt | Logi, stan klastra i kontenerów, runbooki |
 | **flowkit-validator** | tylko odczyt, walidatory | Statyczna walidacja Terraform, Dockerfile, compose, Helm, Kubernetes YAML, CI, skryptów i JSON; bez wdrażania i dostępu do klastra |
@@ -152,7 +152,8 @@ Prefiksy są opcjonalne - bez nich orkiestrator sam dobiera działanie i podaje 
 | Prefiks | Działanie |
 |---|---|
 | `ANALYZE:` · `VERIFY:` · `PLAN:` · `SPEC:` | zaczyna od Analyzera, Verifiera, Plannera albo PM |
-| `BA:` · `QA:` · `DEVOPS:` · `DIAG:` · `SQL:` | analityk, testy manualne frontu i audyt OWASP (`QA:`), DevOps, diagnostyka albo skill SQL |
+| `GRILL:` / `PRZEPYTAJ:` | przepytanie z planu, decyzji lub dokumentu: rundy pytań według zależności z rekomendacjami, fakty sprawdzane w źródłach, na końcu ustalenia do potwierdzenia |
+| `BA:` · `QA:` · `TEST:` · `UAT:` · `DEVOPS:` · `DIAG:` · `SQL:` | analityk, testy manualne frontu i audyt OWASP (`QA:`), przypadki testowe z przeglądem `TEST-AUDIT:` (`TEST:`), przygotowanie UAT (`UAT:`), DevOps, diagnostyka albo skill SQL |
 | `WARSZTAT:` / `WORKSHOP:` | interaktywny warsztat wymagań: od pomysłu przez część biznesową i techniczną do docelowego PT/PRD, z zatwierdzeniem każdej fazy |
 | `DRY:` | pokazuje plan i czeka na potwierdzenie |
 | `LOG:` | zapisuje iteracje w `AGENT_LOG.md` |

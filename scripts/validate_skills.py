@@ -12,6 +12,10 @@ KEBAB = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 VERSION = re.compile(r"^\d+\.\d+$")
 LINK = re.compile(r"\[[^\]]*\]\(([^)\s]+)\)")
 EXTERNAL = ("http://", "https://", "mailto:", "#")
+MAX_SKILL_LINES = 500
+TOC_MIN_LINES = 100
+TOC_WITHIN = 15
+TOC = re.compile(r"(?i)spis treści|table of contents")
 
 errors = []
 
@@ -40,6 +44,18 @@ def check_skill(skill_path: Path, readme: str) -> None:
     if not isinstance(meta, dict):
         return err("Frontmatter is not a YAML mapping")
     body = match.group(2)
+
+    # Rozmiar (zalecenia Anthropic): SKILL.md wczytuje się w całości przy każdym uruchomieniu skilla,
+    # więc szczegóły rzadko potrzebne trafiają do plików pomocniczych czytanych na żądanie.
+    body_lines = len(body.splitlines())
+    if body_lines > MAX_SKILL_LINES:
+        err(f"SKILL.md body has {body_lines} lines (max {MAX_SKILL_LINES}); move details to references/")
+    for folder in ("references", "checklists", "examples"):
+        for path in sorted((skill_path / folder).glob("*.md")):
+            lines = path.read_text(encoding="utf-8").splitlines()
+            if len(lines) > TOC_MIN_LINES and not any(TOC.search(line) for line in lines[:TOC_WITHIN]):
+                err(f"{folder}/{path.name} has {len(lines)} lines and no table of contents ('Spis treści') "
+                    f"in the first {TOC_WITHIN} lines")
 
     # Frontmatter
     if not KEBAB.match(name):

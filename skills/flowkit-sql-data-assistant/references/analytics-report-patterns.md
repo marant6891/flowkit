@@ -1,5 +1,13 @@
 # Wzorce zestawień analitycznych i raportowych
 
+Spis treści:
+1. Ściągawka różnic między bazami
+2. Zasady poprawnego raportu
+3. Pełny przykład (sprzedaż miesięcznie, zmiana m/m, udział, narastająco): PostgreSQL, SQL Server, Oracle,
+   MySQL i MariaDB
+4. Katalog wzorców: Top N klientów w miesiącu, analiza ABC (Pareto), tabela przestawna z sumami częściowymi,
+   kohorty retencji, zapytanie kontrolne (rekonsyliacja)
+
 Używaj w trybie `ANALYTICS_REPORT`. Nazwy `schemat.zamowienie`, `zamowienie_id`, `klient_id`, `data_zamowienia`,
 `status`, `wartosc_netto` i wartości statusów są **przykładowe** - zastąp je nazwami ze schematu lub zgłoszenia
 (zasada 2). Każdy wzorzec to tylko odczyt: `SELECT` z agregacją lub limitem.

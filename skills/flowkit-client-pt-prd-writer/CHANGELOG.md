@@ -1,5 +1,9 @@
 # Historia zmian skilla flowkit-client-pt-prd-writer
 
+## 3.7 (28.11.2026)
+
+- **Krótszy `SKILL.md` (progressive disclosure):** szczegóły trybów „Dokument końcowy bez dopisków” i AUTO przeniesiono do `references/final-and-auto-modes.md`. W `SKILL.md` zostały krótkie streszczenia i odnośniki, więc przy zwykłym uruchomieniu skill zużywa mniej kontekstu. Zachowanie trybów się nie zmienia.
+
 ## 3.6 (26.11.2026)
 
 - **Przykłady struktur komunikatów (JSON/XML) w wersji dla klienta:** dodano jawną zasadę w `SKILL.md` i wskazówkę w `templates/client-pt-prd-template.md`, aby zachowywać przykłady struktur komunikatów (JSON/XML) opisane w źródłach obok tabeli integracji — dokument czytają także osoby techniczne po stronie klienta.

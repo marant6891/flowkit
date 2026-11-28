@@ -20,11 +20,11 @@ VSCODE_TOOLS = {"vscode/askQuestions", "execute", "read", "agent", "edit", "sear
 # Minimalna treść kontraktów z agents/core, która musi trafić do instalowanych adapterów.
 CORE_TERMS = {
     "flowkit-orchestrator": ["REPORT_PROGRESS", "ASK_USER", "WAIT_FOR_APPROVAL", "Correction loop", "Reconciliation",
-                  "Task profiles", "Risk labels", "Error handling", "SHIP:", "Automatic routing", "SQL:", "DOC-AUDIT:", "QA:",
+                  "Task profiles", "Risk labels", "Error handling", "SHIP:", "Automatic routing", "SQL:", "DOC-AUDIT:", "QA:", "TEST:", "UAT:", "GRILL:",
                   "Ask: window", "plain-language.md"],
     "flowkit-code-analyzer": ["Scanned:", "Not checked:", "Confidence:", "Assumptions:"],
     "flowkit-verifier": ["Logic", "Contracts", "Tests", "Dependencies", "Security", "Performance",
-                           "Consistency", "Docs", "Requirements", "[NOT VERIFIED]", "DOC-AUDIT:", "SKILL-AUDIT:", "QA-AUDIT:",
+                           "Consistency", "Docs", "Requirements", "[NOT VERIFIED]", "DOC-AUDIT:", "SKILL-AUDIT:", "QA-AUDIT:", "TEST-AUDIT:",
                            "CONTRADICTION-NNN", "plain-check"],
     "flowkit-planner": ["Iter 1:", "Effort:", "Risks:"],
     "flowkit-implementer": ["Self-check", "DONE", "PARTIAL", "BLOCKED"],

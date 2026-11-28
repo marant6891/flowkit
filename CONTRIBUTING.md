@@ -88,6 +88,7 @@ Pull Request zostanie odrzucony, jeśli:
 - Frontmatter SKILL.md nie zawiera wymaganych pól lub `name` ≠ nazwa katalogu.
 - Brak katalogu `templates/` z co najmniej jednym plikiem.
 - Wewnętrzne linki w SKILL.md prowadzą do nieistniejących plików.
+- Treść SKILL.md przekracza 500 linii albo plik pomocniczy dłuższy niż 100 linii nie ma spisu treści.
 - W commicie znajdują się dane wrażliwe (tokeny, klucze API, hasła, nazwy klientów produkcyjnych).
 
 ---

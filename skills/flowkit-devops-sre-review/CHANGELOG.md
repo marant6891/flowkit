@@ -1,5 +1,10 @@
 # Historia zmian skilla flowkit-devops-sre-review
 
+## 1.3 (28.11.2026)
+
+- Nowy obszar „GitOps (Argo CD, Flux)”: synchronizacja produkcji, `prune` i `selfHeal`, dryf, przypięta wersja źródła, health checks i ścieżka wycofania.
+- Obszar „Koszt (FinOps)”: środowiska nieprodukcyjne pracujące bez przerwy, etykiety kosztowe, oszczędności tylko z danych o zużyciu.
+
 ## 1.2 (26.11.2026)
 
 - Prosty język PL i EN według standardu FlowKit (`runtime/procedures/plain-language.md`): ustalenia i rekomendacje. Nowa zasada

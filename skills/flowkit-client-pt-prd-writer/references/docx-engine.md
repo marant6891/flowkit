@@ -1,5 +1,9 @@
 # Obsługa plików .docx: odczyt, zapis i diagramy
 
+Spis treści: Krok 1: Wykrycie środowiska · Krok 2: Odczyt szablonu i materiałów · Krok 3: Zapis DOCX
+(w tym uzupełnianie szablonu z polami) · Krok 4: Weryfikacja wyniku · Tryb bezpieczny: Markdown ·
+Zasady sesji · Szybka instalacja.
+
 Instrukcja obowiązuje zawsze, gdy skill lub agent musi **odczytać lub wygenerować plik `.docx`/`.dotx`**.
 Agenci FlowKit uruchamiają polecenia wyłącznie przez lokalny executor:
 

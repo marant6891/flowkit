@@ -20,7 +20,7 @@ import zipfile
 from pathlib import Path
 
 # Wersja runtime: musi być równa wersji w .claude-plugin/plugin.json (sprawdza validate_manifest.py).
-VERSION = "1.8.0"
+VERSION = "1.9.0"
 MAX_LINES = 200
 HEAD_LINES = 40
 MAX_LINE_CHARS = 400

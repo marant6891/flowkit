@@ -9,7 +9,7 @@ tools:
 - search
 ---
 
-<!-- FlowKit 1.8.0 · Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-implementer_agent.md. Nie edytuj ręcznie. -->
+<!-- FlowKit 1.9.0 · Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-implementer_agent.md. Nie edytuj ręcznie. -->
 
 ## Questions for the user
 

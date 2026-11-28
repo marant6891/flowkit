@@ -1,7 +1,7 @@
 {
   "name": "flowkit",
   "displayName": "FlowKit - Analyst & DevOps Skills",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "Skille i agenci AI dla analityków biznesowo-systemowych i inżynierów DevOps: interaktywny warsztat wymagań od pomysłu do dokumentu, dokumenty PT/PRD w szablonie klienta, podsumowania spotkań, postmortemy, przeglądy SRE, bezpieczny SQL i walidacja konfiguracji. Treść tylko ze źródeł, praca lokalna przez kontrolowany executor.",
   "author": {
     "name": "Mariusz Antosiewicz",

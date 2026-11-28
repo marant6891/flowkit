@@ -17,7 +17,7 @@ hooks:
       onFailure: block
 ---
 
-<!-- FlowKit 1.8.0 · Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-validator_agent.md. Nie edytuj ręcznie. -->
+<!-- FlowKit 1.9.0 · Plik generowany przez scripts/build_agents.py ze źródła agents/flowkit-validator_agent.md. Nie edytuj ręcznie. -->
 
 ## Claude Code tool names
 

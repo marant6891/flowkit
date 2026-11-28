@@ -86,6 +86,8 @@ To najważniejsza reguła odróżniająca FlowKit od innych repozytoriów prompt
   łańcuchów odnośników między plikami pomocniczymi.
 - Plik w `references/`, `checklists/` lub `examples/` dłuższy niż 100 linii zaczyna się spisem treści
   („Spis treści” w pierwszych 15 liniach). Obie reguły sprawdza `scripts/validate_skills.py`.
+- Nowy skill, agent, prefiks orkiestratora albo tryb audytu opisz w `README.md`, `docs/USAGE.md` i
+  `.github/copilot-instructions.md`. Sprawdza to `scripts/validate_docs.py` w CI.
 
 ### 2.4 Szablon klienta ma zawsze pierwszeństwo (User Template Priority)
 Każdy skill generujący dokumenty musi w pierwszym kroku zapytać o szablon klienta/użytkownika (`.docx`, `.md`). Wbudowany szablon w `templates/` jest wyłącznie szablonem zapasowym (*fallback*).

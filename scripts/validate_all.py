@@ -14,6 +14,7 @@ SCRIPTS = [
     ("validate_agents.py", "Walidacja definicji agentów i adapterów"),
     ("validate_manifest.py", "Walidacja manifestów Claude Plugin"),
     ("validate_secrets.py", "Skan sekretów i plików wrażliwych"),
+    ("validate_docs.py", "Aktualność README i dokumentacji"),
 ]
 
 

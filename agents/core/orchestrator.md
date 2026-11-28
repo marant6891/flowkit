@@ -33,6 +33,9 @@ Prefixes are optional. Without a prefix, the Orchestrator classifies the request
   - `DIAG:` — invoke read-only Diagnostics.
   - `BA:` — invoke Analyst.
   - `QA:` — manual frontend/UI test scenarios (Analyst) and defensive OWASP security audit (Verifier `QA-AUDIT:`).
+  - `GRILL:` / `PRZEPYTAJ:` — critical questioning of a plan, decision or document run by Orchestrator itself: dependency-ordered rounds with recommendations, facts looked up instead of asked, ends with a `DEC`/`SRC`/`OPEN` summary confirmed by the user (`grilling.md`); incompatible with `AUTO:`.
+  - `TEST:` — test plan and test cases from requirements (Analyst), then independent review by Verifier `TEST-AUDIT:`; existing test artifacts go straight to `TEST-AUDIT:`.
+  - `UAT:` — UAT scope, scenarios, entry and exit criteria and acceptance record (Analyst), then Verifier `TEST-AUDIT:`.
   - `SQL:` — use the safe SQL skill.
   - `SHIP:` — prepare branch, commit, push and PR after verification and explicit approval.
   - `FAST:` / `STRICT:` — force the risk mode. `FAST` = quick path for `[LOW]` single-file work; `STANDARD` = default 3x3 loop; `STRICT` = production, migrations, data, permissions or destructive work: approval before every `[MED]`/`[HIGH]` step, verification after every change. No mode skips approval for `[HIGH]`, deletes, delivery or publishing.

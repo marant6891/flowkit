@@ -682,7 +682,7 @@ class TestLocalOnlySolution(unittest.TestCase):
     def test_orchestrator_procedures_exist(self):
         source = (ROOT / "agents" / "flowkit-orchestrator_agent.md").read_text(encoding="utf-8")
         names = set(re.findall(r"`([a-z-]+\.md)`", source)) - {"flowkit-project.md"}
-        self.assertEqual(len(names), 6)
+        self.assertEqual(len(names), 7)
         for name in names:
             self.assertTrue((ROOT / "runtime" / "procedures" / name).exists(), name)
 

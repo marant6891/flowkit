@@ -109,6 +109,7 @@ Prefixes are optional shortcuts. Without a prefix, classify the request yourself
 | Request is about | Action |
 |---|---|
 | SQL query, database report, analytical report (KPI, trends, period comparison, ranking, cohorts, pivot), data check, INSERT, UPDATE, DELETE | Skill `flowkit-sql-data-assistant` |
+| Stress-test a plan, decision, idea or document by questioning ("przepytaj mnie", "grill me", "podważ ten plan"), no document expected | Grilling (`grilling.md`), run yourself |
 | Idea, concept or problem without ready materials; guided requirements session from idea to target document; resume a workshop | Skill `flowkit-requirements-workshop` (always interactive) |
 | PT, PRD, change specification for a client | Skill `flowkit-client-pt-prd-writer` |
 | Meeting transcript, recap, client e-mail | Skill `flowkit-client-meeting-recap` |
@@ -118,6 +119,8 @@ Prefixes are optional shortcuts. Without a prefix, classify the request yourself
 | Current failure, logs, cluster or container state | Diagnostics |
 | Pipeline, Docker, Kubernetes, IaC files | DevOps, then Validator |
 | Checking configuration files (Terraform, Dockerfile, Helm, Kubernetes YAML, compose, CI) | Validator |
+| Review of existing test plan, test cases or UAT scenarios: coverage, case quality, missing negative or boundary cases | Verifier (`TEST-AUDIT:`) |
+| Test plan or test cases from requirements, UAT preparation | Analyst, then Verifier (`TEST-AUDIT:`) |
 | Requirements, process, impact, backlog, test cases, manual frontend QA, Jira/ADO tickets, UAT | Analyst |
 | Application security / OWASP pentest checklist audit, QA verification | Verifier (`QA-AUDIT:`) |
 | Unknown code, "how does it work", code review | Analyzer |
@@ -162,10 +165,13 @@ Prefixes are optional shortcuts. Without a prefix, classify the request yourself
 | `DIAG:` | invoke Diagnostics for read-only checks of logs, clusters, containers and configuration |
 | `BA:` | invoke Analyst for requirements, process, impact, backlog, test cases or UAT |
 | `QA:` | manual frontend/UI test scenarios (Analyst) and defensive OWASP security audit (Verifier `QA-AUDIT:`) |
+| `TEST:` | test plan and test cases from requirements: Analyst writes `TEST-NNN` linked to `FR`/`US`/`AC`, then Verifier `TEST-AUDIT:` reviews them; on `FAIL` route findings back to Analyst (max 2 attempts). When the user supplies existing test artifacts to review, run `TEST-AUDIT:` only |
+| `UAT:` | user acceptance testing: Analyst prepares scope, scenarios linked to `US`/`AC`, entry and exit criteria and the acceptance record, then Verifier `TEST-AUDIT:` reviews the scenarios |
 | `SQL:` | use skill `flowkit-sql-data-assistant` for safe queries, reports, analytical reports (`ANALYTICS_REPORT`) and data-fix scripts |
+| `GRILL:` / `PRZEPYTAJ:` | critical questioning of a plan, decision, idea or document until a shared understanding: rounds of dependency-ordered questions with recommendations, facts looked up instead of asked, result `DEC`/`SRC`/`OPEN` confirmed by the user. Run it yourself, never delegate. Details: `grilling.md` |
 | `WORKSHOP:` / `WARSZTAT:` | use skill `flowkit-requirements-workshop`: interactive path from idea through business and technical requirements to the target PT/PRD |
 | `SHIP:` | prepare delivery of verified changes: branch, commit, push, PR (see Delivery) |
-| `AUTO:` | run the whole task on recommendations: accept option 1 at every checkpoint (see AUTO mode) |
+| `AUTO:` | run the whole task on recommendations: accept option 1 at every checkpoint (see AUTO mode); not combinable with `GRILL:` |
 | `FAST:` / `STRICT:` | force the risk mode (see Work modes) |
 
 Combinable left-to-right: `PLAN: LOG: task`, `SPEC: PLAN: task`, `AUTO: BA: task`.

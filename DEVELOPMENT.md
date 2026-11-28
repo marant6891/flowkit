@@ -80,6 +80,12 @@ To najważniejsza reguła odróżniająca FlowKit od innych repozytoriów prompt
 - Wersja w formacie `"X.Y"` (np. `"1.0"`).
 - Co najmniej 3 tagi po angielsku.
 - Ostatni etap w `SKILL.md` **musi być etapem weryfikacji** odsyłającym do pliku w `checklists/`.
+- Treść `SKILL.md` ma **najwyżej 500 linii** (zalecenia Anthropic dla skilli). `SKILL.md` wczytuje się w całości
+  przy każdym uruchomieniu, a pliki pomocnicze dopiero wtedy, gdy są potrzebne. Szczegóły używane rzadko (tryby
+  na żądanie, długie przykłady, ściągawki) przenoś do `references/` i linkuj bezpośrednio z `SKILL.md`, bez
+  łańcuchów odnośników między plikami pomocniczymi.
+- Plik w `references/`, `checklists/` lub `examples/` dłuższy niż 100 linii zaczyna się spisem treści
+  („Spis treści” w pierwszych 15 liniach). Obie reguły sprawdza `scripts/validate_skills.py`.
 
 ### 2.4 Szablon klienta ma zawsze pierwszeństwo (User Template Priority)
 Każdy skill generujący dokumenty musi w pierwszym kroku zapytać o szablon klienta/użytkownika (`.docx`, `.md`). Wbudowany szablon w `templates/` jest wyłącznie szablonem zapasowym (*fallback*).

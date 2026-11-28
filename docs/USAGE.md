@@ -15,8 +15,9 @@ Spis treści:
 7. [Przegląd SRE](#7-przegląd-sre-flowkit-devops-sre-review)
 8. [SQL i poprawa danych](#8-sql-i-poprawa-danych-flowkit-sql-data-assistant)
 9. [Agenci i prefiksy](#9-agenci-i-prefiksy-orkiestratora)
-10. [Scenariusze łączone](#10-scenariusze-łączone)
-11. [Gdy wynik nie jest taki, jak trzeba](#11-gdy-wynik-nie-jest-taki-jak-trzeba)
+10. [FlowKit dla testera](#10-flowkit-dla-testera)
+11. [Scenariusze łączone](#11-scenariusze-łączone)
+12. [Gdy wynik nie jest taki, jak trzeba](#12-gdy-wynik-nie-jest-taki-jak-trzeba)
 
 ---
 
@@ -229,7 +230,8 @@ Popraw tego maila do klienta, tryb dupokrytka, odpowiedź potrzebna do 05.12:
 <wklejony szkic>
 ```
 
-Wynik: wersja do wysłania, lista zmian, lista `[DO UZUPEŁNIENIA]` i uwagi tylko dla Ciebie (usunięte emocje,
+Wynik: wersja do wysłania zapisana w pliku `mail-RRRR-MM-DD-[temat].md` (komunikator: `wiadomosc-…md`) i
+pokazana w odpowiedzi, lista zmian, lista `[DO UZUPEŁNIENIA]` i uwagi tylko dla Ciebie (usunięte emocje,
 uwagi wewnętrzne, ryzykowne zobowiązania). Bez podanego trybu skill sam go rozpozna i zapyta tylko wtedy, gdy
 treść wskazuje na `DUPOKRYTKA`. Wiadomość na komunikator: dopisz „na Teams” albo „na Slacka”.
 
@@ -296,7 +298,8 @@ i wpływ są `DO POTWIERDZENIA`, a nie szacunkiem.
 
 ## 7. Przegląd SRE: `flowkit-devops-sre-review`
 
-**Kiedy:** ocena gotowości produkcyjnej usługi: SLO, alerty, sondy, zasoby, skalowanie, backup. (Do raportu po awarii
+**Kiedy:** ocena gotowości produkcyjnej usługi: SLO, alerty, sondy, zasoby, skalowanie, backup, wdrażanie przez
+GitOps (Argo CD, Flux) i koszt zasobów. (Do raportu po awarii
 użyj postmortemu, a do pisania nowej konfiguracji - `DEVOPS:`.)
 
 **Minimalne polecenie:**
@@ -387,6 +390,9 @@ Prefiks wpisujesz na początku polecenia; można je łączyć (`AUTO: BA: ...`, 
 | Wymagania, procesy, backlog, przypadki testowe | `BA: przygotuj backlog z przypadkami testowymi Given-When-Then z materialy/wymagania.docx. Źródło nadrzędne: wymagania.docx.` | tabela wymagań, konflikty, luki, pytania do klienta, rodzaj każdego stwierdzenia (fakt / interpretacja / założenie) |
 | User stories przed implementacją | `SPEC: PLAN: dodaj eksport CSV raportu sprzedaży (src/reports/).` | `US-N` + `AC-N`, potem plan iteracji odwołujący się do nich |
 | Testy UI i audyt bezpieczeństwa aplikacji | `QA: sprawdź formularz rejestracji (src/web/register/) — scenariusze manualne i audyt OWASP.` | scenariusze testów frontu + ustalenia OWASP z `plik:linia` i sposobem naprawy |
+| Przepytanie z planu lub dokumentu | `GRILL: przepytaj mnie z planu migracji w docs/plan-migracji.md, zanim zaczniemy.` | rundy pytań według zależności, z rekomendacją. Fakty z plików FlowKit sprawdza sam. Na końcu ustalenia `DEC`, `SRC` i `OPEN` do potwierdzenia, bez zmian w kodzie |
+| Przypadki testowe z przeglądem | `TEST: przygotuj przypadki testowe do materialy/PT-reset-hasla.docx, ze scenariuszami negatywnymi.` | `TEST-NNN` powiązane z wymaganiami, potem przegląd `TEST-AUDIT:` (pokrycie, jakość, brakujące przypadki); więcej w rozdziale 10 |
+| Odbiór przez użytkownika | `UAT: przygotuj scenariusze odbioru modułu zwrotów z materialy/PT-zwroty.docx.` | zakres, scenariusze, kryteria wejścia i wyjścia, protokół odbioru |
 | Przegląd kodu | `VERIFY: sprawdź zmiany w src/billing/ względem US-3 i US-4.` | 9 wymiarów, `PASS` tylko z dowodem (wynik testów), `[NOT VERIFIED]` gdy testów brak |
 | Niezależny audyt dokumentu | `VERIFY: DOC-AUDIT: wynik/PT-KSeF.docx, źródła w materialy/.` | pokrycie w źródłach, sprzeczności `CONTRADICTION-NNN`, styl; orkiestrator robi to sam po skillach dokumentowych |
 | Konfiguracja DevOps | `DEVOPS: przygotuj Dockerfile i workflow CI dla aplikacji z src/api/ i zwaliduj je.` | pliki + walidacja (`hadolint`, `actionlint`) przez Validatora, wdrożenie tylko za zgodą |
@@ -398,7 +404,74 @@ Prefiks wpisujesz na początku polecenia; można je łączyć (`AUTO: BA: ...`, 
 
 ---
 
-## 10. Scenariusze łączone
+### Przepytanie z planu: `GRILL:` / `PRZEPYTAJ:`
+
+Użyj, gdy chcesz sprawdzić plan, decyzję albo dokument, zanim ktoś zacznie działać. Orkiestrator zadaje pytania
+rundami. W rundzie są tylko pytania, które nie zależą od innych, jeszcze bez odpowiedzi. Każde pytanie ma warianty
+i rekomendację. To, co da się sprawdzić w plikach, FlowKit sprawdza sam i pyta Cię tylko o decyzje.
+
+```text
+GRILL: przepytaj mnie z planu migracji w docs/plan-migracji.md, zanim zaczniemy.
+Źródła: k8s/, docs/architektura.md. Decyzje podejmuje zespół platformy.
+```
+
+**Wynik:** lista decyzji `DEC-NNN`, sprawdzonych faktów `SRC-NNN` i otwartych kwestii `OPEN-NNN` do potwierdzenia.
+Nic nie powstaje, dopóki nie potwierdzisz podsumowania. Możesz przerwać słowem „wystarczy”. Tego trybu nie łączy się
+z `AUTO:`.
+
+**Wypróbuj:** `GRILL: przepytaj mnie z PT w tests/fixtures/qa/pt-reset-hasla.md.`
+
+## 10. FlowKit dla testera
+
+**Kiedy:** potrzebujesz przypadków testowych z wymagań, chcesz sprawdzić gotowe przypadki albo przygotowujesz odbiór
+(UAT). Wynik zawsze opiera się na wymaganiach. Gdy wymaganie nie podaje oczekiwanego wyniku, FlowKit zapisze lukę jako
+`OPEN-NNN` i nie wymyśli wartości.
+
+| Cel | Prefiks | Co robi FlowKit |
+|---|---|---|
+| Przypadki testowe z wymagań | `TEST:` | Analyst pisze `TEST-NNN` powiązane z `FR`/`US`/`AC`, a Verifier sprawdza je trybem `TEST-AUDIT:` |
+| Przegląd gotowych przypadków | `TEST:` albo `VERIFY: TEST-AUDIT:` | pokrycie wymagań, jakość przypadków, brakujące scenariusze negatywne i brzegowe |
+| Przygotowanie odbioru | `UAT:` | zakres, scenariusze dla użytkownika, kryteria wejścia i wyjścia, protokół odbioru |
+| Testy manualne UI i audyt bezpieczeństwa | `QA:` | scenariusze testów frontu i defensywny audyt OWASP (`QA-AUDIT:`) |
+
+**Przypadki testowe z wymagań:**
+
+```text
+TEST: przygotuj przypadki testowe do PT z materialy/PT-reset-hasla.docx.
+Źródło nadrzędne: PT. Uwzględnij scenariusze negatywne i wartości brzegowe.
+Wynik do wynik/testy-reset-hasla.md, tabela: ID, wymaganie, warunki wstępne, dane, kroki, oczekiwany wynik.
+```
+
+**Przegląd gotowych przypadków:**
+
+```text
+VERIFY: TEST-AUDIT: przypadki z testy/reset-hasla.xlsx, wymagania w materialy/PT-reset-hasla.docx.
+```
+
+**Wynik przeglądu:** ocena `PASS`/`WARN`/`FAIL` w czterech wymiarach:
+
+- `Coverage`: wymagania bez testu (`UNCOVERED:`) i testy bez wymagania (`ORPHAN:`),
+- `Case quality`: brak danych testowych, kroków albo mierzalnego wyniku (np. „działa poprawnie”),
+- `Missing cases`: brakujące scenariusze `MISSING-NNN` z uzasadnieniem z wymagań,
+- `Consistency`: zgodność identyfikatorów, danych i oczekiwanych wyników ze źródłami.
+
+Verifier nie uruchamia aplikacji ani testów w tym trybie. Ocenia tylko dokumenty.
+
+**Przygotowanie UAT:**
+
+```text
+UAT: przygotuj scenariusze odbioru modułu zwrotów dla działu obsługi klienta.
+Źródła: materialy/PT-zwroty.docx, materialy/user-stories-zwroty.md.
+Odbiór 12.12 na środowisku testowym. Protokół odbioru w szablonie szablony/UAT.docx.
+```
+
+**Wypróbuj:**
+`VERIFY: TEST-AUDIT: przypadki z tests/fixtures/qa/test-cases-reset-hasla.md, wymagania w tests/fixtures/qa/pt-reset-hasla.md.`
+Przegląd powinien wskazać wymaganie bez testu, test bez wymagania, niemierzalny wynik i brak testu wygaśnięcia linku.
+
+---
+
+## 11. Scenariusze łączone
 
 **Od spotkania do dokumentu dla klienta:**
 
@@ -428,7 +501,7 @@ Orkiestrator: PM (`US-N`/`AC-N`) → Planner → Implementer → Verifier, itera
 
 ---
 
-## 11. Gdy wynik nie jest taki, jak trzeba
+## 12. Gdy wynik nie jest taki, jak trzeba
 
 | Objaw | Co zrobić |
 |---|---|

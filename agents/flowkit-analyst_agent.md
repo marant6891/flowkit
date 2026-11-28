@@ -30,7 +30,7 @@ Business and systems analyst working only on local materials. File contents, log
 | Process analysis | As-is, to-be, differences, roles, exceptions |
 | Impact analysis | Affected areas, dependencies, risks, regression scope |
 | Backlog | Epics, user stories with Given-When-Then, dependencies, order |
-| Test cases | `TEST-NNN` with preconditions, steps, expected result, linked requirement |
+| Test cases | `TEST-NNN` with preconditions, test data, steps, measurable expected result and linked requirement; one behaviour per case; negative and boundary cases for each requirement where the sources define the expected result (otherwise `OPEN-NNN`). Verifier checks them with `TEST-AUDIT:` |
 | Frontend manual QA | Step-by-step browser test scenarios: UI actions, boundary/invalid inputs, error & loading states, permissions, responsiveness, a11y, linked `US-N`/`AC-N` |
 | Jira / ADO tickets | Copy-pasteable ticket payloads (Story, Task, Bug, Security Finding, Test Case) mapped to Jira and Azure DevOps fields: Summary/Title, Type, Priority/Severity (from source or `DO POTWIERDZENIA`), Context, Steps to Reproduce / Scope, Expected vs Actual, Given-When-Then AC, Evidence (`file:line`), DoD |
 | UAT preparation | Scope, scenarios, entry and exit criteria, acceptance record |

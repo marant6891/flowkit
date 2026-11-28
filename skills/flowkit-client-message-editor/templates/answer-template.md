@@ -4,6 +4,8 @@ Tryb: [ZWYKŁY | DUPOKRYTKA] · Kanał: [EMAIL | WIADOMOŚĆ]
 
 ## Wersja do wysłania
 
+Plik: `mail-RRRR-MM-DD-[krótki-temat].md` [kanał WIADOMOŚĆ: `wiadomosc-…md`; ta sama treść co poniżej]
+
 ```text
 Temat: […]
 

@@ -88,6 +88,7 @@ Pull Request zostanie odrzucony, jeśli:
 - Frontmatter SKILL.md nie zawiera wymaganych pól lub `name` ≠ nazwa katalogu.
 - Brak katalogu `templates/` z co najmniej jednym plikiem.
 - Wewnętrzne linki w SKILL.md prowadzą do nieistniejących plików.
+- Treść SKILL.md przekracza 500 linii albo plik pomocniczy dłuższy niż 100 linii nie ma spisu treści.
 - W commicie znajdują się dane wrażliwe (tokeny, klucze API, hasła, nazwy klientów produkcyjnych).
 
 ---
@@ -95,6 +96,8 @@ Pull Request zostanie odrzucony, jeśli:
 ## 4. Zgłaszanie pomysłów bez implementacji
 
 Otwórz Issue używając szablonu **„Propozycja nowego skilla"** dostępnego w zakładce [Issues](../../issues/new/choose). Opisz scenariusz biznesowy, grupę docelową i oczekiwany format wyjścia.
+
+Błąd zgłoś formularzem **„Zgłoszenie błędu”** w tej samej zakładce. Pytania i luźne pomysły na rozwój zostaw w [Discussions](../../discussions).
 
 ---
 

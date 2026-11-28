@@ -27,8 +27,17 @@
 - [ ] Backup ma harmonogram i retencję; jest dowód testu odtworzenia (bez niego najwyżej `UNKNOWN`).
 - [ ] RPO/RTO są zdefiniowane i zgodne z konfiguracją backupu.
 
-## Koszt
+## GitOps (Argo CD, Flux)
+- [ ] Produkcja nie synchronizuje się automatycznie bez kontroli albo materiały opisują, kto zatwierdza zmianę.
+- [ ] `prune` i `selfHeal` (Argo CD) lub `prune` i `interval` (Flux) są ustawione świadomie; dryf jest wykrywany i widoczny.
+- [ ] Źródło wdrożenia wskazuje tag lub commit, a nie ruchomą gałąź; wersja obrazu nie jest `latest`.
+- [ ] Health checks obejmują zasoby usługi; jest opisana ścieżka wycofania (rollback do poprzedniej wersji w repozytorium).
+
+## Koszt (FinOps)
 - [ ] requests nie są wielokrotnie wyższe od zużycia; repliki i limity są uzasadnione obciążeniem.
+- [ ] Środowiska nieprodukcyjne mają skalowanie w dół poza godzinami pracy albo uzasadnienie pracy ciągłej.
+- [ ] Zasoby mają etykiety przypisujące koszt (zespół, usługa, środowisko).
+- [ ] Oszczędności wynikają z danych o zużyciu; bez danych rekomendacja nie podaje kwoty.
 
 ## Przed oddaniem
 - [ ] Każde ustalenie ma dowód (`plik:linia`, alert, opis) albo status `UNKNOWN`.

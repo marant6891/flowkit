@@ -1,5 +1,11 @@
 # Historia zmian skilla flowkit-client-message-editor
 
+## 1.2 (27.11.2026)
+
+- Wersja do wysłania trafia do pliku Markdown: `mail-RRRR-MM-DD-[krótki-temat].md` (komunikator:
+  `wiadomosc-…md`), tylko treść dla klienta, bez nadpisywania istniejących plików (zasada 12). `check_message.py`
+  sprawdza ten plik; odpowiedź podaje ścieżkę pliku.
+
 ## 1.1 (26.11.2026)
 
 - Prosty język PL i EN według standardu FlowKit (`runtime/procedures/plain-language.md`): zasada 11, nowe sekcje

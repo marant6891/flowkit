@@ -9,7 +9,7 @@ skills:
       - Zrób dokumentację change requestu w szablonie klienta.
       - Przygotuj projekt techniczny tej modyfikacji aplikacji.
     should_not_trigger:
-      - Napraw błąd walidacji w pliku orders.py.
+      - Sprawdź pokrycie wymagań w tych przypadkach testowych i wskaż brakujące scenariusze negatywne.
       - Podsumuj to spotkanie w mailu do klienta.
       - Przygotuj raport postmortem z awarii bazy danych.
       - Mam tylko luźny pomysł na aplikację, przeprowadź mnie krok po kroku przez wymagania.

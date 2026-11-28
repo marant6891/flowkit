@@ -1,13 +1,14 @@
 ---
 name: flowkit-devops-sre-review
-version: "1.2"
-tags: [devops, sre, observability, slo, reliability, kubernetes, monitoring, backup]
+version: "1.3"
+tags: [devops, sre, observability, slo, reliability, kubernetes, monitoring, backup, gitops, finops]
 description: >
   Przegląd niezawodności usługi według praktyk SRE na podstawie dostarczonych
   manifestów, konfiguracji monitoringu, alertów, dashboardów i opisu architektury:
   SLI/SLO i error budget, jakość alertów (alert fatigue), metryki RED/USE, sondy
   health/readiness/liveness, requests i limits, HPA i PDB, zachowanie przy
-  awarii, backup i odtwarzanie (RPO/RTO) oraz koszt zasobów. Zwraca zwięzły raport
+  awarii, backup i odtwarzanie (RPO/RTO), wdrażanie przez GitOps (Argo CD, Flux)
+  oraz koszt zasobów. Zwraca zwięzły raport
   z ustaleniami opartymi na plikach i rekomendacjami z sygnałem, progiem i
   uzasadnieniem. Użyj, gdy użytkownik prosi o przegląd SRE, ocenę gotowości
   produkcyjnej, SLO, alertów, monitoringu, sond, limitów zasobów, skalowania lub
@@ -76,7 +77,8 @@ Przejdź tylko obszary, których dotyczą materiały. Kryteria: [checklista SRE]
 | Zasoby | requests i limits dla CPU i pamięci, relacja do zużycia, klasa QoS |
 | Skalowanie i awaria | HPA (metryka, min/max), PDB, liczba replik, rozkład na strefy, graceful shutdown |
 | Dane | backup, retencja, test odtworzenia, RPO/RTO względem wymagań |
-| Koszt | zasoby zarezerwowane a wykorzystane, nadmiarowe repliki lub limity |
+| GitOps (Argo CD, Flux) | gdy są manifesty `Application`, `Kustomization` lub `HelmRelease`: automatyczna synchronizacja a ręczne zatwierdzanie dla produkcji, `prune` i `selfHeal`, health checks, wykrywanie dryfu, przypięta wersja źródła (tag lub commit, nie gałąź), ścieżka wycofania |
+| Koszt (FinOps) | zasoby zarezerwowane a wykorzystane, nadmiarowe repliki lub limity, środowiska nieprodukcyjne działające bez przerwy, brak etykiet przypisujących koszt (zespół, usługa, środowisko); oszczędność podawaj tylko z danych o zużyciu, bez szacunków kwotowych |
 
 # Etapy pracy
 

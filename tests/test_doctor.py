@@ -213,6 +213,20 @@ class TestInstalledAgents(TempHome):
         self.assertEqual(error.status, doctor.ERROR)
         self.assertIn("-AgentName all" if os.name == "nt" else "agent all", error.fix)
 
+    def test_stale_vscode_agents_hint_names_the_agent_directory(self):
+        agents = self.dir / "projekt" / ".github" / "agents"
+        agents.mkdir(parents=True)
+        (agents / "flowkit-analyst.agent.md").write_text("---\ntools:\n- read\n---\n<!-- FlowKit 1.7.0 · x -->\n",
+                                                          encoding="utf-8")
+        with mock.patch.object(doctor, "agent_dirs", return_value=[agents]), self.home():
+            checks = doctor.check_agents()
+        stale = next(c for c in checks if c.fix and "vscode" in c.fix)
+        self.assertIn("1.7.0", stale.detail)
+        if os.name == "nt":
+            self.assertIn(f'-AgentTargetPath "{agents}"', stale.fix)
+        else:
+            self.assertIn(str(agents.parent.parent), stale.fix)
+
     def test_stale_installer_runtime_and_double_install_are_reported(self):
         runtime = self.dir / ".claude" / "flowkit" / "runtime"
         runtime.mkdir(parents=True)

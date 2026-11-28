@@ -213,11 +213,12 @@ def check_installation() -> list[Check]:
 def reinstall_hint(directory: Path) -> str:
     """Polecenie ponownej instalacji agentów i runtime dla katalogu, w którym leżą agenci."""
     vscode = directory.parent.name == ".github"
-    script = r"<repozytorium FlowKit>\scripts\install.ps1" if os.name == "nt" else "<repozytorium FlowKit>/scripts/install.sh"
+    platform = "vscode" if vscode else "claude"
     if os.name == "nt":
-        command = f"{script} -AgentName all -Platform {'vscode' if vscode else 'claude'} -Force"
-    else:
-        command = f"{script} agent all --platform {'vscode' if vscode else 'claude'} --force"
+        command = rf"<repozytorium FlowKit>\scripts\install.ps1 -AgentName all -Platform {platform} -Force"
+        # Pełna ścieżka: polecenie działa z dowolnego katalogu, a runtime trafia obok agentów (.github/flowkit).
+        return command + (f' -AgentTargetPath "{directory}"' if vscode else "")
+    command = f"<repozytorium FlowKit>/scripts/install.sh agent all --platform {platform} --force"
     return command + (f" (uruchom w katalogu projektu {directory.parent.parent})" if vscode else "")
 
 

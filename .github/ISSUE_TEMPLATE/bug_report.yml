@@ -1,0 +1,90 @@
+name: Zgłoszenie błędu
+description: Coś w FlowKit działa inaczej, niż powinno (skill, agent, executor, instalacja).
+title: "[BŁĄD] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Dziękujemy za zgłoszenie. Nie wklejaj danych klientów, haseł, tokenów ani treści poufnych dokumentów.
+        Zastąp je opisem albo fikcyjnym przykładem. Podatności bezpieczeństwa zgłaszaj prywatnie według `SECURITY.md`.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Czego dotyczy błąd
+      options:
+        - Skill (podaj nazwę niżej)
+        - Agent lub orkiestrator (prefiks, routing, okno pytań)
+        - Executor lub hook (flowkit_exec.py, guard_bash.py, plik zgód)
+        - Instalacja lub doctor
+        - Dokumentacja
+        - Inne
+    validations:
+      required: true
+
+  - type: input
+    id: component
+    attributes:
+      label: Skill, agent albo prefiks
+      placeholder: "np. flowkit-client-pt-prd-writer 3.7, TEST-AUDIT:, GRILL:"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Środowisko
+      options:
+        - Claude Code (wtyczka)
+        - Claude Code (instalacja ręczna)
+        - VS Code (GitHub Copilot)
+        - Inne
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Wersja FlowKit
+      description: Wynik `doctor` albo wersja z `.claude-plugin/plugin.json`.
+      placeholder: np. 1.8.0
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Kroki do odtworzenia
+      description: Polecenie, które wpisałeś, i materiały, na których pracował FlowKit (opis albo fikcyjny przykład).
+      placeholder: |
+        1. Polecenie: TEST: przygotuj przypadki testowe do tests/fixtures/qa/pt-reset-hasla.md
+        2. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Oczekiwany wynik
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Rzeczywisty wynik
+      description: Fragment odpowiedzi, komunikat błędu albo wynik `doctor`. Usuń dane poufne.
+      render: text
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Sprawdzenie przed wysłaniem
+      options:
+        - label: Zgłoszenie nie zawiera danych klientów, haseł ani tokenów.
+          required: true
+        - label: Sprawdziłem, że podobne zgłoszenie jeszcze nie istnieje.
+          required: true

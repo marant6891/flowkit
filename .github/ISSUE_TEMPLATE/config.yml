@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Pytania i pomysły (Discussions)
+    url: https://github.com/marant6891/flowkit/discussions
+    about: Pytania o użycie FlowKit, pomysły na rozwój i wymiana doświadczeń.
+  - name: Podatność bezpieczeństwa
+    url: https://github.com/marant6891/flowkit/security/policy
+    about: Zgłoś prywatnie, nie w publicznym zgłoszeniu.

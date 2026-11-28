@@ -108,3 +108,29 @@ cases:
     must_contain: ['21\.11', '9\.12', '2\.12', '(?i)current']
     must_not_contain: ['(?i)hope this email finds you', '(?i)in the attachment I send', '(?i)actual version', '(?i)according to me', '(?i)basing on', '(?i)eventually we can', '(?i)leverage', '(?i)circle back', '(?i)going forward', '(?i)prior to', '—']
 
+
+  # Testerzy: przegląd przypadków testowych (TEST-AUDIT:) i przypadki z wymagań (TEST:).
+  - id: test-audit-gaps
+    target: flowkit-verifier
+    fixture: qa/test-cases-reset-hasla.md
+    prompt: "TEST-AUDIT: przypadki z tests/fixtures/qa/test-cases-reset-hasla.md, wymagania w tests/fixtures/qa/pt-reset-hasla.md."
+    evidence: ["TEST-002", "Reset działa poprawnie", "TEST-004", "FR-009"]
+    must_contain: ['(?i)UNCOVERED:.*FR-003', '(?i)ORPHAN:.*TEST-004', 'TEST-002', 'MISSING-\d{3}', '(?i)30 min', '\[FAIL\]', 'Coverage']
+    must_not_contain: ['(?i)uruchomi(łem|łam) testy', '(?i)tests? passed', 'Overall: PASS']
+
+  - id: test-cases-from-pt
+    target: flowkit-analyst
+    fixture: qa/pt-reset-hasla.md
+    prompt: "TEST: przygotuj przypadki testowe do tego PT, ze scenariuszami negatywnymi i wartościami brzegowymi."
+    evidence: ["FR-002", "30 minut", "FR-003", "od 12 do 64 znaków", "Jeśli konto istnieje, wysłaliśmy link"]
+    must_contain: ['TEST-\d{3}', 'FR-002', 'FR-003', 'FR-004', '\b(11|65)\b', '(?i)wygas', 'Coverage:']
+    must_not_contain: ['(?i)działa poprawnie', '(?i)\b(SMS|kod 2FA|captcha)\b']
+
+  # Grilling: pierwsza runda pyta tylko o decyzje; faktów z materiału nie zadaje jako pytań i niczego nie rozstrzyga sama.
+  - id: grill-first-round
+    target: flowkit-orchestrator
+    fixture: qa/pt-reset-hasla.md
+    prompt: "GRILL: przepytaj mnie z tego PT, zanim przekażę go zespołowi."
+    evidence: ["30 minut", "od 12 do 64 znaków", "RISK-001"]
+    must_contain: ['Q-\d{3}', '(?i)rekomendowane', 'Ask: (window|text)']
+    must_not_contain: ['(?i)jak długo.{0,40}link.{0,40}ważny', '(?i)ile znaków.{0,40}hasło', 'DEC-\d{3}', '(?i)zaimplementowa(łem|łam)']

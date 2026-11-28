@@ -382,7 +382,8 @@ widoków ani tabel raportowych.
 
 ## 9. Agenci i prefiksy orkiestratora
 
-Prefiks wpisujesz na początku polecenia; można je łączyć (`AUTO: BA: ...`, `SPEC: PLAN: ...`).
+Prefiks wpisujesz na początku polecenia; można je łączyć (`AUTO: BA: ...`, `SPEC: PLAN: ...`). Prefiksy polskie i angielskie
+są równoważne: `WARSZTAT:` = `WORKSHOP:`, `PRZEPYTAJ:` = `GRILL:`.
 
 | Cel | Polecenie | Wynik |
 |---|---|---|
@@ -393,6 +394,7 @@ Prefiks wpisujesz na początku polecenia; można je łączyć (`AUTO: BA: ...`, 
 | Przepytanie z planu lub dokumentu | `GRILL: przepytaj mnie z planu migracji w docs/plan-migracji.md, zanim zaczniemy.` | rundy pytań według zależności, z rekomendacją. Fakty z plików FlowKit sprawdza sam. Na końcu ustalenia `DEC`, `SRC` i `OPEN` do potwierdzenia, bez zmian w kodzie |
 | Przypadki testowe z przeglądem | `TEST: przygotuj przypadki testowe do materialy/PT-reset-hasla.docx, ze scenariuszami negatywnymi.` | `TEST-NNN` powiązane z wymaganiami, potem przegląd `TEST-AUDIT:` (pokrycie, jakość, brakujące przypadki); więcej w rozdziale 10 |
 | Odbiór przez użytkownika | `UAT: przygotuj scenariusze odbioru modułu zwrotów z materialy/PT-zwroty.docx.` | zakres, scenariusze, kryteria wejścia i wyjścia, protokół odbioru |
+| Jak działa nieznany kod | `ANALYZE: jak działa naliczanie rabatów w src/billing/?` | opis działania i zależności z `plik:linia`, fakty oddzielone od hipotez, lista tego, czego nie sprawdzono |
 | Przegląd kodu | `VERIFY: sprawdź zmiany w src/billing/ względem US-3 i US-4.` | 9 wymiarów, `PASS` tylko z dowodem (wynik testów), `[NOT VERIFIED]` gdy testów brak |
 | Niezależny audyt dokumentu | `VERIFY: DOC-AUDIT: wynik/PT-KSeF.docx, źródła w materialy/.` | pokrycie w źródłach, sprzeczności `CONTRADICTION-NNN`, styl; orkiestrator robi to sam po skillach dokumentowych |
 | Konfiguracja DevOps | `DEVOPS: przygotuj Dockerfile i workflow CI dla aplikacji z src/api/ i zwaliduj je.` | pliki + walidacja (`hadolint`, `actionlint`) przez Validatora, wdrożenie tylko za zgodą |
@@ -400,6 +402,7 @@ Prefiks wpisujesz na początku polecenia; można je łączyć (`AUTO: BA: ...`, 
 | Najpierw plan | `DRY: zmień limit pamięci w k8s/payments/deployment.yaml na 1Gi.` | plan do 3 kroków, czeka na potwierdzenie |
 | Dostarczenie | `SHIP: przygotuj PR ze zweryfikowanych zmian.` | gałąź, commit, push, PR - po weryfikacji i Twojej zgodzie |
 | Całość bez pytań | `AUTO: ...` | praca na rekomendacjach + lista przyjętych decyzji do potwierdzenia |
+| Szybka, drobna zmiana | `FAST: popraw literówkę w komunikacie w src/web/login.html.` | zmiana i jej sprawdzenie bez subagentów, jedno podsumowanie; przy wątpliwości FlowKit przechodzi na tryb standardowy |
 | Produkcja, migracje, uprawnienia | `STRICT: ...` | zgoda przed każdym ryzykownym krokiem, weryfikacja po każdej zmianie, plan wycofania |
 
 ---

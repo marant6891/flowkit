@@ -400,7 +400,7 @@ Problem spoza tabeli zgłoś formularzem [Zgłoszenie błędu](https://github.co
 
 ```bash
 pip install pyyaml python-docx
-python scripts/validate_all.py      # skille, agenci, manifesty i testy jednostkowe (to samo uruchamia CI)
+python scripts/validate_all.py      # skille, agenci, manifesty, aktualność dokumentacji i testy (to samo uruchamia CI)
 python scripts/build_agents.py      # po każdej zmianie agents/*_agent.md
 python scripts/run_evals.py triggers --dry-run   # scenariusze aktywacji skilli
 ```
@@ -432,6 +432,7 @@ offline, że wzorzec przechodzi wszystkie kontrole, a szkic nie.
 - Zmiany tylko przez Pull Request z gałęzi `feat/*`, `fix/*` lub `docs/*`; bezpośredni push do `main` jest zablokowany.
 - Przykłady i dane testowe są fikcyjne; żadnych sekretów ani danych klientów w commitach.
 - Gałąź PR jest usuwana automatycznie po mergu.
+- Dokumentacja musi nadążać za kodem: `scripts/validate_docs.py` (część CI) sprawdza wersję w README, prefiksy orkiestratora, tryby Verifiera, subagentów i skille w README, `docs/USAGE.md` i instrukcjach Copilota oraz martwe linki. Nowy prefiks, agent albo skill bez opisu w dokumentacji zatrzyma PR.
 - Konwencje pracy, commitów i gałęzi: [DEVELOPMENT.md](DEVELOPMENT.md), [CONTRIBUTING.md](CONTRIBUTING.md).
 - Błędy zgłaszaj formularzem [Zgłoszenie błędu](https://github.com/marant6891/flowkit/issues/new/choose), pytania i pomysły w [Discussions](https://github.com/marant6891/flowkit/discussions), podatności prywatnie według [SECURITY.md](SECURITY.md).
 

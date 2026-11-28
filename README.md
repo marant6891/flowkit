@@ -63,6 +63,8 @@ Przygotuj dokument PT na podstawie materiałów z folderu materialy/ w szablonie
 Podsumuj spotkanie z pliku spotkanie.vtt i przygotuj mail do klienta.
 DEVOPS: przygotuj Dockerfile dla aplikacji i zwaliduj go.
 AUTO: BA: przygotuj backlog z przypadkami testowymi z dokumentu wymagania.docx.
+TEST: przygotuj przypadki testowe do PT z materialy/PT-reset-hasla.docx.
+GRILL: przepytaj mnie z planu migracji w docs/plan-migracji.md.
 ```
 
 Orkiestrator sam rozpoznaje rodzaj zadania i wybiera skill lub subagenta. Optymalne polecenia ze wskazaniem źródeł i oczekiwanego wyniku dla każdego skilla: [**FlowKit w praktyce**](docs/USAGE.md). Instalacja dla VS Code Copilot i instalacja ręczna: [Instalacja](#instalacja).
@@ -138,7 +140,7 @@ Nowy skill zaczyna się od wzorca [`skills/_template/`](skills/_template/) - pat
 | **flowkit-planner** | tylko odczyt | Plan iteracji z etykietami ryzyka i szacunkiem pracy |
 | **flowkit-product-owner** | tylko odczyt | User stories, kryteria akceptacji, ADR |
 | **flowkit-implementer** | edycja, testy | Jeden atomowy krok zmiany z samokontrolą diffa |
-| **flowkit-verifier** | tylko odczyt, testy | Weryfikacja kodu w 9 wymiarach (bez testów `[NOT VERIFIED]`), niezależny audyt dokumentów klienckich (`DOC-AUDIT:`), zmian w skillach/agentach (`SKILL-AUDIT:`) defensywny audyt bezpieczeństwa OWASP i testów frontu (`QA-AUDIT:`) oraz przegląd planu i przypadków testowych (`TEST-AUDIT:`) |
+| **flowkit-verifier** | tylko odczyt, testy | Weryfikacja kodu w 9 wymiarach (bez testów `[NOT VERIFIED]`), niezależny audyt dokumentów klienckich (`DOC-AUDIT:`), zmian w skillach/agentach (`SKILL-AUDIT:`), defensywny audyt bezpieczeństwa OWASP i testów frontu (`QA-AUDIT:`) oraz przegląd planu i przypadków testowych (`TEST-AUDIT:`) |
 | **flowkit-devops** | edycja, bez wykonywania poleceń | CI/CD, Docker, Kubernetes, IaC, chmura; polecenia zmieniające środowisko tylko jako propozycja `REQUIRES APPROVAL` |
 | **flowkit-diagnostics** | tylko odczyt | Logi, stan klastra i kontenerów, runbooki |
 | **flowkit-validator** | tylko odczyt, walidatory | Statyczna walidacja Terraform, Dockerfile, compose, Helm, Kubernetes YAML, CI, skryptów i JSON; bez wdrażania i dostępu do klastra |
@@ -390,6 +392,8 @@ Pełna lista zmian: [CHANGELOG.md](CHANGELOG.md).
 | `read-document` odrzucone w audycie `DOC-AUDIT:` | stary runtime bez `read-document` dla roli `verifier` | zainstaluj ponownie agentów i runtime; nie dopisuj poleceń wbudowanych do pliku zgód |
 | w VS Code na liście agentów są `agent-3x3*` | starzy agenci z wersji 1.7 | usuń `.github/agents/agent-3x3*.agent.md` (patrz [Aktualizacja](#aktualizacja-z-wersji-17)) |
 
+Problem spoza tabeli zgłoś formularzem [Zgłoszenie błędu](https://github.com/marant6891/flowkit/issues/new/choose) z wynikiem `doctor`, bez danych klientów.
+
 ---
 
 ## Rozwój i współtworzenie
@@ -419,7 +423,7 @@ offline, że wzorzec przechodzi wszystkie kontrole, a szkic nie.
 
 1. Skopiuj [`skills/_template/`](skills/_template/) do `skills/flowkit-<nazwa>/` (prefiks `flowkit-` jest wymagany).
 2. Zmień `SKILL.template.md` na `SKILL.md` i uzupełnij nagłówek YAML: `name` (równy nazwie katalogu), `version`, `tags` (co najmniej 3), `description`.
-3. Dodaj `CHANGELOG.md`, `templates/` i `checklists/` (co najmniej jeden plik `.md` w każdym), opcjonalnie `examples/` i `references/`.
+3. Dodaj `CHANGELOG.md`, `templates/` i `checklists/` (co najmniej jeden plik `.md` w każdym), opcjonalnie `examples/` i `references/`. Treść `SKILL.md` ma najwyżej 500 linii; rzadziej potrzebne szczegóły przenieś do `references/`. Plik pomocniczy dłuższy niż 100 linii zaczyna się spisem treści.
 4. Dopisz skill do tabeli w sekcji [Skille](#skille), do instalatorów i do `tests/evals/triggers.yaml`.
 5. Uruchom `python scripts/validate_all.py` i zgłoś zmianę przez Pull Request.
 
@@ -427,7 +431,9 @@ offline, że wzorzec przechodzi wszystkie kontrole, a szkic nie.
 
 - Zmiany tylko przez Pull Request z gałęzi `feat/*`, `fix/*` lub `docs/*`; bezpośredni push do `main` jest zablokowany.
 - Przykłady i dane testowe są fikcyjne; żadnych sekretów ani danych klientów w commitach.
+- Gałąź PR jest usuwana automatycznie po mergu.
 - Konwencje pracy, commitów i gałęzi: [DEVELOPMENT.md](DEVELOPMENT.md), [CONTRIBUTING.md](CONTRIBUTING.md).
+- Błędy zgłaszaj formularzem [Zgłoszenie błędu](https://github.com/marant6891/flowkit/issues/new/choose), pytania i pomysły w [Discussions](https://github.com/marant6891/flowkit/discussions), podatności prywatnie według [SECURITY.md](SECURITY.md).
 
 ---
 

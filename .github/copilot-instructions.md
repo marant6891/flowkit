@@ -23,7 +23,7 @@ Activate a skill when the user requests an output that matches the skill's `desc
 - User asks for **documentation of an existing solution** — **end-user help, user guide, manual, quick start, FAQ, admin guide or technical documentation** — based on its **source code**, for a given audience and Word template → `flowkit-client-solution-docs-writer`
 - User pastes a **draft e-mail or chat message to a client** and asks to **improve, soften, shorten or turn it into a written confirmation ("dupokrytka")** → `flowkit-client-message-editor`
 - User asks for a **postmortem, RCA, incident report** → `flowkit-devops-incident-postmortem`
-- User asks for a **reliability or SRE review, SLO, alerts, probes, resource limits, scaling or backup** → `flowkit-devops-sre-review`
+- User asks for a **reliability or SRE review, SLO, alerts, probes, resource limits, scaling, backup, GitOps (Argo CD, Flux) or resource cost** → `flowkit-devops-sre-review`
 - User asks for a **SQL query, database or analytical report (KPI, trends, period comparison, ranking, cohorts), data check, INSERT, UPDATE or DELETE** → `flowkit-sql-data-assistant`
 
 When activating a skill, read the full `SKILL.md` and all files referenced inside it before generating output.
@@ -32,7 +32,9 @@ When activating a skill, read the full `SKILL.md` and all files referenced insid
 
 The `flowkit-orchestrator` agent is the single entry point. It coordinates subagents using a strict 3-step iteration loop:
 - Each iteration: ≤3 steps → summarize → ask user → repeat
-- Supported prefixes: `ANALYZE:` `VERIFY:` `PLAN:` `SPEC:` `DRY:` `LOG:` `DEVOPS:` `DIAG:` `BA:` `SQL:` `SHIP:` `AUTO:` `FAST:` `STRICT:` (whole task on recommendations, no checkpoint stops except high-risk actions). Prefixes are optional: without one the orchestrator selects the action from the request
+- Supported prefixes: `ANALYZE:` `VERIFY:` `PLAN:` `SPEC:` `DRY:` `LOG:` `DEVOPS:` `DIAG:` `BA:` `QA:` `TEST:` `UAT:` `GRILL:`/`PRZEPYTAJ:` `WORKSHOP:`/`WARSZTAT:` `SQL:` `SHIP:` `AUTO:` (whole task on recommendations, no checkpoint stops except high-risk actions; not combinable with `GRILL:` or the workshop) `FAST:` `STRICT:`. Prefixes are optional: without one the orchestrator selects the action from the request
+- Testing: `TEST:` writes test cases linked to requirements and has them reviewed by the verifier (`TEST-AUDIT:` — coverage, case quality, missing negative and boundary cases); `UAT:` prepares user acceptance testing
+- `GRILL:` questions the user about a plan, decision or document in dependency-ordered rounds with recommendations, looks facts up instead of asking, and ends with confirmed decisions (`runtime/procedures/grilling.md`)
 - Subagents (hidden from the agent picker, called by the orchestrator): `flowkit-code-analyzer`, `flowkit-verifier`, `flowkit-planner`, `flowkit-implementer`, `flowkit-devops`, `flowkit-product-owner`, `flowkit-diagnostics`, `flowkit-analyst`, `flowkit-validator`
 
 See [`agents/flowkit-orchestrator_agent.md`](../agents/flowkit-orchestrator_agent.md) for full protocol.

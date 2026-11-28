@@ -11,7 +11,7 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 - `flowkit-client-pt-prd-writer` 3.7: tryby „Dokument końcowy bez dopisków” i AUTO opisane w `references/final-and-auto-modes.md`; `SKILL.md` skrócony z 489 do 447 linii.
 - `validate_skills.py`: `SKILL.md` ma najwyżej 500 linii treści, a pliki w `references/`, `checklists/` i `examples/` dłuższe niż 100 linii zaczynają się spisem treści (zalecenia Anthropic dla skilli).
 - `flowkit-client-message-editor` 1.2: wersja do wysłania trafia do pliku `mail-RRRR-MM-DD-[temat].md` (komunikator: `wiadomosc-…md`), sprawdzanego przez `check_message.py`.
-- `doctor`: przy nieaktualnych agentach w `.githubgents` podpowiedź `install.ps1` zawiera `-AgentTargetPath` z pełną ścieżką, więc działa z dowolnego katalogu.
+- `doctor`: przy nieaktualnych agentach w `.github/agents` podpowiedź `install.ps1` zawiera `-AgentTargetPath` z pełną ścieżką, więc działa z dowolnego katalogu.
 
 ### Dodano
 - **Zgłoszenia na GitHub:** formularz „Zgłoszenie błędu” (`.github/ISSUE_TEMPLATE/bug_report.yml`) z obszarem, wersją, krokami i potwierdzeniem braku danych poufnych; `config.yml` kieruje pytania i pomysły do Discussions, a podatności do `SECURITY.md`.

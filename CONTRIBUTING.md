@@ -97,6 +97,8 @@ Pull Request zostanie odrzucony, jeśli:
 
 Otwórz Issue używając szablonu **„Propozycja nowego skilla"** dostępnego w zakładce [Issues](../../issues/new/choose). Opisz scenariusz biznesowy, grupę docelową i oczekiwany format wyjścia.
 
+Błąd zgłoś formularzem **„Zgłoszenie błędu”** w tej samej zakładce. Pytania i luźne pomysły na rozwój zostaw w [Discussions](../../discussions).
+
 ---
 
 ## 5. Licencja

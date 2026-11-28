@@ -6,6 +6,10 @@ Wszystkie znaczące zmiany w repozytorium. Format zgodny z [Keep a Changelog](ht
 
 ## [Unreleased]
 
+---
+
+## [1.9.0] — 2026-11-28
+
 ### Zmieniono
 - `flowkit-devops-sre-review` 1.3: obszary GitOps (Argo CD, Flux) i FinOps w przeglądzie i checkliście.
 - `flowkit-client-pt-prd-writer` 3.7: tryby „Dokument końcowy bez dopisków” i AUTO opisane w `references/final-and-auto-modes.md`; `SKILL.md` skrócony z 489 do 447 linii.

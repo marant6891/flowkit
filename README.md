@@ -11,7 +11,7 @@ Zasady, na których opiera się całe rozwiązanie:
 - **Praca lokalna i kontrolowana.** Agenci nie korzystają z sieci ani MCP; polecenia uruchamiają tylko przez lokalny executor z listą dozwoloną dla roli.
 - **Decyzje ryzykowne należą do człowieka.** Wdrożenia, usuwanie, commit, push i publikacja zawsze czekają na zgodę.
 
-Wersja: **1.8.0** · Licencja: [MIT](LICENSE) · Historia zmian: [CHANGELOG.md](CHANGELOG.md)
+Wersja: **1.9.0** · Licencja: [MIT](LICENSE) · Historia zmian: [CHANGELOG.md](CHANGELOG.md)
 
 ---
 
@@ -26,9 +26,10 @@ Wersja: **1.8.0** · Licencja: [MIT](LICENSE) · Historia zmian: [CHANGELOG.md](
 7. [Bezpieczeństwo i ograniczenia](#bezpieczeństwo-i-ograniczenia)
 8. [Obsługiwane platformy](#obsługiwane-platformy)
 9. [Instalacja](#instalacja)
-10. [Aktualizacja z wersji 1.7](#aktualizacja-z-wersji-17)
-11. [Rozwiązywanie problemów](#rozwiązywanie-problemów)
-12. [Rozwój i współtworzenie](#rozwój-i-współtworzenie)
+10. [Aktualizacja z wersji 1.8](#aktualizacja-z-wersji-18)
+11. [Aktualizacja z wersji 1.7](#aktualizacja-z-wersji-17)
+12. [Rozwiązywanie problemów](#rozwiązywanie-problemów)
+13. [Rozwój i współtworzenie](#rozwój-i-współtworzenie)
 
 **Praktyczne użycie:** gotowe polecenia dla każdego skilla i agenta (jakie źródła wskazać, jak opisać oczekiwany wynik, co dostaniesz) - [docs/USAGE.md](docs/USAGE.md).
 
@@ -347,6 +348,16 @@ Prompty skilli dla Copilot Chat są w [`.github/prompts/`](.github/prompts/) (np
 
 ---
 
+## Aktualizacja z wersji 1.8
+
+1. Wtyczka: `claude plugin update flowkit@flowkit`. Instalacja przez instalator: zainstaluj ponownie agentów i runtime
+   (`-AgentName all` / `agent all`) oraz zmienione skille: `flowkit-client-pt-prd-writer` (nowy plik
+   `references/final-and-auto-modes.md`) i `flowkit-devops-sre-review`.
+2. Uruchom `doctor`. Wiersz „Agenci” musi pokazać wersję 1.9.0; inna wersja oznacza, że agenci i runtime pochodzą
+   z różnych instalacji.
+3. Nowe możliwości są dostępne od razu: `TEST:`, `UAT:`, `GRILL:` / `PRZEPYTAJ:` i audyt `TEST-AUDIT:`
+   (patrz [docs/USAGE.md](docs/USAGE.md)). Konfiguracja i plik zgód się nie zmieniają.
+
 ## Aktualizacja z wersji 1.7
 
 1. Zainstaluj ponownie agentów i runtime (`-AgentName all`) oraz potrzebne skille - runtime zawiera nowe zabezpieczenia i polecenia.
@@ -366,7 +377,7 @@ Prompty skilli dla Copilot Chat są w [`.github/prompts/`](.github/prompts/) (np
    | `agent-3x3-diagnostics` | `flowkit-diagnostics` |
    | `agent-3x3-validator` | `flowkit-validator` |
 
-   Polecenie startowe to teraz `claude --agent flowkit-orchestrator`. Do czasu usunięcia starzy agenci są nadal chronieni przez hook nowego runtime (zgodność wsteczna tylko w wersji 1.8).
+   Polecenie startowe to teraz `claude --agent flowkit-orchestrator`. Do czasu usunięcia starzy agenci są nadal chronieni przez hook nowego runtime (zgodność wsteczna w wersjach 1.8 i 1.9).
 4. Agenci czytają teraz tylko pliki z katalogu projektu. Materiały z innych miejsc skopiuj do projektu albo ustaw `FLOWKIT_EXTRA_PATHS`.
 5. Polecenia, które agenci mają wykonywać sami (np. budowanie projektu), dopisz do pliku zgód.
 

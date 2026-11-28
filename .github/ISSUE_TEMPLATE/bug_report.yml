@@ -48,7 +48,7 @@ body:
     attributes:
       label: Wersja FlowKit
       description: Wynik `doctor` albo wersja z `.claude-plugin/plugin.json`.
-      placeholder: np. 1.8.0
+      placeholder: np. 1.9.0
     validations:
       required: true
 
